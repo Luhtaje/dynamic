@@ -1,6 +1,6 @@
-cmake_minumum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.24)
 
-set (This Example)
+set (This main)
 
 project (${This} C CXX)
 
@@ -13,11 +13,11 @@ enable_testing()
 add_subdirectory(googletest)
 
 set(Headers
-    main.hpp    
+    Ringbuffer.hpp    
 )
 
 set(Sources
-    main.cpp
+    Ringbuffer.cpp
 )
 
 add_library(${This} STATIC ${Sources} ${Headers})
