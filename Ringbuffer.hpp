@@ -2,18 +2,24 @@
 #define MAIN_HPP
 
 #include <memory>
+#include <vector>
 
-template<typename T>
-using RingBufferSharedPtr = shared_ptr<RingBuffer<T>>;
+//template<template <typename T, typename Allocator = std::allocator<T>> class RingBuffer>
+//using RingBufferSharedPtr = shared_ptr<RingBuffer<T, Allocator>>;
 
-template<typename T> 
+template<typename T, typename Allocator = std::allocator<T>> 
 class RingBuffer
 {
+public:
+   
+    //RingBuffer();
+
+    RingBuffer data();
+    //size_type size();
 
 private:
-
-public:
-
-    RingBufferSharedPtr getBuffer();
+    std::vector <T,Allocator> m_data;
+    size_t m_beginIndex;
+    size_t m_endIndex;
 };
 #endif /*MAIN_HPP*/

@@ -14,10 +14,12 @@ add_subdirectory(googletest)
 
 set(Headers
     Ringbuffer.hpp    
+    TestClass.hpp   
 )
 
 set(Sources
     Ringbuffer.cpp
+    TestClass.cpp
 )
 
 add_library(${This} STATIC ${Sources} ${Headers})
