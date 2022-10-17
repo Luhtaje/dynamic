@@ -4,7 +4,16 @@
         "array": "cpp",
         "vector": "cpp",
         "xstring": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "variant": "cpp",
+        "xhash": "cpp",
+        "xlocale": "cpp",
+        "xmemory0": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "initializer_list": "cpp",
+        "list": "cpp",
+        "xtree": "cpp"
     },
     "C_Cpp.errorSquiggles": "Disabled"
 }

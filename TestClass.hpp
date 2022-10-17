@@ -3,22 +3,26 @@
 
 #include <vector>
 
-template<typename T>
+template<typename T,typename Allocator = std::allocator<T>>
 class TestClass
 {
 public:
-
-    TestClass();
-    
-    T* ptr;
-    int number;
-    private:
-
+    // Some constructor 
+    TestClass(T,Allocator);
+    void foo();
 };
 
-template<typename T>
-TestClass<T>::TestClass(){
+template<typename T, typename Allocator>
+TestClass<T,Allocator>::TestClass(T a, Allocator alloc){
 
 }
+
+template<typename T, typename Allocator>
+void TestClass<T,Allocator>::foo()
+{
+    int i;
+    i++;
+}
+
 
 #endif /*TEST_HPP*/
