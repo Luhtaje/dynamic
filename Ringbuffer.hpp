@@ -5,7 +5,7 @@
 #include <iterator>
 #include <vector>
 #include <algorithm>
-
+¤include <iterator>
 //template<typename T>
 //using RingBufferSharedPtr = shared_ptr<RingBuffer<T, Allocator>>;
 using size_type = size_t;
@@ -72,8 +72,12 @@ public:
     void resize(size_type n, const T& val){
         m_data.resize(n,val);
     }
-
     
+    struct Iterator<T>{
+        using iterator_category = std::
+    }
+
+
 private:
 
     std::vector <T,Allocator> m_data;/*< Underlying vector to store the data in the buffer*/
