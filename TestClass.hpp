@@ -2,7 +2,7 @@
 #define TEST_HPP
 
 #include <vector>
-#include <iostrem>  
+#include <iostream>
 
 /// @brief Clas Template for testing purposes. This is just a test block for doxygen documentation generation. 
 /// @tparam T Class has typename T pointer member
