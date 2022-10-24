@@ -1,0 +1,18 @@
+cmake_minimum_required(VERSION 3.24)
+
+set(This source)
+
+set(Headers
+    Ringbuffer.hpp    
+    TestClass.hpp
+    RawIterator.hpp
+)
+
+set(Sources
+    Ringbuffer.cpp
+    TestClass.cpp
+)
+
+add_library(${This} STATIC ${Sources} ${Headers})
+
+target_include_directories(${This} PUBLIC ${Headers} ${Sources})
