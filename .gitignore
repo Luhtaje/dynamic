@@ -2,3 +2,5 @@ build
 googletest
 html
 latex
+**/.vscode/
+src/TestClass*

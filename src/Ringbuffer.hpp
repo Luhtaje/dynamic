@@ -19,6 +19,9 @@ class RingBuffer
 {
 
 public:
+using iterator = RawIterator<T>;
+using 
+public:
     /// @brief Default constructor.
     RingBuffer() =default;
 
@@ -79,6 +82,10 @@ public:
         m_data.resize(n,val);
     }
     
+    iterator being()
+    {
+        std::vector<T>
+    }
 
 private:
 
