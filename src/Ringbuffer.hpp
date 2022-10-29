@@ -2,14 +2,329 @@
 #define MAIN_HPP
 
 #include <memory>
-#include <iterator>
 #include <vector>
 #include <algorithm>
-#include <iterator>
+
+
+/// @brief Custom iterator class.
+/// @tparam T Type of the element what iterator points to.
+template<class _rBuf>
+class _rBuf_const_iterator
+{
+
+public:
+    using iterator_category = std::random_access_iterator_tag;
+
+    using value_type = typename _rBuf::value_type;
+    using pointer = typename _rBuf::const_pointer;
+    using reference = const value_type&;
+
+public:
+    /// @brief Constructor.
+    /// @param ptr Raw pointer to an element in container of type T.
+    _rBuf_const_iterator(_rBuf* ptr = nullptr){m_ptr = ptr};
+
+    /// @brief default copy constructor.
+    /// @param iterator
+    _rBuf_const_iterator(const _rBuf_const_iterator<_rBuf>& iterator) = default;
+
+    /// Destructor
+    ~_rBuf_const_iterator(){};
+
+    /// @brief Default assingment operator overload.
+    /// @param iterator Source iterator to assign from
+    _rBuf_const_iterator<_rBuf>& operator=(const _rBuf_const_iterator<_rBuf>& iterator) =default;
+
+    /// @brief Custom assingment operator overload.
+    /// @param ptr Raw source pointer to assign from.
+    _rBuf_const_iterator<_rBuf>& operator=(_rBuf* ptr) const
+    {
+        m_ptr = ptr;
+        return (*this);
+    };
+
+    /// @brief Conversion operator, allows iterator to be converted to typename bool.
+    operator bool() const
+    {
+        if(m_ptr)
+            return true;
+        else
+            return false;
+    }
+
+    bool operator==(const _rBuf_const_iterator& other) const
+    {
+        return m_ptr == other.m_ptr;
+    }
+
+    bool operator!=(const _rBuf_const_iterator& other) const
+    {
+        return m_ptr != other.m_ptr;
+    }
+
+    /// @brief Moves iterator forward.
+    /// @param movement Amount of elements to move.
+    _rBuf_const_iterator<_rBuf>& operator+=(const ptrdiff_t& movement)
+    {
+        m_ptr += movement
+        return (*this);    
+    }
+
+    /// @brief Moves iterator backwards.
+    /// @param movement Amount of elements to move.
+    _rBuf_const_iterator<_rBuf>& operator-=(const ptrdiff_t&  movement)
+    {
+        m_ptr -= movement;
+        return (*this);
+    }
+
+    /// @brief Move iterator forward by ony element.
+    _rBuf_const_iterator<_rBuf>& operator++()
+    {
+        ++m_ptr;
+        return (*this);
+    }
+
+    /// @brief Move iterator backward by one element.
+    _rBuf_const_iterator<_rBuf>& operator--()
+    {
+        --m_ptr;
+        return(*this);
+    }
+
+    /// @brief Move iterator forward by one element.
+    /// @param  int empty parameter to guide overload resolution.
+    _rBuf_const_iterator<_rBuf> operator++(int)
+    {
+        auto temp (*this);
+        ++m_ptr;
+        return temp; 
+    }
+
+    /// @brief Move iterator backwards by one element.
+    /// @param  int empty parameter to guide overload resolution.
+    _rBuf_const_iterator<_rBuf> operator--(int)
+    {
+        auto temp (*this);
+        --m_ptr;
+        return temp;
+    }
+
+    /// @brief Move iterator forward by specified amount.
+    /// @param movement Amount of elements to move the iterator.
+    _rBuf_const_iterator<_rBuf> operator+(const int& movement)
+    {
+        auto oldPtr = this->m_ptr;
+        this->m_ptr-=movement;
+        auto temp(*this);
+        this->m_ptr = oldPtr;
+        return temp;
+    }
+
+    /// @brief Gets distance between two iterators.
+    /// @param iterator Iterator to get distance to.
+    /// @return Amount of elements between the iterators.
+    ptrdiff_t operator-(const _rBuf_const_iterator<_rBuf>& iterator)
+    {
+        return std::distance(iterator.getPtr(),this->getPtr());
+    }
+
+    /// @brief Dereference operator.
+    /// @return Object pointed by iterator.
+    _rBuf& operator*()
+    {
+        return *m_ptr;
+    }
+
+    /// @brief Const dereference operator
+    /// @return  Const object pointed by iterator.
+    const _rBuf& operator*() const
+    {
+        return *m_ptr;    
+    }
+
+    /// @brief 
+    /// @return 
+    _rBuf& operator->()
+    {
+        return m_ptr;
+    }
+
+    _rBuf* getPtr()
+    {
+        return m_ptr;
+    }
+
+    const _rBuf* getConstPtr()
+    {
+        return m_ptr;
+    }
+protected:
+    const _rBuf* m_ptr;
+};
+
+
+/// @brief Custom iterator class.
+/// @tparam T Type of the element what iterator points to.
+template<class _rBuf>
+class _rBuf_iterator
+{
+
+public:
+    using iterator_category = std::random_access_iterator_tag;
+    using base = _rBuf_const_iterator<_rBuf>;
+
+    using value_type = typename _rBuf::value_type;
+    using pointer = typename _rBuf::const_pointer;
+    using reference = const value_type&;
+
+public:
+    /// @brief Constructor.
+    /// @param ptr Raw pointer to an element in container of type T.
+    _rBuf_iterator(_rBuf* ptr = nullptr){m_ptr = ptr};
+
+    /// @brief default copy constructor.
+    /// @param iterator
+    _rBuf_iterator(const _rBuf_iterator<_rBuf>& iterator) = default;
+
+    /// Destructor
+    ~_rBuf_iterator(){};
+
+    /// @brief Default assingment operator overload.
+    /// @param iterator Source iterator to assign from
+    _rBuf_iterator<_rBuf>& operator=(const _rBuf_iterator<_rBuf>& iterator) =default;
+
+    /// @brief Custom assingment operator overload.
+    /// @param ptr Raw source pointer to assign from.
+    _rBuf_iterator<_rBuf>& operator=(_rBuf* ptr)
+    {
+        m_ptr = ptr;
+        return (*this);
+    };
+
+    /// @brief Conversion operator, allows iterator to be converted to typename bool.
+    operator bool() const
+    {
+        if(m_ptr)
+            return true;
+        else
+            return false;
+    }
+
+    bool operator==(const _rBuf_iterator& other) const
+    {
+        return m_ptr == other.m_ptr;
+    }
+
+    bool operator!=(const _rBuf_iterator& other) const
+    {
+        return m_ptr != other.m_ptr;
+    }
+
+    /// @brief Moves iterator forward.
+    /// @param movement Amount of elements to move.
+    _rBuf_iterator<_rBuf>& operator+=(const ptrdiff_t& movement)
+    {
+        m_ptr += movement
+        return (*this);    
+    }
+
+    /// @brief Moves iterator backwards.
+    /// @param movement Amount of elements to move.
+    _rBuf_iterator<_rBuf>& operator-=(const ptrdiff_t&  movement)
+    {
+        m_ptr -= movement;
+        return (*this);
+    }
+
+    /// @brief Move iterator forward by ony element.
+    _rBuf_iterator<_rBuf>& operator++()
+    {
+        ++m_ptr;
+        return (*this);
+    }
+
+    /// @brief Move iterator backward by one element.
+    _rBuf_iterator<_rBuf>& operator--()
+    {
+        --m_ptr;
+        return(*this);
+    }
+
+    /// @brief Move iterator forward by one element.
+    /// @param  int empty parameter to guide overload resolution.
+    _rBuf_iterator<_rBuf> operator++(int)
+    {
+        auto temp (*this);
+        ++m_ptr;
+        return temp; 
+    }
+
+    /// @brief Move iterator backwards by one element.
+    /// @param  int empty parameter to guide overload resolution.
+    _rBuf_iterator<_rBuf> operator--(int)
+    {
+        auto temp (*this);
+        --m_ptr;
+        return temp;
+    }
+
+    /// @brief Move iterator forward by specified amount.
+    /// @param movement Amount of elements to move the iterator.
+    _rBuf_iterator<_rBuf> operator+(const int& movement)
+    {
+        auto oldPtr = this->m_ptr;
+        this->m_ptr-=movement;
+        auto temp(*this);
+        this->m_ptr = oldPtr;
+        return temp;
+    }
+
+    /// @brief Gets distance between two iterators.
+    /// @param iterator Iterator to get distance to.
+    /// @return Amount of elements between the iterators.
+    ptrdiff_t operator-(const _rBuf_iterator<_rBuf>& iterator)
+    {
+        return std::distance(iterator.getPtr(),this->getPtr());
+    }
+
+    /// @brief Dereference operator.
+    /// @return Object pointed by iterator.
+    _rBuf& operator*()
+    {
+        return *m_ptr;
+    }
+
+    /// @brief Const dereference operator
+    /// @return  Const object pointed by iterator.
+    const _rBuf& operator*() const
+    {
+        return *m_ptr;    
+    }
+
+    /// @brief 
+    /// @return 
+    _rBuf& operator->()
+    {
+        return m_ptr;
+    }
+
+    _rBuf* getPtr()
+    {
+        return m_ptr;
+    }
+
+    const _rBuf* getConstPtr()
+    {
+        return m_ptr;
+    }
+protected:
+    _rBuf* m_ptr;
+};
+
 
 //template<typename T>
 //using RingBufferSharedPtr = shared_ptr<RingBuffer<T, Allocator>>;
-using size_type = size_t;
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
 /// @tparam T type of the ringbuffer
@@ -19,8 +334,15 @@ class RingBuffer
 {
 
 public:
-using iterator = RawIterator<T>;
-using 
+    using value_type = T;
+    using reference = T&;
+    using const_reference= const T&;
+    using difference_type = ptrdiff_t;
+    using size_type = std::size_t;
+
+    using const_iterator = _rBuf_const_iterator<RingBuffer<T>>;
+    //using iterator = _rBuf_iterator<RingBuffer<T>>;
+
 public:
     /// @brief Default constructor.
     RingBuffer() =default;
@@ -80,11 +402,6 @@ public:
     /// @param val Value to initialize new elements to, if N is larger than current container capacity.
     void resize(size_type n, const T& val){
         m_data.resize(n,val);
-    }
-    
-    iterator being()
-    {
-        std::vector<T>
     }
 
 private:

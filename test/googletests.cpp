@@ -16,7 +16,6 @@ TEST(mainframe, copyConstruction){
 
     RingBuffer<int> control(5);
     RingBuffer<int> experiment(control);
-
     EXPECT_EQ(experiment.size(), control.size());
     EXPECT_EQ(sizeof(experiment), sizeof(control));
 }
