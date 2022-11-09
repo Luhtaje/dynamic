@@ -7,7 +7,7 @@
 
 
 /// @brief Custom iterator class.
-/// @tparam T Type of the element what iterator points to.
+/// @tparam _rBuf Ringbuffer class.
 template<class _rBuf>
 class _rBuf_const_iterator
 {
@@ -22,16 +22,22 @@ public:
     //using _Tptr = typename _rBuf::pointer;
 
 public:
+    /// @brief default constructor
+    _rBuf_const_iterator() = default;
+
     /// @brief Constructor.
     /// @param ptr Raw pointer to an element in container of type T.
-    _rBuf_const_iterator(pointer ptr = nullptr){m_ptr = ptr};
+    _rBuf_const_iterator(pointer ptr = nullptr)
+    {
+        m_ptr = ptr;
+    }
 
     /// @brief default copy constructor.
     /// @param iterator
     _rBuf_const_iterator(const _rBuf_const_iterator& iterator) = default;
 
-    /// Destructor
-    ~_rBuf_const_iterator(){};
+    /// Destructor.
+    ~_rBuf_const_iterator() =default;
 
     /// @brief Dereference operator
     /// @return  Object pointed by iterator.
@@ -41,7 +47,7 @@ public:
         return *m_ptr;
     }
 
-    /// @brief Arrow operator
+    /// @brief Arrow operator.
     /// @return pointer.
     pointer operator->() const
     {
@@ -70,7 +76,7 @@ public:
     /// @brief Move iterator backward by one element.
     _rBuf_const_iterator& operator--()
     {
-        //TODO:    check value initialization and "under" begin() decrement
+        //TODO:    check value initialization and "under" begin() decrement.
         --m_ptr;
         return(*this);
     }
@@ -79,42 +85,44 @@ public:
     /// @param  int empty parameter to guide overload resolution.
     _rBuf_const_iterator operator--(int)
     {
-        //TODO:    check value initialization and "under" begin() decrement
+        //TODO:    check value initialization and "under" begin() decrement.
         auto temp (*this);
         --m_ptr;
         return temp;
     }
 
-    void _Verify_offset(const difference_type offset) const
-    {
-        //TODO: test this as well. Thoroughly
-        const auto container = static_cast<const _rBuf *>(_rBuf.m_data);
-        _STL_VERIFY(offset == 0 || m_ptr, "cannot seek value-initialized ringbuffer iterator")
-        if(offset < 0)
-        {
-            _STL_VERIFY(offset >= container->at(0) - m_ptr, "cannot seek ringbuffer iterator before begin");
-        }
-        if(offset > 0)
-        {
-            _STL_VERIFY(offset <= container->at(0) - m_ptr, "cannot seek ringbuffer iterator after end")
-        }
-    }
+    // Part of THE
+    // void _Verify_offset(const difference_type offset) const
+    // {
+    //     //TODO: test this as well. Thoroughly
+    //     const auto container = static_cast<const _rBuf*>(_rBuf.m_data);
+    //     _STL_VERIFY(offset == 0 || m_ptr, "cannot seek value-initialized ringbuffer iterator")
+    //     if(offset < 0)
+    //     {
+    //         _STL_VERIFY(offset >= container->at(0) - m_ptr, "cannot seek ringbuffer iterator before begin");
+    //     }
+    //     if(offset > 0)
+    //     {
+    //         _STL_VERIFY(offset <= container->at(0) - m_ptr, "cannot seek ringbuffer iterator after end")
+    //     }
+
 
     /// @brief Moves iterator forward.
     /// @param movement Amount of elements to move.
     _rBuf_const_iterator& operator+=(difference_type offset)
-    {   _Verify_offset(offset);
+    {
         m_ptr += offset;
         return (*this);
     }
 
+    // "Deprecated" for now, nos apparent use case and causes ambiguous function call with some C++ internal operator+ overload.
     /// @brief Move iterator forward by specified amount.
     /// @param movement Amount of elements to move the iterator.
-    _rBuf_const_iterator operator+(const difference_type offset)
-    {
-        _rBuf_const_iterator temp = *this;
-        return (temp + offset);
-    }
+    // _rBuf_const_iterator operator+(const difference_type offset)
+    // {
+    //     _rBuf_const_iterator temp = *this;
+    //     return (temp + offset);
+    // }
 
     /// @brief Moves iterator backwards.
     /// @param movement Amount of elements to move.
@@ -194,8 +202,7 @@ public:
         return (!(m_ptr < other.m_ptr));
     }
 
-    //Implement _Compat?
-    //Implement _Verify_range?
+    //Implement _Compat? TODO
 
     /// @brief Default assingment operator overload.
     /// @param iterator Source iterator to assign from
@@ -220,12 +227,12 @@ public:
 
     /// @brief Dereference operator.
     /// @return Object pointed by iterator.
-    _rBuf& operator*()
+    reference operator*()
     {
         return *m_ptr;
     }
 
-    const _rBuf* m_ptr;
+    const value_type* m_ptr;
 };
 
 
@@ -244,9 +251,16 @@ public:
     using reference = value_type&;
 
 public:
+
+    _rBuf_iterator()
+    {
+    }
     /// @brief Constructor.
     /// @param ptr Raw pointer to an element in container of type T.
-    _rBuf_iterator(pointer ptr = nullptr){m_ptr = ptr};
+    _rBuf_iterator(pointer ptr = nullptr)
+    {
+        m_ptr = ptr;
+    }
 
     /// @brief default copy constructor.
     /// @param iterator
@@ -254,7 +268,7 @@ public:
 
     /// @brief Conversion constructor
     /// @param const_iterator const iterator to construct from.
-    _rBuf_iterator(_rBuf_const_iterator& const_iterator)
+    _rBuf_iterator(_rBuf_const_iterator<value_type>& const_iterator)
     {
         m_ptr = const_iterator.m_ptr;
     }
@@ -314,36 +328,36 @@ public:
         return temp;
     }
 
-    void _Verify_offset(const difference_type offset) const
-    {
-        //TODO: test this as well. Thoroughly
-        const auto container = static_cast<const _rBuf *>(_rBuf.m_data);
-        _STL_VERIFY(offset == 0 || m_ptr, "cannot seek value-initialized ringbuffer iterator")
-        if(offset < 0)
-        {
-            _STL_VERIFY(offset >= container->at(0) - m_ptr, "cannot seek ringbuffer iterator before begin");
-        }
-        if(offset > 0)
-        {
-            _STL_VERIFY(offset <= container->at(0) - m_ptr, "cannot seek ringbuffer iterator after end")
-        }
-    }
+    //TODO
+    // Part of THE (Tail Head Expansion).
+    // void _Verify_offset(const difference_type offset) const
+    // {
+    //     ASSERT(offset == 0 || m_ptr, "cannot seek value-initialized ringbuffer iterator")
+    //     if(offset < 0)
+    //     {
+    //         ASSERT(offset >= container.begin() - m_ptr, "cannot seek ringbuffer iterator before begin");
+    //     }
+    //     if(offset > 0)
+    //     {
+    //         ASSERT(offset <= container.end() - m_ptr, "cannot seek ringbuffer iterator after end")
+    //     }
+    // }
 
     /// @brief Moves iterator forward.
     /// @param movement Amount of elements to move.
     _rBuf_iterator& operator+=(difference_type offset)
-    {   _Verify_offset(offset);
+    {
         m_ptr += offset;
         return (*this);
     }
-
+    // "Deprecated" for now, no apparent use case and causes ambiguous function call with some C++ internal operator+ overload.
     /// @brief Move iterator forward by specified amount.
     /// @param movement Amount of elements to move the iterator.
-    _rBuf_iterator operator+(const difference_type offset)
-    {
-        _rBuf_iterator temp = *this;
-        return (temp + offset);
-    }
+    // _rBuf_iterator operator+(const difference_type offset)
+    // {
+    //     _rBuf_iterator temp = *this;
+    //     return (temp + offset);
+    // }
 
     /// @brief Moves iterator backwards.
     /// @param movement Amount of elements to move.
@@ -375,7 +389,7 @@ public:
     /// @return 
     reference operator[](const difference_type index) const
     {
-        return (*(*this + index));
+        return *(this->m_ptr + index);
     }
 
     /// @brief Comparison operator== overload
@@ -423,8 +437,7 @@ public:
         return (!(m_ptr < other.m_ptr));
     }
 
-    //Implement _Compat?
-    //Implement _Verify_range?
+    //Implement _Compat? TODO
 
     /// @brief Default assingment operator overload.
     /// @param iterator Source iterator to assign from
@@ -438,7 +451,7 @@ public:
         return (*this);
     };
 
-    /// @brief Conversion operator, allows iterator to be converted to typename bool.
+    /// @brief Conversion operator, allows iterator to be converted to typename bool or "something convertable to bool".
     operator bool() const
     {
         if(m_ptr)
@@ -449,17 +462,17 @@ public:
 
     /// @brief Dereference operator.
     /// @return Object pointed by iterator.
-    _rBuf& operator*()
+    reference operator*()
     {
         return *m_ptr;
     }
 
-    _rBuf* m_ptr;
+    value_type* m_ptr;
 };
 
 
 //template<typename T>
-//using RingBufferSharedPtr = shared_ptr<RingBuffer<T, Allocator>>;
+//using RingBufferSharedPtr = shared_ptr<RingBuffer<value_type>>;
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
 /// @tparam T type of the ringbuffer
@@ -473,12 +486,12 @@ public:
     using allocator_type = Allocator;
     using reference = T&;
     using const_reference= const T&;
-    using pointer = typename Allocator::pointer;
-    using const_pointer= typename Allocator::const_pointer;
+    using pointer = typename T*;
+    using const_pointer= typename const T*;
     using const_iterator = _rBuf_const_iterator<RingBuffer<T>>;
-    //using iterator = _rBuf_iterator<RingBuffer<T>>;
+    using iterator = _rBuf_iterator<RingBuffer<T>>;
 
-    //TODO::are reverse iterators needed? Probably, hard to compete with stl container algorithms without reverse iterator.
+    //TODO::are reverse iterators needed? Probably, hard to compete with stl container algorithms without reverse iterator.Right?
     //using reverse_iterator = reverse_iterator<iterator>;
     //using const_reverse_iterator = const_reverse_iterator<const_iterator>;
 
@@ -491,11 +504,10 @@ public:
 
     /// @brief Default copy constructor.
     /// @param b Buffer to construct from.
-    RingBuffer(const RingBuffer& b){
-        m_data = b.m_data;
-        m_beginIndex = b.m_beginIndex;
-        m_endIndex = b.m_endIndex;
-    }
+    RingBuffer(const RingBuffer& b) =default;
+
+    /// @brief Initializer list contructor.
+    RingBuffer(std::initializer_list<T> init):m_data(init){};
 
     /// @brief Custom constructor.
     /// @param size Size of the buffer to initialize.
@@ -503,55 +515,175 @@ public:
     RingBuffer(size_type size, T val = 0)
     {
         m_data.resize(size);
-
-        for(auto elem : m_data){
-            elem = val;
+        m_endIndex = size;
+        for(std::vector<T>::iterator it = m_data.begin() ; m_data.end() != it; it++) {
+            *it = val;
         }
     }
 
     /// @brief Default move constructor.
     /// @param  RingBuffer&&  Rval reference to a RingBuffer
-    //RingBuffer(RingBuffer&&)=default;
+    RingBuffer(RingBuffer&&) =default;
 
-	
+    /// @brief Default move assignment operator
+    /// @param other Rval ref of RingBuffer
+    /// @return RingBuffer
+    RingBuffer& operator=(RingBuffer&& other) = default;
 
+    /// @brief Default copy assignment operator
+    /// @param other Lval ref of RingBuffer
+    /// @return RingBuffer
+    RingBuffer& operator=(const RingBuffer& other)= default;
+
+    /// @brief Defaut destructor.
     ~RingBuffer()=default;
+
+    /// @brief Contruct iterator at begin.
+    /// @return Iterator pointing to first element.
+    iterator begin() noexcept
+    {
+        return iterator(m_data.data());
+    }
+
+    /// @brief Construct const_iterator at begin.
+    /// @return Const_iterator pointing to first element.
+    const_iterator begin() const noexcept
+    {
+        return const_iterator(m_data.data());
+    }
+
+    /// @brief Construct iterator at end.
+    /// @return Iterator pointing past last element.
+    iterator end() noexcept
+    {
+        return iterator(m_data.data() + m_data.size());
+    }
+
+    /// @brief Construct const_iterator at end.
+    /// @return Const_iterator pointing past last element.
+    const_iterator end() const noexcept
+    {
+        return const_iterator(m_data.data() + m_data.size());
+    }
+
+    /// @brief Construct const_iterator at begin.
+    /// @return Const_iterator pointing to first element.
+    const_iterator cbegin() const noexcept
+    {
+        return const_iterator(m_data.data());
+    }
+
+    /// @brief Construct const_iterator.
+    /// @return Const_iterator pointing past last element.
+    const_iterator cend() const noexcept
+    {
+        return const_iterator(m_data.data() + m_data.size());
+    }
+
+    /// @brief swap contents with another buffer.
+    /// @param other buffer to swap with.
+    void inline swap(RingBuffer& other)
+    {
+        std::swap(m_data, other.m_data);
+        std::swap(m_beginIndex, other.m_beginIndex);
+        std::swap(m_endIndex, other.m_endIndex);
+    }
+
+    //AFAIK this it not meta, and it feels shit. Look into extending std::swap with a specialization. The "temporary" solution for now. TODO
+    static void swap (RingBuffer& lhs, RingBuffer& rhs)
+    {
+        lhs.swap(rhs);
+    }
+
+    reference operator[](const size_type index)
+    {
+        return m_data[index];
+    }
+
+    const_reference operator[](const size_type index) const
+    {
+        return m_data[index];
+    }
 
 	/// @brief Sorts ringbuffer so that logical head matches the first element in physical memory.
     /// @return Pointer to the first element.
+    //To be implemented! Requires knowledge of logical ends which are not implemented yet.
     RingBuffer data();
 
-    /// @brief Gets the size of the underlying container.
+    /// @brief Gets the size of the data container.
     /// @return Size of buffer.
-    size_type size(){
-        return m_data.size();
+    size_type size() const
+    {
+        return std::distance(this->begin(), this->end());
+    }
+
+    size_type max_size() const noexcept
+    {
+        return m_data.max_size();
     }
 
     /// @brief Check if buffer is empty
     /// @return True if buffer is empty
-    bool empty(){
+    bool empty() const noexcept
+    {
         return m_data.empty();
     }
 
-    /// @brief Resizes the container so that it containes n elements.
+    /// @brief Resizes the container so that it contains n elements.
     /// @param n Size to resize to.
-    void resize(size_type n){
+    void resize(size_type n)
+    {
         m_data.resize(n);
     }
 
     /// @brief Resize overload.
     /// @param n Size to resize to.
     /// @param val Value to initialize new elements to, if N is larger than current container capacity.
-    void resize(size_type n, const T& val){
+    void resize(size_type n, const T& val)
+    {
         m_data.resize(n,val);
     }
 
-private:
+    //This bad boi is gonna need some modification. Ideal would be to return rBuf_iterator and not void. This would require explicit emplace implementation or 
+    //learn to convert vector iterator to rbuf iterator
+    void emplace_back(value_type val)
+    {
+        m_data.emplace_back(val);
+    }
 
+private:
     std::vector <T,Allocator> m_data;/*< Underlying vector to store the data in the buffer*/
-    size_t m_beginIndex; /*< Index to the first element in the buffer*/
-    size_t m_endIndex;/*< Index to the last element in the buffer*/
+    size_t m_beginIndex = 0; /*< Index to the first logical element in the buffer. Key part in Tail Head Expansion*/
+    size_t m_endIndex = 0;/*< Index to the last logical element in the buffer. Key part in Tail Head Expansion*/
 
 };
+
+//TODO:
+// Modify to non template friend functions.  https://www.drdobbs.com/the-standard-librarian-defining-iterato/184401331
+// Modify equality operators to compare also logical order. Part of THE.
+
+/// @brief Equality comparator (compare- operator = comparator)
+/// @tparam T Value type
+/// @tparam Alloc Optional custom allocator. Defaults to std::allocator<T>.
+/// @param lhs Left hand side operand
+/// @param rhs right hand side operand
+/// @return returns true if the compared buffers have equal underlying data containers.
+template<typename T , typename Alloc>
+inline bool operator==(const RingBuffer<T,Alloc>& lhs, const RingBuffer<T,Alloc>& rhs)
+{
+    return (lhs.size() == rhs.size()) && std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+/// @brief Not-equal comparator
+/// @tparam T Value type
+/// @tparam Alloc Optional custom allocator. Defaults to std::allocator<T>.
+/// @param lhs Left hand side operand.
+/// @param rhs Right hand side operand.
+/// @return returns true if the compared buffers dont have equal underlying data containers.
+template<typename T,typename Alloc>
+inline bool operator!=(const RingBuffer<T,Alloc>& lhs, const RingBuffer<T,Alloc>& rhs)
+{
+    return !(lhs == rhs);
+}
 
 #endif /*MAIN_HPP*/

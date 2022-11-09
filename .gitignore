@@ -3,4 +3,5 @@ googletest
 html
 latex
 **/.vscode/
+launch.json
 src/TestClass*
