@@ -8,36 +8,147 @@
 
 const static int TEST_SIZE = 10;
 const static int TEST_INT_VALUE = 9;
+/**
+ * @brief The tests for most parts match the named requirements laid out by cppreference. The iterator tests test iterators and const iterators.
+ * There are two sections, iterators and the mainframe which tests the functionality of the RingBuffer.
+ */
 
 //================Iterators=================//
-TEST(iterators, Construction)
-{
-    RingBuffer<int> control= {1,2,3,4,5,6};
-    RingBuffer<int>::iterator bit = control.begin();
-    RingBuffer<int>::const_iterator cbit = control.cbegin();
-    ASSERT_EQ(*bit, 1);
-    ASSERT_EQ(*cbit,1);
-    ++bit;
-    ++cbit;
-    ASSERT_EQ(*bit, 2);
-    ASSERT_EQ(*cbit,2);
+/*
+*Tests the const and non-const iterators for the Ringbuffer.
+*/
 
-    RingBuffer<int>::iterator eit = control.end();
-    RingBuffer<int>::const_iterator ceit = control.cend();
-    --ceit;
-    --eit;
-    ASSERT_EQ(*eit, 6);
+//Control buffer for iterator tests.
+RingBuffer<int> itControl{1,2,3,4,5,6};
+
+class TestClass
+{
+    TestClass() = default;
+
+public:
+    bool foo(){
+        std::cout << "fooo" << std::endl;
+        return true;
+    }
+};
+
+//Tests requirement: DefaultConstructible
+//std::is_default_constructible does not test compilation, so compilation of different construction methods are also tested.
+TEST(iterators, DefaultConstruction)
+{
+    RingBuffer<int>::iterator it;
+    RingBuffer<int>::const_iterator cit;
+
+    RingBuffer<int>::iterator value_it{};
+    RingBuffer<int>::const_iterator value_cit{};
+
+    it = RingBuffer<int>::iterator();
+    cit = RingBuffer<int>::const_iterator();
+
+    EXPECT_EQ(std::is_default_constructible<RingBuffer<int>::iterator>::value, true);
+    EXPECT_EQ(std::is_default_constructible<RingBuffer<int>::const_iterator>::value, true);
 }
 
-
-TEST(iterators, ForwardOperators)
+//Tests requirement: constant_iterator construction from non-const version. Additionally satisfies dereferencing operator.
+TEST(iterators, ConstantConversion)
 {
-    RingBuffer<int> control{1,2,3,4,5,6};
-    RingBuffer<int>::iterator it= control.begin();
-    auto temp = it;
-    it += 4;
-    EXPECT_EQ(*it, temp[4]);
-    EXPECT_NE(*it, *temp);
+    auto it = itControl.begin();
+
+    //Conversion constructor
+    RingBuffer<int>::const_iterator cit(it);
+
+    //Conversion assignment.
+    auto anotherCit = itControl.cbegin();
+    anotherCit = it;
+    EXPECT_EQ(*cit, *it);
+    EXPECT_EQ(*anotherCit, *it);
+    //How to test for failure? TODO
+}
+
+//Tests requirement: contextually convertible to bool. 
+TEST(iterators, ConvertibleToBool)
+{
+    RingBuffer<int>::iterator it; 
+    //Iterator is value-initialized
+    EXPECT_NE(it, true);
+    it = itControl.begin();
+    EXPECT_EQ(it, true);
+
+    RingBuffer<int>::const_iterator cit; 
+    EXPECT_NE(cit, true);
+    cit = itControl.cbegin();
+    EXPECT_EQ(cit, true);
+}
+
+//Tests requirement: LegacyInputIterator, Expression i->m is equivalent to (*i).m. Precondition, i is dereferenceable. 
+TEST(iterators, PointerReduction)
+{
+    RingBuffer<std::string> strBuf = {"bb"};
+    auto customIt = strBuf.begin();
+    EXPECT_EQ(customIt->at(0), (*customIt).at(0));
+
+    auto constIt = strBuf.cbegin();
+    EXPECT_EQ(constIt->at(0), (*constIt).at(0));
+}
+
+//Tests requirement: LegacyInputIterator, ++r, (void)r++ , *r++;
+TEST(iterators, IncrementOperators)
+{
+    auto begin= itControl.begin();
+    auto cbegin= itControl.cbegin();
+
+    //Copies value post increment
+    auto pre = ++begin;
+    //Copies value pre increment
+    auto post = begin++;
+    //Values should be the same
+    ASSERT_EQ(pre, post);
+    ASSERT_EQ(*post, itControl[1]);
+
+    //Same for constant iterator
+    auto cpre = ++cbegin;
+    auto cpost = cbegin++;
+    ASSERT_EQ(cpre, cpost);
+    ASSERT_EQ(*cpost, itControl[1]);
+    
+    ASSERT_EQ(*begin, itControl[2]);
+    ASSERT_EQ(*cbegin, itControl[2]);
+
+    auto controlIt = begin;
+    ++begin;
+    ASSERT_NE(*controlIt++, *begin);
+    ASSERT_EQ(*controlIt,*begin);
+}
+
+TEST(iterators, CopyConstruction)
+{
+    auto initial{itControl.begin()};
+    auto cinitial = itControl.cbegin();
+
+    auto constructed(initial);
+    ASSERT_EQ(initial, constructed);
+}
+
+TEST(iterators, CopyAssignable)
+{
+    auto it {itControl.begin()};
+    RingBuffer<int>::const_iterator cit = it;
+
+    auto experiment{it};
+    ASSERT_EQ(it, experiment);
+
+    auto const_experiment{cit};
+    ASSERT_EQ(cit,const_experiment);
+}
+
+TEST(iterators, swap)
+{
+    auto begin = itControl.begin();
+    auto end = itControl.end();
+
+    auto refIt = itControl.begin();
+    swap(begin,end);
+    ASSERT_EQ(refIt, end);
 }
 
 //TODO Increase test coverage for iterators. By alot.
@@ -83,8 +194,6 @@ TEST(mainframe, MoveAssign)
     EXPECT_EQ(experiment.empty(), false);
     EXPECT_EQ(temp, experiment);
 
-    //This fails without size checking in != operator (size check has been implemented now, no problem anymore). "Expected: (control) != (temp) Actual: {} vs {9,9,9,9,9,9,9,9,9,9}""
-    //And that is interesting.
     EXPECT_NE(control,temp);
 }
 
@@ -128,15 +237,10 @@ TEST(mainframe, Swap)
     RingBuffer<int> experiment2(TEST_SIZE - 3, TEST_INT_VALUE - 4);
     EXPECT_EQ(control, experiment1);
 
-    RingBuffer<int>::swap(experiment2,experiment1);
+    swap(experiment1, experiment2);
 
     EXPECT_EQ(control, experiment2);
     EXPECT_NE(control, experiment1);
-
-    experiment1.swap(experiment2);
-
-    EXPECT_EQ(control, experiment1);
-    EXPECT_NE(control, experiment2);
 }
 
 TEST(mainframe, Resize)
@@ -160,7 +264,7 @@ TEST(mainframe, Size)
 TEST(mainframe, MaxSize)
 {
     // TODO.
-    // No immediate solution for testing max_size. How to get compiler / platform independent max size? MSVC uses some msvc exclusive limits header to get max size.
+    // No immediate solution for testing max_size. How to get compiler / platform independent max size? MSVC uses some msvc exclusive "limits" header to get max size.
 }
 
 TEST(mainframe, Empty)

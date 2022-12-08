@@ -5,7 +5,6 @@ set(This source)
 set(Headers
     Ringbuffer.hpp    
     TestClass.hpp
-    RawIterator.hpp
 )
 
 set(Sources

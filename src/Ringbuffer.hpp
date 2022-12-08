@@ -5,9 +5,19 @@
 #include <vector>
 #include <algorithm>
 
+//Forward declarations
+//============================================================================
+template<typename _rBuf>
+class _rBuf_iterator;
+
+template<typename T, typename Allocator = std::allocator<T>>
+class RingBuffer;
+//============================================================================
+
+
 
 /// @brief Custom iterator class.
-/// @tparam _rBuf Ringbuffer class.
+/// @tparam _rBuf Ringbuffer class type.
 template<class _rBuf>
 class _rBuf_const_iterator
 {
@@ -22,8 +32,6 @@ public:
     //using _Tptr = typename _rBuf::pointer;
 
 public:
-    /// @brief default constructor
-    _rBuf_const_iterator() = default;
 
     /// @brief Constructor.
     /// @param ptr Raw pointer to an element in container of type T.
@@ -32,12 +40,25 @@ public:
         m_ptr = ptr;
     }
 
-    /// @brief default copy constructor.
-    /// @param iterator
-    _rBuf_const_iterator(const _rBuf_const_iterator& iterator) = default;
+    /// @brief Conversion constructor
+    /// @param const_iterator const iterator to construct from.
+    _rBuf_const_iterator(_rBuf_iterator<_rBuf>& iterator)
+    {
+        m_ptr = iterator.m_ptr;
+    }
 
-    /// Destructor.
-    ~_rBuf_const_iterator() =default;
+    /// @brief Conversion assingment from non-const iterator
+    /// @param iterator non-const iterator.
+    /// @return Returns the new object by reference
+    _rBuf_const_iterator& operator=(_rBuf_iterator<_rBuf>& iterator)
+    {
+        if(m_ptr == iterator.m_ptr)
+        {
+            return *this;
+        }
+        m_ptr = iterator.m_ptr;
+        return *this;
+    }
 
     /// @brief Dereference operator
     /// @return  Object pointed by iterator.
@@ -55,25 +76,25 @@ public:
         return m_ptr;
     }
 
-    /// @brief Move iterator forward by ony element.
+    /// @brief Postfix increment
     _rBuf_const_iterator& operator++()
     {
         //TODO: check value-initialization and over end() increment.
-        ++m_ptr;
+        m_ptr++;
         return (*this);
     }
 
-    /// @brief Move iterator forward by one element.
+    /// @brief Postfix increment
     /// @param  int empty parameter to guide overload resolution.
     _rBuf_const_iterator operator++(int)
     {
         //TODO: check value-initialization and over end() increment.
         auto temp (*this);
         ++m_ptr;
-        return temp; 
+        return temp;
     }
 
-    /// @brief Move iterator backward by one element.
+    /// @brief Prefix decrement
     _rBuf_const_iterator& operator--()
     {
         //TODO:    check value initialization and "under" begin() decrement.
@@ -81,7 +102,7 @@ public:
         return(*this);
     }
 
-    /// @brief Move iterator backwards by one element.
+    /// @brief Postfix decrement
     /// @param  int empty parameter to guide overload resolution.
     _rBuf_const_iterator operator--(int)
     {
@@ -252,29 +273,12 @@ public:
 
 public:
 
-    _rBuf_iterator()
-    {
-    }
     /// @brief Constructor.
     /// @param ptr Raw pointer to an element in container of type T.
     _rBuf_iterator(pointer ptr = nullptr)
     {
         m_ptr = ptr;
     }
-
-    /// @brief default copy constructor.
-    /// @param iterator
-    _rBuf_iterator(_rBuf_iterator& iterator) = default;
-
-    /// @brief Conversion constructor
-    /// @param const_iterator const iterator to construct from.
-    _rBuf_iterator(_rBuf_const_iterator<value_type>& const_iterator)
-    {
-        m_ptr = const_iterator.m_ptr;
-    }
-
-    /// Destructor
-    ~_rBuf_iterator(){};
 
     /// @brief Const dereference operator
     /// @return  Const object pointed by iterator.
@@ -284,7 +288,7 @@ public:
         return *m_ptr;
     }
 
-    /// @brief 
+    /// @brief
     /// @return 
     pointer operator->() const
     {
@@ -292,7 +296,7 @@ public:
         return m_ptr;
     }
 
-    /// @brief Move iterator forward by ony element.
+    /// @brief Prefix increment
     _rBuf_iterator& operator++()
     {
         //TODO: check value-initialization and over end() increment.
@@ -300,7 +304,7 @@ public:
         return (*this);
     }
 
-    /// @brief Move iterator forward by one element.
+    /// @brief Postfix increment
     /// @param  int empty parameter to guide overload resolution.
     _rBuf_iterator operator++(int)
     {
@@ -310,7 +314,7 @@ public:
         return temp; 
     }
 
-    /// @brief Move iterator backward by one element.
+    /// @brief prefix decrement
     _rBuf_iterator& operator--()
     {
         //TODO:    check value initialization and "under" begin() decrement
@@ -318,7 +322,7 @@ public:
         return(*this);
     }
 
-    /// @brief Move iterator backwards by one element.
+    /// @brief Postfix decrement
     /// @param  int empty parameter to guide overload resolution.
     _rBuf_iterator operator--(int)
     {
@@ -477,7 +481,7 @@ public:
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
 /// @tparam T type of the ringbuffer
 /// @tparam Allocator optional allocator for underlying vector. Defaults to std::allocator<T>
-template<typename T, typename Allocator = std::allocator<T>> 
+template<typename T, typename Allocator> 
 class RingBuffer
 {
 
@@ -580,21 +584,6 @@ public:
         return const_iterator(m_data.data() + m_data.size());
     }
 
-    /// @brief swap contents with another buffer.
-    /// @param other buffer to swap with.
-    void inline swap(RingBuffer& other)
-    {
-        std::swap(m_data, other.m_data);
-        std::swap(m_beginIndex, other.m_beginIndex);
-        std::swap(m_endIndex, other.m_endIndex);
-    }
-
-    //AFAIK this it not meta, and it feels shit. Look into extending std::swap with a specialization. The "temporary" solution for now. TODO
-    static void swap (RingBuffer& lhs, RingBuffer& rhs)
-    {
-        lhs.swap(rhs);
-    }
-
     reference operator[](const size_type index)
     {
         return m_data[index];
@@ -638,14 +627,14 @@ public:
 
     /// @brief Resize overload.
     /// @param n Size to resize to.
-    /// @param val Value to initialize new elements to, if N is larger than current container capacity.
+    /// @param val Value to initialize new elements to, if N is larger than current container capacity. Checked implicitly in the vector implementation.
     void resize(size_type n, const T& val)
     {
         m_data.resize(n,val);
     }
 
     //This bad boi is gonna need some modification. Ideal would be to return rBuf_iterator and not void. This would require explicit emplace implementation or 
-    //learn to convert vector iterator to rbuf iterator
+    //learn to convert vector iterator to rbuf iterator. TODO
     void emplace_back(value_type val)
     {
         m_data.emplace_back(val);
@@ -655,7 +644,6 @@ private:
     std::vector <T,Allocator> m_data;/*< Underlying vector to store the data in the buffer*/
     size_t m_beginIndex = 0; /*< Index to the first logical element in the buffer. Key part in Tail Head Expansion*/
     size_t m_endIndex = 0;/*< Index to the last logical element in the buffer. Key part in Tail Head Expansion*/
-
 };
 
 //TODO:
