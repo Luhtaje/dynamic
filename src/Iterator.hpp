@@ -23,22 +23,23 @@ public:
 
     /// @brief Constructor.
     /// @param ptr Raw pointer to an element in container of type T.
-    _rBuf_const_iterator(const _rBuf* container = nullptr, pointer ptr = nullptr, bool overflow = false): m_container(container), m_ptr(ptr), m_overflow(overflow) {}
+    _rBuf_const_iterator(const _rBuf* container = nullptr, pointer ptr = nullptr): m_container(container), m_ptr(ptr) {}
 
     /// @brief Conversion constructor
     /// @param const_iterator const iterator to construct from.
-    _rBuf_const_iterator(_rBuf_iterator<_rBuf>& iterator) : m_container(iterator.m_container), m_ptr(iterator.m_ptr), m_overflow(iterator.m_overflow) {}
+    _rBuf_const_iterator(_rBuf_iterator<_rBuf>& iterator) : m_container(iterator.m_container), m_ptr(iterator.m_ptr) {}
 
     /// @brief Conversion assingment from non-const iterator
     /// @param iterator non-const iterator.
     /// @return Returns the new object by reference
     _rBuf_const_iterator& operator=(_rBuf_iterator<_rBuf>& iterator)
     {
-        if(m_ptr == iterator.m_ptr)
+        if(m_ptr == iterator.m_ptr && m_container == iterator.m_container)
         {
             return *this;
         }
         m_ptr = iterator.m_ptr;
+        m_container = iterator.m_container;
         return *this;
     }
 
@@ -182,7 +183,6 @@ public:
     /// @return true if other is larger.
     bool operator<(const _rBuf_const_iterator& other) const
     {
-        //TODO:compatibility check
         return (m_ptr < other.m_ptr);
     }
 
@@ -236,15 +236,11 @@ public:
         return *m_ptr;
     }
 
-    //What container is this iterator for.
+    //What container instance is this iterator for.
     const _rBuf* m_container;
     
     //Pointer to an element.
     const value_type* m_ptr;
-    
-    // Tracks if the buffer that the iterator points to has overflown, meaning that the head < tail.
-    // By default the buffer is in correct order.
-    bool m_overflow;
 };
 
 
@@ -268,7 +264,7 @@ public:
 
     /// @brief Constructor.
     /// @param ptr Raw pointer to an element in container of type T.
-    _rBuf_iterator(_rBuf* container = nullptr, pointer ptr = nullptr, bool overflow = false): m_container(container), m_ptr(ptr), m_overflow(overflow) {}
+    _rBuf_iterator(_rBuf* container = nullptr, pointer ptr = nullptr): m_container(container), m_ptr(ptr) {}
 
     /// @brief Const dereference operator
     /// @return  Const object pointed by iterator.
@@ -466,8 +462,4 @@ public:
     
     //Pointer to an element.
     value_type* m_ptr;
-    
-    // Tracks if the buffer that the iterator points to has overflown, meaning that the head < tail.
-    // By default the buffer is in correct order.
-    bool m_overflow;
 };

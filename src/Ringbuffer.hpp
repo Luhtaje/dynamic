@@ -83,52 +83,54 @@ public:
     /// @return Iterator pointing to first element.
     iterator begin() noexcept
     {
-        return iterator(this,&m_data[0] + m_tailIndex, m_overflow);
+        return iterator(this,&m_data[0] + m_tailIndex);
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator begin() const noexcept
     {
-        return const_iterator(this, &m_data[0] + m_tailIndex, m_overflow);
+        return const_iterator(this, &m_data[0] + m_tailIndex);
     }
 
     /// @brief Construct iterator at end.
     /// @return Iterator pointing past last element.
     iterator end() noexcept
     {
-        return iterator(this, &m_data[0] + m_headIndex, m_overflow);
+        return iterator(this, &m_data[0] + m_headIndex);
     }
 
     /// @brief Construct const_iterator at end.
     /// @return Const_iterator pointing past last element.
     const_iterator end() const noexcept
     {
-        return const_iterator(this, &m_data[0] + m_headIndex, m_overflow);
+        return const_iterator(this, &m_data[0] + m_headIndex);
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator cbegin() const noexcept
     {
-        return const_iterator(this, &m_data[0] + m_tailIndex, m_overflow);
+        return const_iterator(this, &m_data[0] + m_tailIndex);
     }
 
     /// @brief Construct const_iterator.
     /// @return Const_iterator pointing past last element.
     const_iterator cend() const noexcept
     {
-        return const_iterator(this, &m_data[0] + m_headIndex, m_overflow);
+        return const_iterator(this, &m_data[0] + m_headIndex);
     }
 
-    reference operator[](const size_type index)
+    //TODO Add wrap-around functionality.
+    reference operator[](const size_type logicalIndex)
     {
-        return m_data[index];
+        return m_data[m_tailIndex + logicalIndex];
     }
 
-    const_reference operator[](const size_type index) const
+    //TODO Add wrap-around functionality.
+    const_reference operator[](const size_type logicalIndex) const
     {
-        return m_data[index];
+        return m_data[m_tailIndex + logicalIndex];
     }
 
 	/// @brief Sorts ringbuffer so that logical tail matches the first element in physical memory.
@@ -136,12 +138,12 @@ public:
     //To be implemented! Requires knowledge of logical ends which are not implemented yet.
     RingBuffer data();
 
-    /// @brief Gets the size of the data container.
+    /// @brief Gets the size of the container.
     /// @return Size of buffer.
     size_type size() const
     {
-        //TODO take overflow into consideration
-        return std::distance(this->begin(), this->end());
+        //TODO rework distance does not produce correct result
+        return m_count;
     }
 
     size_type max_size() const noexcept
@@ -153,7 +155,7 @@ public:
     /// @return True if buffer is empty
     bool empty() const noexcept
     {
-        return m_data.empty();
+        return m_headIndex == m_tailIndex;
     }
 
     /// @brief Resizes the container so that it contains n elements.
@@ -171,24 +173,31 @@ public:
         m_data.resize(n,val);
     }
 
-    //This bad boi is gonna need some modification. Ideal would be to return rBuf_iterator and not void. This would require explicit emplace implementation or 
-    //learn to convert vector iterator to rbuf iterator. TODO
+    //TODO vector emplace no-go. Insert to back of the buffer, not back of the vector.
     void emplace_back(value_type val)
     {
-        m_data.emplace_back(val);
-        m_headIndex++;
     }
 
     void push_front(value_type val)
     {
-        auto tail_it = m_data.begin();
-        m_data.insert(tail_it, val);
+        m_data.insert(m_data.begin() + m_tailIndex, val);
+        count++;
     }
 
     void push_back(value_type val)
     {
-        auto head_it = m_data.cend();
-        m_data.insert(head_it, val);
+        m_data.insert(m_data.begin() + m_headIndex, val);
+        count++;
+    }
+
+    void pop_front()
+    {
+        m_data.erase(m_data.begin() + m_tailIndex);
+    }
+
+    void pop_back()
+    {
+        m_data.erase(m_data.begin() + m_headIndex);
     }
 
     pointer getLastPtr()
@@ -201,37 +210,51 @@ public:
         return &m_data.front();
     }
 
+    size_t getPhysicalOffset()
+    {
+        return m_tailIndex;
+    }
+
+    size_t getCapacity()
+    {
+        return m_data.capacity();
+    }
+
 //===========================================================
-//  std::queue adapter functions
+//  std::queue adaptor functions
 //===========================================================
 
     reference front()
     {
-        return *begin();
+        return m_data[m_tailIndex];
     }
 
-    const reference front() const
+    const_reference front() const
     {
-        return *begin();
+        return m_data[m_tailIndex];
     }
 
     reference back()
     {
-        return *end();
+        return m_data[m_headIndex];
     }
 
-    const reference back() const
+    const_reference back() const
     {
-        return *end();
+        return m_data[m_headIndex];
     }
 
+//==========================================
+// Members 
+//==========================================
+    
 private:
-    std::vector <T,Allocator> m_data;/* Underlying vector to store the data in the buffer*/
-    size_t m_headIndex = 0; /* Index to the last logical element in the buffer. Key part in Tail Head Expansion*/ 
-    size_t m_tailIndex = 0;/* Index to the first logical element in the buffer. Key part in Tail Head Expansion*/
+    // Count tracks the amount of elements in the buffer.
+    size_t m_count = 0;
+    size_t m_headIndex = 0; /* Index of the last element in the buffer.*/ 
+    size_t m_tailIndex = 0;/* Index of the first element in the buffer.*/
 
-    bool m_overflow;
-
+    std::vector <T,Allocator> m_data;/* Underlying vector to store the data*/
 };
 
 //TODO:
