@@ -83,42 +83,42 @@ public:
     /// @return Iterator pointing to first element.
     iterator begin() noexcept
     {
-        return iterator(this,&m_data[0] + m_tailIndex);
+        return iterator(this,&m_data[0] + m_tailIndex, m_overflow);
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator begin() const noexcept
     {
-        return const_iterator(this);
+        return const_iterator(this, &m_data[0] + m_tailIndex, m_overflow);
     }
 
     /// @brief Construct iterator at end.
     /// @return Iterator pointing past last element.
     iterator end() noexcept
     {
-        return iterator();
+        return iterator(this, &m_data[0] + m_headIndex, m_overflow);
     }
 
     /// @brief Construct const_iterator at end.
     /// @return Const_iterator pointing past last element.
     const_iterator end() const noexcept
     {
-        return const_iterator();
+        return const_iterator(this, &m_data[0] + m_headIndex, m_overflow);
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator cbegin() const noexcept
     {
-        return const_iterator();
+        return const_iterator(this, &m_data[0] + m_tailIndex, m_overflow);
     }
 
     /// @brief Construct const_iterator.
     /// @return Const_iterator pointing past last element.
     const_iterator cend() const noexcept
     {
-        return const_iterator(m_data.data() + m_data.size());
+        return const_iterator(this, &m_data[0] + m_headIndex, m_overflow);
     }
 
     reference operator[](const size_type index)
@@ -131,7 +131,7 @@ public:
         return m_data[index];
     }
 
-	/// @brief Sorts ringbuffer so that logical head matches the first element in physical memory.
+	/// @brief Sorts ringbuffer so that logical tail matches the first element in physical memory.
     /// @return Pointer to the first element.
     //To be implemented! Requires knowledge of logical ends which are not implemented yet.
     RingBuffer data();
@@ -140,6 +140,7 @@ public:
     /// @return Size of buffer.
     size_type size() const
     {
+        //TODO take overflow into consideration
         return std::distance(this->begin(), this->end());
     }
 
@@ -228,6 +229,8 @@ private:
     std::vector <T,Allocator> m_data;/* Underlying vector to store the data in the buffer*/
     size_t m_headIndex = 0; /* Index to the last logical element in the buffer. Key part in Tail Head Expansion*/ 
     size_t m_tailIndex = 0;/* Index to the first logical element in the buffer. Key part in Tail Head Expansion*/
+
+    bool m_overflow;
 
 };
 
