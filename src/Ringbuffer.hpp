@@ -83,42 +83,42 @@ public:
     /// @return Iterator pointing to first element.
     iterator begin() noexcept
     {
-        return iterator(this,&m_data[0] + m_tailIndex);
+        return iterator(this, 0);
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator begin() const noexcept
     {
-        return const_iterator(this, &m_data[0] + m_tailIndex);
+        return const_iterator(this, 0);
     }
 
     /// @brief Construct iterator at end.
     /// @return Iterator pointing past last element.
     iterator end() noexcept
     {
-        return iterator(this, &m_data[0] + m_headIndex);
+        return iterator(this, m_count);
     }
 
     /// @brief Construct const_iterator at end.
     /// @return Const_iterator pointing past last element.
     const_iterator end() const noexcept
     {
-        return const_iterator(this, &m_data[0] + m_headIndex);
+        return const_iterator(this, m_count);
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator cbegin() const noexcept
     {
-        return const_iterator(this, &m_data[0] + m_tailIndex);
+        return const_iterator(this, 0);
     }
 
     /// @brief Construct const_iterator.
     /// @return Const_iterator pointing past last element.
     const_iterator cend() const noexcept
     {
-        return const_iterator(this, &m_data[0] + m_headIndex);
+        return const_iterator(this, count);
     }
 
     //TODO Add wrap-around functionality.
