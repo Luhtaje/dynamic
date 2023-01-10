@@ -68,7 +68,7 @@ TEST(iterators, ConstantConversion)
 //Tests requirement: contextually convertible to bool. 
 TEST(iterators, ConvertibleToBool)
 {
-    RingBuffer<int>::iterator it; 
+    RingBuffer<int>::iterator it(nullptr); 
     //Iterator is value-initialized
     EXPECT_NE(it, true);
     it = itControl.begin();
@@ -228,6 +228,7 @@ TEST(mainframe, EqualityComparators)
     EXPECT_NE(control, experiment);
     experiment = control;
     EXPECT_EQ(control, experiment);
+    EXPECT_TRUE(control == experiment);
 }
 
 TEST(mainframe, Swap)
