@@ -27,7 +27,7 @@ public:
 
     /// @brief Conversion constructor
     /// @param const_iterator const iterator to construct from.
-    _rBuf_const_iterator(_rBuf_iterator<_rBuf>& iterator) : m_container(iterator.m_container), m_logicalIndex(iterator.m_logicalIndex) {}
+    explicit _rBuf_const_iterator(_rBuf_iterator<_rBuf>& iterator) : m_container(iterator.m_container), m_logicalIndex(iterator.m_logicalIndex) {}
 
     /// @brief Conversion assingment from non-const iterator
     /// @param iterator non-const iterator.
@@ -38,6 +38,7 @@ public:
         {
             return *this;
         }
+
         m_logicalIndex = iterator.m_logicalIndex;
         m_container = iterator.m_container;
         return *this;
@@ -112,15 +113,6 @@ public:
         return (*this += -offset);
     }
 
-    /// @brief Get iterator - offset.
-    /// @param offset offset.
-    /// @return iterator at this - offset.
-    _rBuf_const_iterator operator-(const difference_type offset)
-    {
-        _rBuf_const_iterator temp = *this;
-        return (temp - offset);
-    }
-
     /// @brief Gets distance between two iterators.
     /// @param iterator Iterator to get distance to.
     /// @return Amount of elements between the iterators.
@@ -182,8 +174,6 @@ public:
         return (!(m_logicalIndex < other.m_logicalIndex));
     }
 
-    //Implement _Compat? TODO
-
     /// @brief Default assingment operator overload.
     /// @param iterator Source iterator to assign from
     _rBuf_const_iterator& operator=(const _rBuf_const_iterator<_rBuf>& iterator) =default;
@@ -208,7 +198,7 @@ public:
     {
         return (*m_container)[m_logicalIndex];
     }
-
+private:
     //What container instance is this iterator for.
     const _rBuf* m_container;
     
@@ -313,15 +303,6 @@ public:
     _rBuf_iterator& operator-=(const difference_type offset)
     {
         return (*this += -offset);
-    }
-
-    /// @brief Get iterator - offset.
-    /// @param offset offset.
-    /// @return iterator at this - offset.
-    _rBuf_iterator operator-(const difference_type offset)
-    {
-        _rBuf_iterator temp = *this;
-        return (temp - offset);
     }
 
     /// @brief Gets distance between two iterators.

@@ -122,19 +122,45 @@ TEST(iterators, IncrementOperators)
     ASSERT_EQ(*controlIt,*begin);
 }
 
-TEST(iterators, CopyConstruction)
+//Tests requirement: CopyConstructible.
+TEST(legacyIterator, CopyConstruction)
 {
-    auto initial{itControl.begin()};
-    auto cinitial = itControl.cbegin();
+    RingBuffer<int>::iterator initial(itControl.begin());
 
     auto constructed(initial);
+    auto assignConstructed = (initial);
     ASSERT_EQ(initial, constructed);
+    ASSERT_EQ(assignConstructed, constructed);
+
+
+    RingBuffer<int>::const_iterator cinitial = itControl.cbegin();
+
+    auto constConstructed(cinitial);
+    auto assignConstConstructed = (cinitial);
+    ASSERT_EQ(cinitial, constConstructed);
+    ASSERT_EQ(assignConstConstructed, constConstructed); 
+
+
+}
+
+// Tests requirement: MoveConstucrible
+TEST(legacyIterator, MoveConstruction)
+{
+    auto it = itControl.begin();
+    it++;
+    auto reference(it);
+    auto movedIt(std::move(it));
+    ASSERT_EQ(*movedIt, *reference);
+    auto something = *it;
+
+    EXPECT_EQ(std::is_move_constructible<RingBuffer<int>::iterator>::value, true);
+    EXPECT_EQ(std::is_move_constructible<RingBuffer<int>::const_iterator>::value, true);
 }
 
 TEST(iterators, CopyAssignable)
 {
-    auto it {itControl.begin()};
-    RingBuffer<int>::const_iterator cit = it;
+    RingBuffer<int>::iterator it(itControl.begin());
+    RingBuffer<int>::const_iterator cit(it);
 
     auto experiment{it};
     ASSERT_EQ(it, experiment);

@@ -41,11 +41,7 @@ public:
 
 public:
     /// @brief Default constructor.
-    RingBuffer() =default;
-
-    /// @brief Default copy constructor.
-    /// @param b Buffer to construct from.
-    RingBuffer(const RingBuffer& b) =default;
+    RingBuffer() = default;
 
     /// @brief Initializer list contructor.
     RingBuffer(std::initializer_list<T> init):m_data(init), m_count(init.size()), m_headIndex(init.size()), m_tailIndex(0) {}
@@ -57,23 +53,6 @@ public:
     {
         m_data = std::vector<T>(size,val);
     }
-
-    /// @brief Default move constructor.
-    /// @param  RingBuffer&&  Rval reference to a RingBuffer
-    RingBuffer(RingBuffer&&) =default;
-
-    /// @brief Default move assignment operator
-    /// @param other Rval ref of RingBuffer
-    /// @return RingBuffer
-    RingBuffer& operator=(RingBuffer&& other) = default;
-
-    /// @brief Default copy assignment operator
-    /// @param other Lval ref of RingBuffer
-    /// @return RingBuffer
-    RingBuffer& operator=(const RingBuffer& other)= default;
-
-    /// @brief Defaut destructor.
-    ~RingBuffer()=default;
 
     /// @brief Contruct iterator at begin.
     /// @return Iterator pointing to first element.
