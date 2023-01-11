@@ -23,7 +23,7 @@ public:
 
     /// @brief Constructor.
     /// @param index Index representing the logical element of the.
-    _rBuf_const_iterator(const _rBuf* container = nullptr, size_t index = NULL): m_container(container), m_logicalIndex(index) {}
+    _rBuf_const_iterator(const _rBuf* container = nullptr, int index = -1): m_container(container), m_logicalIndex(index) {}
 
     /// @brief Conversion constructor
     /// @param const_iterator const iterator to construct from.
@@ -199,10 +199,7 @@ public:
     /// @brief Conversion operator, allows iterator to be converted to typename bool.
     operator bool() const
     {
-        if(m_logicalIndex)
-            return true;
-        else
-            return false;
+        return(0 <=m_logicalIndex);
     }
 
     /// @brief Dereference operator.
@@ -217,7 +214,7 @@ public:
     
     // The iterator does not point to any memory location, but is interfaced to the Ring Buffer via an index which is the logical index
     // to an element. Logical index 0 is the first element in the buffer. 
-    size_t m_logicalIndex;
+    int m_logicalIndex;
 };
 
 
@@ -240,8 +237,8 @@ public:
 
 
     /// @brief Constructor.
-    /// @param ptr Raw pointer to an element in container of type T.
-    _rBuf_iterator(_rBuf* container = nullptr, size_t index = NULL): m_container(container), m_logicalIndex(index) {}
+    /// @param index Index pointing to the logical element of the RingBuffer.
+    _rBuf_iterator(_rBuf* container = nullptr, int index = -1): m_container(container), m_logicalIndex(index) {}
 
     /// @brief Const dereference operator
     /// @return  Const object pointed by iterator.
@@ -404,10 +401,7 @@ public:
     /// @brief Conversion operator, allows iterator to be converted to typename bool or "something convertable to bool".
     operator bool() const
     {
-        if(m_logicalIndex)
-            return true;
-        else
-            return false;
+        return (0 <= m_logicalIndex);
     }
 
     /// @brief Dereference operator.
@@ -421,5 +415,5 @@ public:
     _rBuf* m_container;
     
     //Pointer to an element.
-    size_t m_logicalIndex;
+    int m_logicalIndex;
 };

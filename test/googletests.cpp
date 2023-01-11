@@ -68,16 +68,18 @@ TEST(iterators, ConstantConversion)
 //Tests requirement: contextually convertible to bool. 
 TEST(iterators, ConvertibleToBool)
 {
+    //Non-const iterator
     RingBuffer<int>::iterator it(nullptr); 
     //Iterator is value-initialized
-    EXPECT_NE(it, true);
+    EXPECT_FALSE(it);
     it = itControl.begin();
-    EXPECT_EQ(it, true);
+    EXPECT_TRUE(it);
 
+    //Const iterator.
     RingBuffer<int>::const_iterator cit; 
-    EXPECT_NE(cit, true);
+    EXPECT_FALSE(cit);
     cit = itControl.cbegin();
-    EXPECT_EQ(cit, true);
+    EXPECT_TRUE(cit);
 }
 
 //Tests requirement: LegacyInputIterator, Expression i->m is equivalent to (*i).m. Precondition, i is dereferenceable. 
@@ -180,7 +182,8 @@ TEST(mainframe, MoveConstruction)
     RingBuffer<std::string> tempcopy(initial);
     EXPECT_EQ(initial.empty(), false);
     RingBuffer<std::string> moved(std::move(initial));
-    EXPECT_EQ(initial.empty(), true);
+
+    EXPECT_DEATH(initial[0], "vector subscript out of range");
     EXPECT_EQ(moved, tempcopy);
 }
 

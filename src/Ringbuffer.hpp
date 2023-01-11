@@ -48,18 +48,14 @@ public:
     RingBuffer(const RingBuffer& b) =default;
 
     /// @brief Initializer list contructor.
-    RingBuffer(std::initializer_list<T> init):m_data(init){};
+    RingBuffer(std::initializer_list<T> init):m_data(init), m_count(init.size()), m_headIndex(init.size()), m_tailIndex(0) {}
 
     /// @brief Custom constructor.
     /// @param size Size of the buffer to initialize.
     /// @param val Value to set every element to.
-    RingBuffer(size_type size, T val = 0)
+    RingBuffer(size_type size, T val = 0) : m_count(size), m_headIndex(size), m_tailIndex(0)
     {
-        m_data.resize(size);
-        m_headIndex = size;
-        for(std::vector<T>::iterator it = m_data.begin() ; m_data.end() != it; it++) {
-            *it = val;
-        }
+        m_data = std::vector<T>(size,val);
     }
 
     /// @brief Default move constructor.
@@ -181,13 +177,13 @@ public:
     void push_front(value_type val)
     {
         m_data.insert(m_data.begin() + m_tailIndex, val);
-        count++;
+        m_count++;
     }
 
     void push_back(value_type val)
     {
         m_data.insert(m_data.begin() + m_headIndex, val);
-        count++;
+        m_count++;
     }
 
     void pop_front()
