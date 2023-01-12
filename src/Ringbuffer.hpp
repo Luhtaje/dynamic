@@ -96,16 +96,34 @@ public:
         return const_iterator(this, m_count);
     }
 
-    //TODO Add wrap-around functionality.
     reference operator[](const size_type logicalIndex)
     {
-        return m_data[m_tailIndex + logicalIndex];
+        // if sum of 
+        auto index(m_tailIndex + logicalIndex);
+        auto capacity(m_data.capacity());
+
+        if(capacity < index)
+        {
+            index -= capacity;
+        }
+
+        return m_data[index];
     }
 
-    //TODO Add wrap-around functionality.
+    /// @brief Returns an element from the buffer corresponding to a logical index.
+    /// @param logicalIndex Index of the element to fetch.
+    /// @return Const reference the the object at 
     const_reference operator[](const size_type logicalIndex) const
     {
-        return m_data[m_tailIndex + logicalIndex];
+        auto index(m_tailIndex + logicalIndex);
+        auto capacity(m_data.capacity());
+
+        if(capacity <= index)
+        {
+            index -= capacity;
+        }
+
+        return m_data[index];
     }
 
 	/// @brief Sorts ringbuffer so that logical tail matches the first element in physical memory.
@@ -130,7 +148,7 @@ public:
     /// @return True if buffer is empty
     bool empty() const noexcept
     {
-        return m_headIndex == m_tailIndex;
+        return m_count == 0;
     }
 
     /// @brief Resizes the container so that it contains n elements.
@@ -148,51 +166,37 @@ public:
         m_data.resize(n,val);
     }
 
-    //TODO vector emplace no-go. Insert to back of the buffer, not back of the vector.
-    void emplace_back(value_type val)
-    {
-    }
-
+    // Insert element to tail. The logical front of the buffer.
     void push_front(value_type val)
     {
-        m_data.insert(m_data.begin() + m_tailIndex, val);
         m_count++;
+        m_data.insert(m_data.begin() + m_tailIndex, val);
+        // Pushing to tail grows the buffer backwards.
+        decrement(m_tailIndex);
     }
 
+    // Insert element to head. The logcial back of the buffer.
     void push_back(value_type val)
     {
-        m_data.insert(m_data.begin() + m_headIndex, val);
         m_count++;
+        m_data.insert(m_data.begin() + m_headIndex, val);
+        increment(m_headIndex);
     }
 
+    // Erases an element from logical front of the buffer. Moves tail forward.
     void pop_front()
     {
+        m_count--;
+        increment(m_tailIndex);
         m_data.erase(m_data.begin() + m_tailIndex);
     }
 
+    // Erases at index
     void pop_back()
     {
+        m_count--;
+        decrement(m_headIndex);
         m_data.erase(m_data.begin() + m_headIndex);
-    }
-
-    pointer getLastPtr()
-    {
-        return &m_data.back();
-    }
-
-    pointer getFirstPtr()
-    {
-        return &m_data.front();
-    }
-
-    size_t getPhysicalOffset()
-    {
-        return m_tailIndex;
-    }
-
-    size_t getCapacity()
-    {
-        return m_data.capacity();
     }
 
 //===========================================================
@@ -217,6 +221,29 @@ public:
     const_reference back() const
     {
         return m_data[m_headIndex];
+    }
+
+private:
+    void increment(size_t& index)
+    {   
+        index++;
+        // Reaching equal is past the last element, wraps around.
+        if(index >= m_count)
+        {
+            index = 0;
+        }
+    }
+
+    void decrement(size_t& index)
+    {
+        index--;
+        if(index<0)
+        {
+            // Move head to last element. Using size is a little sus, pop does not remove an item from the vector atm! TODO
+            // Erasing from the end of the vector is constant complexity but the complexity is linear
+            // Not sure if this is even correct. Vector should have this size no?
+            m_headIndex = m_count - 1;
+        }
     }
 
 //==========================================

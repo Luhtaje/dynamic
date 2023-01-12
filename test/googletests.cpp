@@ -372,6 +372,14 @@ TEST(mainframe, EqualityComparators)
     EXPECT_TRUE(control == experiment);
 }
 
+TEST(mainframe, AccessOperator)
+{
+    itControl.pop_front();
+    auto val(itControl[0]);
+    itControl.pop_front();
+    auto val2(itControl[0]);
+}
+
 TEST(mainframe, Swap)
 {
     using std::swap;
@@ -427,7 +435,8 @@ TEST(mainframe, Emplace)
     GTEST_SKIP();
     //Emplace not implemented at the moment
     RingBuffer<int> control(TEST_SIZE, TEST_INT_VALUE);
-    control.emplace_back(TEST_INT_VALUE + 1);
+    // Emplace is no more. Is it required?
+    //control.emplace_back(TEST_INT_VALUE + 1);
     auto size = control.size();
     EXPECT_EQ(control[size-1], TEST_INT_VALUE + 1);
 }
@@ -439,4 +448,13 @@ TEST(sequencecontainer, front)
 
     EXPECT_EQ(nonConst.front(), *nonConst.begin());
     EXPECT_EQ(itControl.front(), *itControl.begin());
+}
+
+TEST(mainframe, user)
+{
+    RingBuffer<int> myBuf;
+    myBuf.push_back(10);
+    myBuf.push_front(2);
+
+    ASSERT_EQ(myBuf.front(), 2);
 }
