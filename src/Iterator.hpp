@@ -135,7 +135,7 @@ public:
     /// @return true if underlying pointers are the same.
     bool operator==(const _rBuf_const_iterator& other) const
     {
-        return m_logicalIndex == other.m_logicalIndex;
+        return m_logicalIndex == other.m_logicalIndex && m_container == other.m_container;
     }
 
     /// @brief Comparison operator != overload
@@ -143,7 +143,7 @@ public:
     /// @return ture if underlying pointers are not the same
     bool operator!=(const _rBuf_const_iterator& other) const
     {
-        return m_logicalIndex != other.m_logicalIndex;
+        return !(m_logicalIndex == other.m_logicalIndex && m_container == other.m_container);
     }
 
     /// @brief Comparison operator < overload
@@ -327,7 +327,7 @@ public:
     /// @return true if underlying pointers are the same.
     bool operator==(const _rBuf_iterator& other) const
     {
-        return m_logicalIndex == other.m_logicalIndex;
+        return m_logicalIndex == other.m_logicalIndex && m_container == other.m_container;
     }
 
     /// @brief Comparison operator != overload
@@ -335,7 +335,7 @@ public:
     /// @return ture if underlying pointers are not the same
     bool operator!=(const _rBuf_iterator& other) const
     {
-        return m_logicalIndex != other.m_logicalIndex;
+        return !(m_logicalIndex == other.m_logicalIndex && m_container == other.m_container);
     }
 
     /// @brief Comparison operator < overload

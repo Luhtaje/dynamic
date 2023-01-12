@@ -93,7 +93,7 @@ public:
     /// @return Const_iterator pointing past last element.
     const_iterator cend() const noexcept
     {
-        return const_iterator(this, count);
+        return const_iterator(this, m_count);
     }
 
     //TODO Add wrap-around functionality.
