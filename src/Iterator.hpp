@@ -27,7 +27,7 @@ public:
 
     /// @brief Conversion constructor
     /// @param const_iterator const iterator to construct from.
-    explicit _rBuf_const_iterator(_rBuf_iterator<_rBuf>& iterator) : m_container(iterator.m_container), m_logicalIndex(iterator.m_logicalIndex) {}
+    _rBuf_const_iterator(_rBuf_iterator<_rBuf>& iterator) : m_container(iterator.m_container), m_logicalIndex(iterator.m_logicalIndex) {}
 
     /// @brief Conversion assingment from non-const iterator
     /// @param iterator non-const iterator.
@@ -186,12 +186,6 @@ public:
         return (*this);
     };
 
-    /// @brief Conversion operator, allows iterator to be converted to typename bool.
-    operator bool() const
-    {
-        return(0 <=m_logicalIndex);
-    }
-
     /// @brief Dereference operator.
     /// @return Object pointed by iterator.
     reference operator*()
@@ -223,8 +217,6 @@ public:
     using reference = value_type&;
 
 public:
-
-
 
     /// @brief Constructor.
     /// @param index Index pointing to the logical element of the RingBuffer.
@@ -378,12 +370,6 @@ public:
         m_logicalIndex = index;
         return (*this);
     };
-
-    /// @brief Conversion operator, allows iterator to be converted to typename bool or "something convertable to bool".
-    operator bool() const
-    {
-        return (0 <= m_logicalIndex);
-    }
 
     /// @brief Dereference operator.
     /// @return Object pointed by iterator.

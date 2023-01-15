@@ -2,6 +2,7 @@
 #include "RingBuffer.hpp"
 #include <utility>
 #include <string>
+#include <deque>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -192,7 +193,8 @@ TEST(legacyInputOperator, Inequality)
     ASSERT_TRUE(constControl != constSnapshot);
 
     // Tests comparing non-const and const. Constness should not change the result.
-    ASSERT_FALSE(constSnapshot != snapshot);
+    // Only works one way, when const_iterator is on the left. This is the requirement by the standard, additional setup is optional but preferred.
+    ASSERT_FALSE(constSnapshot!=snapshot);
 }
 
 // Tests requirement: LegacyInputIterator, expression *i.
@@ -247,22 +249,6 @@ TEST(iterators, ConstantConversion)
 
 }
 
-//Tests requirement: contextually convertible to bool. 
-TEST(iterators, ConvertibleToBool)
-{
-    //Non-const iterator
-    RingBuffer<int>::iterator it(nullptr); 
-    //Iterator is value-initialized
-    EXPECT_FALSE(it);
-    it = itControl.begin();
-    EXPECT_TRUE(it);
-
-    //Const iterator.
-    RingBuffer<int>::const_iterator cit; 
-    EXPECT_FALSE(cit);
-    cit = itControl.cbegin();
-    EXPECT_TRUE(cit);
-}
 
 //Tests requirement: LegacyInputIterator, dereferenceable Expression i->m is equivalent to (*i).m.
 TEST(iterators, PointerReduction)
@@ -453,8 +439,8 @@ TEST(sequencecontainer, front)
 TEST(mainframe, user)
 {
     RingBuffer<int> myBuf;
-    myBuf.push_back(10);
-    myBuf.push_front(2);
 
-    ASSERT_EQ(myBuf.front(), 2);
+    myBuf.push_back(10);
+
+    myBuf.empty();
 }

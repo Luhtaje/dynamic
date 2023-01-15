@@ -44,12 +44,12 @@ public:
     RingBuffer() = default;
 
     /// @brief Initializer list contructor.
-    RingBuffer(std::initializer_list<T> init):m_data(init), m_count(init.size()), m_headIndex(init.size()), m_tailIndex(0) {}
+    RingBuffer(std::initializer_list<T> init):m_data(init), debug_count(init.size()), m_headIndex(init.size()), m_tailIndex(0) {}
 
     /// @brief Custom constructor.
     /// @param size Size of the buffer to initialize.
     /// @param val Value to set every element to.
-    RingBuffer(size_type size, T val = 0) : m_count(size), m_headIndex(size), m_tailIndex(0)
+    RingBuffer(size_type size, T val = 0) : debug_count(size), m_headIndex(size), m_tailIndex(0)
     {
         m_data = std::vector<T>(size,val);
     }
@@ -72,14 +72,14 @@ public:
     /// @return Iterator pointing past last element.
     iterator end() noexcept
     {
-        return iterator(this, m_count);
+        return iterator(this, debug_count);
     }
 
     /// @brief Construct const_iterator at end.
     /// @return Const_iterator pointing past last element.
     const_iterator end() const noexcept
     {
-        return const_iterator(this, m_count);
+        return const_iterator(this, debug_count);
     }
 
     /// @brief Construct const_iterator at begin.
@@ -93,12 +93,13 @@ public:
     /// @return Const_iterator pointing past last element.
     const_iterator cend() const noexcept
     {
-        return const_iterator(this, m_count);
+        return const_iterator(this, debug_count);
     }
 
     reference operator[](const size_type logicalIndex)
     {
-        // if sum of 
+        // if sum of tailIndex (physical first element) and logical index(logical first element) is larger than vector capacity, 
+        // wrap index around to start.
         auto index(m_tailIndex + logicalIndex);
         auto capacity(m_data.capacity());
 
@@ -135,8 +136,8 @@ public:
     /// @return Size of buffer.
     size_type size() const
     {
-        //TODO rework distance does not produce correct result
-        return m_count;
+        //TODO rework distance does not produce correct result. count not good either.
+        return debug_count;
     }
 
     size_type max_size() const noexcept
@@ -148,7 +149,7 @@ public:
     /// @return True if buffer is empty
     bool empty() const noexcept
     {
-        return m_count == 0;
+        return m_tailIndex == m_headIndex;
     }
 
     /// @brief Resizes the container so that it contains n elements.
@@ -169,40 +170,55 @@ public:
     // Insert element to tail. The logical front of the buffer.
     void push_front(value_type val)
     {
-        m_count++;
-        m_data.insert(m_data.begin() + m_tailIndex, val);
-        // Pushing to tail grows the buffer backwards.
-        decrement(m_tailIndex);
+        debug_count++;
+        // Special case when buffer is empty. Moves head instead of tail. This makes pushing to front always a little slower.
+        if(m_headIndex == m_tailIndex)
+        {
+            push_back(val);
+        }
+        else
+        {
+            // Pushing to tail grows the buffer backwards.
+            decrement(m_tailIndex);
+            m_data.insert(m_data.begin() + m_tailIndex, val);
+            
+        }
     }
 
-    // Insert element to head. The logcial back of the buffer.
+    // Insert element to head. The logical back of the buffer.
     void push_back(value_type val)
     {
-        m_count++;
-        m_data.insert(m_data.begin() + m_headIndex, val);
+        debug_count++;
+        //m_data.insert(m_data.begin() + m_headIndex, val);
+        //  Buffer needs to have capacity. If full, allocate more and then push.
+        T* _ptr = new(&m_data + sizeof(T) * m_headIndex) T(val);
+        if(!_ptr)
+        {
+            throw;
+        }
         increment(m_headIndex);
     }
 
-    // Erases an element from logical front of the buffer. Moves tail forward.
+    // Erases an element from logical front of the buffer. Moves tail forward. Leaves the object in the vector. When could it be removed?
     void pop_front()
     {
-        m_count--;
+        debug_count--;
+        (&m_data[m_tailIndex])->~T();
         increment(m_tailIndex);
-        m_data.erase(m_data.begin() + m_tailIndex);
     }
 
-    // Erases at index
+    // Erase at from head..
     void pop_back()
     {
-        m_count--;
+        debug_count--;
         decrement(m_headIndex);
-        m_data.erase(m_data.begin() + m_headIndex);
     }
 
 //===========================================================
 //  std::queue adaptor functions
 //===========================================================
 
+    // TODO: the indexes point to over-the-element, need to adjust how they are retrieved. Would have to take wrap-around into consideration.
     reference front()
     {
         return m_data[m_tailIndex];
@@ -224,17 +240,18 @@ public:
     }
 
 private:
+    // Creating a few functions seemed better than passing the info as parameter if 
     void increment(size_t& index)
     {   
         index++;
         // Reaching equal is past the last element, wraps around.
-        if(index >= m_count)
+        if(index >= debug_count)
         {
             index = 0;
         }
     }
 
-    void decrement(size_t& index)
+    void decrement(size_t& index, bool isTail)
     {
         index--;
         if(index<0)
@@ -242,9 +259,10 @@ private:
             // Move head to last element. Using size is a little sus, pop does not remove an item from the vector atm! TODO
             // Erasing from the end of the vector is constant complexity but the complexity is linear
             // Not sure if this is even correct. Vector should have this size no?
-            m_headIndex = m_count - 1;
+            index = m_data.capacity() - 1;
         }
     }
+
 
 //==========================================
 // Members 
@@ -252,15 +270,13 @@ private:
     
 private:
     // Count tracks the amount of elements in the buffer.
-    size_t m_count = 0;
+    size_t debug_count = 0;
     size_t m_headIndex = 0; /* Index of the last element in the buffer.*/ 
     size_t m_tailIndex = 0;/* Index of the first element in the buffer.*/
 
     std::vector <T,Allocator> m_data;/* Underlying vector to store the data*/
 };
 
-//TODO:
-// Modify to non template friend functions.  https://www.drdobbs.com/the-standard-librarian-defining-iterato/184401331
 // Modify equality operators to compare also logical order. Part of THE.
 
 /// @brief Equality comparator (compare- operator = comparator)
@@ -272,7 +288,7 @@ private:
 template<typename T , typename Alloc>
 inline bool operator==(const RingBuffer<T,Alloc>& lhs, const RingBuffer<T,Alloc>& rhs)
 {
-    return (lhs.size() == rhs.size()) && std::equal(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    return (lhs.size() == rhs.size());
 }
 
 /// @brief Not-equal comparator
