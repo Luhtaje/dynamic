@@ -40,6 +40,8 @@ public:
     using size_type = std::size_t;
 
 public:
+    // TODO Implement user-defined constructors and what not. Need to implement destructor that destroys all the elements, which are not
+    //
     /// @brief Default constructor.
     RingBuffer() = default;
 
@@ -180,23 +182,45 @@ public:
         {
             // Pushing to tail grows the buffer backwards.
             decrement(m_tailIndex);
-            m_data.insert(m_data.begin() + m_tailIndex, val);
+            if(m_tailIndex == m_headIndex)
+            {
+                // TODO Current implementation requires the buffer to be rotated to match physical layout before reserve.
+                // Otherwise buffer will end up cut in half if it has wrapped around. Wonder how vector would deal with uncontinuous structure.
+                m_data.reserve(floor(m_data.capacity()* 1.3) + 2);
+            }
+            T* _ptr = new(&m_data + sizeof(T) * m_tailIndex) T(val);
             
         }
     }
 
-    // Insert element to head. The logical back of the buffer.
+    /// @brief Inserts an element in the back of the buffer. If buffer is full, allocates more memory.
+    /// @param val Value of type T to be inserted in to the buffer.
+    // TODO corner cases : first element, buffer full, buffer full and index at border. Poor design atm
     void push_back(value_type val)
     {
-        debug_count++;
-        //m_data.insert(m_data.begin() + m_headIndex, val);
-        //  Buffer needs to have capacity. If full, allocate more and then push.
-        T* _ptr = new(&m_data + sizeof(T) * m_headIndex) T(val);
-        if(!_ptr)
+        // Checks for empty buffer.
+        if(m_headIndex == m_tailIndex)
         {
-            throw;
+            m_data.reserve(m_data.capacity() + 5);
+            T* _ptr = new(&m_data.data()[0]) T(val);
+            if(!_ptr)
+            {
+                throw;
+            }
+            // If buffer was empty, re-increment the index.
+            increment(m_headIndex);
         }
-        increment(m_headIndex);
+        else
+        {
+            m_data.reserve(m_data.capacity() * 1.5);
+            T* _ptr = new(&m_data.data()[m_headIndex]) T(val);
+            if(!_ptr)
+            {
+
+                throw;
+            }
+            increment(m_headIndex);
+        }
     }
 
     // Erases an element from logical front of the buffer. Moves tail forward. Leaves the object in the vector. When could it be removed?
@@ -207,10 +231,11 @@ public:
         increment(m_tailIndex);
     }
 
-    // Erase at from head..
+    // Erase at from head.
     void pop_back()
     {
         debug_count--;
+        (&m_data[m_tailIndex])->~T();
         decrement(m_headIndex);
     }
 
@@ -229,36 +254,34 @@ public:
         return m_data[m_tailIndex];
     }
 
+    ///@brief Access the last element in the buffer.
+    ///@return Reference to the last element in the buffer. Undefined behaviour is size of buffer is 0.
     reference back()
     {
-        return m_data[m_headIndex];
+        return m_data.data()[(m_headIndex -1)];
     }
 
     const_reference back() const
     {
-        return m_data[m_headIndex];
+        return m_data[m_headIndex-1];
     }
 
 private:
-    // Creating a few functions seemed better than passing the info as parameter if 
     void increment(size_t& index)
     {   
         index++;
         // Reaching equal is past the last element, wraps around.
-        if(index >= debug_count)
+        if(index >= m_data.capacity())
         {
             index = 0;
         }
     }
 
-    void decrement(size_t& index, bool isTail)
+    void decrement(size_t& index)
     {
         index--;
         if(index<0)
         {
-            // Move head to last element. Using size is a little sus, pop does not remove an item from the vector atm! TODO
-            // Erasing from the end of the vector is constant complexity but the complexity is linear
-            // Not sure if this is even correct. Vector should have this size no?
             index = m_data.capacity() - 1;
         }
     }

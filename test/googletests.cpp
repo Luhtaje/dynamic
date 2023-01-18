@@ -36,6 +36,14 @@ public:
     }
 };
 
+TEST(AA, user)
+{
+    RingBuffer<int> myVec{1,2,3,4,5,6,7,8};
+    myVec.push_back(5);
+
+    auto value = myVec.back();
+}
+
 //Tests requirement: LegacyInputIterator, ++r, (void)r++ , *r++;
 TEST(legacyIterators, IncrementOperators)
 {
@@ -427,20 +435,10 @@ TEST(mainframe, Emplace)
     EXPECT_EQ(control[size-1], TEST_INT_VALUE + 1);
 }
 
-
 TEST(sequencecontainer, front)
 {
     const RingBuffer<int> nonConst {1,2,3,5,6};
 
     EXPECT_EQ(nonConst.front(), *nonConst.begin());
     EXPECT_EQ(itControl.front(), *itControl.begin());
-}
-
-TEST(mainframe, user)
-{
-    RingBuffer<int> myBuf;
-
-    myBuf.push_back(10);
-
-    myBuf.empty();
 }
