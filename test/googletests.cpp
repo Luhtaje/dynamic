@@ -435,6 +435,17 @@ TEST(mainframe, Emplace)
     EXPECT_EQ(control[size-1], TEST_INT_VALUE + 1);
 }
 
+TEST(mainframe, data)
+{
+    // data() no implemented yet
+    GTEST_SKIP();
+    RingBuffer<int> myBuf;
+    myBuf.reserve(5);
+
+    ASSERT_TRUE((myBuf.size()==0 && myBuf.capacity() > 0));
+    ASSERT_TRUE(myBuf.data() != nullptr);
+}
+
 TEST(sequencecontainer, front)
 {
     const RingBuffer<int> nonConst {1,2,3,5,6};

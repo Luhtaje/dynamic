@@ -138,8 +138,17 @@ public:
     /// @return Size of buffer.
     size_type size() const
     {
-        //TODO rework distance does not produce correct result. count not good either.
-        return debug_count;
+        if(m_headIndex < m_tailIndex)
+        {
+            return m_headIndex + m_data.capacity() - m_tailIndex;
+        }
+
+        return m_headIndex - m_tailIndex;
+    }
+
+    size_type capacity() const
+    {
+        return m_data.capacity();
     }
 
     size_type max_size() const noexcept
@@ -167,6 +176,11 @@ public:
     void resize(size_type n, const T& val)
     {
         m_data.resize(n,val);
+    }
+
+    void reserve(size_t newsize)
+    {
+        m_data.reserve(newsize);
     }
 
     // Insert element to tail. The logical front of the buffer.
