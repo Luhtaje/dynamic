@@ -40,13 +40,21 @@ public:
     using size_type = std::size_t;
 
 public:
-    // TODO Implement user-defined constructors and what not. Need to implement destructor that destroys all the elements, which are not
+    // TODO Implement user-defined constructors and what not. Need to implement destructor that destroys all the elements to take care of dynamic elements.
     //
     /// @brief Default constructor.
-    RingBuffer() = default;
+    RingBuffer()
+    {
+        m_headIndex = 0;
+        m_tailIndex = 0;
+        m_data.reserve(2);
+    }
 
     /// @brief Initializer list contructor.
-    RingBuffer(std::initializer_list<T> init):m_data(init), debug_count(init.size()), m_headIndex(init.size()), m_tailIndex(0) {}
+    RingBuffer(std::initializer_list<T> init):m_data(init), debug_count(init.size()), m_headIndex(init.size()), m_tailIndex(0) 
+    {
+        m_data.reserve(size() * 1.4);
+    }
 
     /// @brief Custom constructor.
     /// @param size Size of the buffer to initialize.
@@ -56,7 +64,7 @@ public:
         m_data = std::vector<T>(size,val);
     }
 
-    /// @brief Contruct iterator at begin.
+    /// @brief Construct iterator at begin.
     /// @return Iterator pointing to first element.
     iterator begin() noexcept
     {
@@ -105,17 +113,17 @@ public:
         auto index(m_tailIndex + logicalIndex);
         auto capacity(m_data.capacity());
 
-        if(capacity < index)
+        if(capacity <= index)
         {
             index -= capacity;
         }
 
-        return m_data[index];
+        return m_data.data()[index];
     }
 
     /// @brief Returns an element from the buffer corresponding to a logical index.
     /// @param logicalIndex Index of the element to fetch.
-    /// @return Const reference the the object at 
+    /// @return Const reference the the object at logical index.
     const_reference operator[](const size_type logicalIndex) const
     {
         auto index(m_tailIndex + logicalIndex);
@@ -126,13 +134,15 @@ public:
             index -= capacity;
         }
 
-        return m_data[index];
+        return m_data.data()[index];
     }
 
 	/// @brief Sorts ringbuffer so that logical tail matches the first element in physical memory.
     /// @return Pointer to the first element.
-    //To be implemented! Requires knowledge of logical ends which are not implemented yet.
-    RingBuffer data();
+    //TODO need to do spinnerino. Now returns vector physical first element.
+    pointer data(){
+        return m_data.data();
+    }
 
     /// @brief Gets the size of the container.
     /// @return Size of buffer.
@@ -178,7 +188,7 @@ public:
         m_data.resize(n,val);
     }
 
-    void reserve(size_t newsize)
+    void reserve(size_type newsize)
     {
         m_data.reserve(newsize);
     }
@@ -187,24 +197,19 @@ public:
     void push_front(value_type val)
     {
         debug_count++;
-        // Special case when buffer is empty. Moves head instead of tail. This makes pushing to front always a little slower.
-        if(m_headIndex == m_tailIndex)
+
+        // Pushing to tail grows the buffer backwards.
+        decrement(m_tailIndex);
+        if(m_tailIndex == m_headIndex)
         {
-            push_back(val);
+            // TODO Current implementation requires the buffer to be rotated to match physical layout before reserve.
+            // Otherwise buffer will end up cut in half if it has wrapped around. Wonder how vector would deal with uncontinuous structure.
+            m_data.reserve(floor(m_data.capacity()* 1.3) + 2);
         }
-        else
-        {
-            // Pushing to tail grows the buffer backwards.
-            decrement(m_tailIndex);
-            if(m_tailIndex == m_headIndex)
-            {
-                // TODO Current implementation requires the buffer to be rotated to match physical layout before reserve.
-                // Otherwise buffer will end up cut in half if it has wrapped around. Wonder how vector would deal with uncontinuous structure.
-                m_data.reserve(floor(m_data.capacity()* 1.3) + 2);
-            }
-            T* _ptr = new(&m_data + sizeof(T) * m_tailIndex) T(val);
-            
-        }
+        // Pushing to front proposes a different problem with std::vector. Pushing back can be solved by resizing,
+        // but pushing to front should push the element possibly to the physical back of the vector. To make vector recognize this element,
+        // The resize should take up the whole capacity. TODO
+        T* _ptr = new(&m_data + sizeof(T) * m_tailIndex) T(val);
     }
 
     /// @brief Inserts an element in the back of the buffer. If buffer is full, allocates more memory.
@@ -212,79 +217,88 @@ public:
     // TODO corner cases : first element, buffer full, buffer full and index at border. Poor design atm
     void push_back(value_type val)
     {
-        // Checks for empty buffer.
-        if(m_headIndex == m_tailIndex)
+        // Empty buffer case.
+        if(m_data.capacity() == m_data.size())
         {
-            m_data.reserve(m_data.capacity() + 5);
-            T* _ptr = new(&m_data.data()[0]) T(val);
-            if(!_ptr)
-            {
-                throw;
-            }
-            // If buffer was empty, re-increment the index.
+            m_data.reserve(m_data.capacity() * 1.5 + 1 );
+            T* _ptr = new(&m_data.data()[m_headIndex]) T(val);
             increment(m_headIndex);
         }
         else
         {
-            m_data.reserve(m_data.capacity() * 1.5);
+            // Adds element, and after checks for if more capacity is needed. This pre-reserves memory for next element.
+            // The buffer is full for only a brief moment.
+            m_data.resize(size() + 1);
             T* _ptr = new(&m_data.data()[m_headIndex]) T(val);
-            if(!_ptr)
-            {
-
-                throw;
-            }
             increment(m_headIndex);
+            if(m_tailIndex == m_headIndex)
+            {
+                decrement(m_headIndex);
+                m_data.reserve(m_data.capacity() * 1.5);
+                increment(m_headIndex);
+            }
         }
     }
 
-    // Erases an element from logical front of the buffer. Moves tail forward. Leaves the object in the vector. When could it be removed?
+    // Erases an element from logical front of the buffer.
     void pop_front()
     {
-        debug_count--;
-        (&m_data[m_tailIndex])->~T();
+        --debug_count;
+        (&m_data.data()[m_tailIndex])->~T();
         increment(m_tailIndex);
     }
 
-    // Erase at from head.
+    // Erase an element from the logical back of the buffer.
     void pop_back()
     {
-        debug_count--;
-        (&m_data[m_tailIndex])->~T();
+        --debug_count;
         decrement(m_headIndex);
+        (&m_data.data()[m_headIndex-1])->~T();
     }
 
 //===========================================================
 //  std::queue adaptor functions
 //===========================================================
 
-    // TODO: the indexes point to over-the-element, need to adjust how they are retrieved. Would have to take wrap-around into consideration.
     reference front()
     {
-        return m_data[m_tailIndex];
+        return m_data.data()[m_tailIndex];
     }
 
     const_reference front() const
     {
-        return m_data[m_tailIndex];
+        return m_data.data()[m_tailIndex];
     }
 
     ///@brief Access the last element in the buffer.
     ///@return Reference to the last element in the buffer. Undefined behaviour is size of buffer is 0.
     reference back()
     {
-        return m_data.data()[(m_headIndex -1)];
+        // Since head points to next-to-last element, it needs to be decremented once to get the correct element. 
+        // If the index is at the beginning border of the allocated memory area it needs to be wrapped around. 
+        if (m_headIndex == 0)
+        {
+            return m_data.data()[m_data.capacity() - 1];
+        }
+        return m_data.data()[m_headIndex-1];
     }
 
     const_reference back() const
     {
-        return m_data[m_headIndex-1];
+        // Since head points to next-to-last element, it needs to be decremented once to get the correct element. 
+        // If the index is at the beginning border of the allocated memory area it needs to be wrapped around. 
+        if (m_headIndex == 0)
+        {
+            return m_data.data()[m_data.capacity() - 1];
+        }
+        return m_data.data()[m_headIndex-1];
     }
 
 private:
     void increment(size_t& index)
     {   
-        index++;
-        // Reaching equal is past the last element, wraps around.
+        ++index;
+        // Reaching equal is past the last element, then wraps around.
         if(index >= m_data.capacity())
         {
             index = 0;
@@ -293,10 +307,13 @@ private:
 
     void decrement(size_t& index)
     {
-        index--;
-        if(index<0)
+
+        if(index == 0)
         {
             index = m_data.capacity() - 1;
+        }
+        else{
+            --index;
         }
     }
 
