@@ -4,13 +4,11 @@ set(This source)
 
 set(Headers
     Ringbuffer.hpp    
-    TestClass.hpp
     Iterator.hpp
 )
 
 set(Sources
     Ringbuffer.cpp
-    TestClass.cpp
 )
 
 add_library(${This} STATIC ${Sources} ${Headers})

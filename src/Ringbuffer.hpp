@@ -11,7 +11,6 @@
 template<typename T, typename Allocator = std::allocator<T>>
 class RingBuffer;
 
-
 //template<typename T>
 //using RingBufferSharedPtr = shared_ptr<RingBuffer<value_type>>;
 
@@ -53,7 +52,7 @@ public:
     /// @brief Initializer list contructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
-    RingBuffer(std::initializer_list<T> init): m_headIndex(init.size()), m_tailIndex(0) m_capacity(init.size() + 2)
+    RingBuffer(std::initializer_list<T> init): m_headIndex(init.size()), m_tailIndex(0), m_capacity(init.size() + 2)
     {
         m_data = m_allocator.allocate(m_capacity);
     }
@@ -63,14 +62,39 @@ public:
     /// @param rhs Reference to a RingBuffer to create a copy from.
     RingBuffer(const RingBuffer& rhs)
     {
-        m_data = m_allocator.allocate(rhs.m_capacity);
-        m_capacity = rhs.capacity;
+        m_capacity = rhs.m_capacity;
+        m_data = m_allocator.allocate(m_capacity);
         m_headIndex = rhs.m_headIndex;
         m_tailIndex = rhs.m_tailIndex;
-        // If contents of the buffer are pointers to some resource, this does not copy the resource.Somehow should call copyConstructor for those objects.
+        // If contents of the buffer are pointers to some resource, this does not copy the resource. Somehow should call copyConstructor for those objects.
         // Also memcpy for uninitialized objects is undefined behaviour
         // One possible implementation is to use std::copy for the ranges possibly wrapped buffer. Maybe just leave uninitialized elements untouched.
-        std::memcpy(rhs.m_data.get(), m_data.get(), m_capacity * sizeof(T));
+        //std::memcpy(rhs.m_data.get(), m_data.get(), m_capacity * sizeof(T));
+        // Copy the buffer in two sections, 
+        if(m_tailIndex > m_headIndex)
+        {   // Copy elements from:
+            //   [Tail]-[]...[]-[capacity-1] |
+            std::copy(rhs.begin(), rhs.begin(), begin());
+
+            // Copy elements from:
+            //   | [0]-[]...[]-[Head]
+            RingBuffer<T>::const_iterator begin = RingBuffer::iterator(this,0);
+            std::copy(rhs.end(), begin, end());
+        }
+        else
+        {
+            // Copy normal formation when buffer is in order (has not wrapped around).
+            std::copy(rhs.begin(),rhs.end(), begin());
+        }
+    }
+
+    /// @brief Custom constructor.
+    /// @param size Size of the buffer to initialize.
+    /// @param val Value to set every element to.
+    RingBuffer(size_type size, T val = 0) : m_headIndex(size), m_tailIndex(0)
+    {
+        m_capacity = size + 2;
+        m_data = m_allocator.allocate(m_capacity);
     }
 
     /// @brief Copy assignment operator.
@@ -83,17 +107,18 @@ public:
         return *this;
     }
 
-    // Move constructor
+    /// @brief Move constructor.
+    /// @param other 
     RingBuffer(RingBuffer&& other) noexcept
     {
         m_data = std::exchange(other.m_data, nullptr);
-        m_capacity(other.m_capacity, 0);
-        m_headIndex(other.m_headIndex, 0);
-        m_tailIndex(other.m_tailIndex, 0);
+        m_capacity = std::exchange(other.m_capacity, 0);
+        m_headIndex = std::exchange(other.m_headIndex, 0);
+        m_tailIndex = std::exchange(other.m_tailIndex, 0);
     }
 
     // Move assignment
-    RingBuffer& RingBuffer::operator=(RingBuffer& other)
+    RingBuffer& operator=(RingBuffer& other)
     {
         RingBuffer copy(std::move(other));
         copy.swap(*this);
@@ -105,15 +130,7 @@ public:
     {
         // Destroy initialized elements before deallocating.
 
-        _allocator.deallocate(m_data, capacity());
-    }
-
-    /// @brief Custom constructor.
-    /// @param size Size of the buffer to initialize.
-    /// @param val Value to set every element to.
-    RingBuffer(size_type size, T val = 0) :, m_headIndex(size), m_tailIndex(0)
-    {
-        m_data = m_allocator.allocate(init.size + 2);
+        m_allocator.deallocate(m_data, capacity());
     }
 
     /// @brief Member swap implementation. Swaps RingBuffers member to member.
@@ -124,7 +141,7 @@ public:
         swap(m_data, other.m_data);
         swap(m_headIndex, other.m_headIndex);
         swap(m_tailIndex, other.m_tailIndex);
-        swap(m_capacity, other.m_capactity);
+        swap(m_capacity, other.m_capacity);
 
     }
 
@@ -138,42 +155,42 @@ public:
     /// @return Iterator pointing to first element.
     iterator begin() noexcept
     {
-        return iterator(this, 0);
+        return iterator(this, m_tailIndex);
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator begin() const noexcept
     {
-        return const_iterator(this, 0);
+        return const_iterator(this, m_tailIndex);
     }
 
     /// @brief Construct iterator at end.
     /// @return Iterator pointing past last element.
     iterator end() noexcept
     {
-        return iterator(this, debug_count);
+        return iterator(this, m_headIndex);
     }
 
     /// @brief Construct const_iterator at end.
     /// @return Const_iterator pointing past last element.
     const_iterator end() const noexcept
     {
-        return const_iterator(this, debug_count);
+        return const_iterator(this, m_headIndex);
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator cbegin() const noexcept
     {
-        return const_iterator(this, 0);
+        return const_iterator(this, m_tailIndex);
     }
 
     /// @brief Construct const_iterator.
     /// @return Const_iterator pointing past last element.
     const_iterator cend() const noexcept
     {
-        return const_iterator(this, debug_count);
+        return const_iterator(this, m_headIndex);
     }
 
     reference operator[](const size_type logicalIndex)
@@ -187,7 +204,7 @@ public:
             index -= m_capacity;
         }
 
-        return m_data[index].get();
+        return m_data[index];
     }
 
     /// @brief Returns an element from the buffer corresponding to a logical index.
@@ -202,14 +219,14 @@ public:
             index -= m_capacity;
         }
 
-        return m_data[index].get();
+        return m_data[index];
     }
 
 	/// @brief Sorts ringbuffer so that logical tail matches the first element in physical memory.
     /// @return Pointer to the first element.
     //TODO need to do spinnerino. Now returns vector physical first element.
     pointer data(){
-        return m_data.get();
+        return m_data;
     }
 
     /// @brief Gets the size of the container.
@@ -218,7 +235,7 @@ public:
     {
         if(m_headIndex < m_tailIndex)
         {
-            return m_headIndex + m_capacity() - m_tailIndex;
+            return m_headIndex + m_capacity - m_tailIndex;
         }
 
         return m_headIndex - m_tailIndex;
@@ -261,7 +278,6 @@ public:
     // Insert element to tail. The logical front of the buffer.
     void push_front(value_type val)
     {
-        debug_count++;
 
         // Pushing to tail grows the buffer backwards.
         decrement(m_tailIndex);
@@ -269,12 +285,12 @@ public:
         {
             // TODO Current implementation requires the buffer to be rotated to match physical layout before reserve.
             // Otherwise buffer will end up cut in half if it has wrapped around. Wonder how vector would deal with uncontinuous structure.
-            m_data.reserve(floor(m_capacity* 1.3) + 2);
+            reserve(floor(m_capacity* 1.3) + 2);
         }
         // Pushing to front proposes a different problem with std::vector. Pushing back can be solved by resizing,
         // but pushing to front should push the element possibly to the physical back of the vector. To make vector recognize this element,
         // The resize should take up the whole capacity. TODO
-        T* _ptr = new(m_data.get() + sizeof(T) * m_tailIndex) T(val);
+        T* _ptr = new(m_data + sizeof(T) * m_tailIndex) T(val);
     }
 
     /// @brief Inserts an element in the back of the buffer. If buffer is full, allocates more memory.
@@ -283,10 +299,10 @@ public:
     void push_back(value_type val)
     {
         // Empty buffer case.
-        if(m_data.capacity() == m_data.size())
+        if(m_capacity == size())
         {
-            m_data.reserve(m_data.capacity() * 1.5 + 1 );
-            T* _ptr = new(m_data[m_headIndex].get()) T(val);
+            reserve(m_capacity * 1.5 + 1 );
+            T* _ptr = new(&m_data[m_headIndex]) T(val);
             increment(m_headIndex);
         }
         else
@@ -294,12 +310,12 @@ public:
             // Adds element, and after checks for if more capacity is needed. This pre-reserves memory for next element.
             // The buffer is full for only a brief moment.
             //m_data.resize(size() + 1);
-            T* _ptr = new(m_data[m_headIndex].get()) T(val);
+            T* _ptr = new(&m_data[m_headIndex]) T(val);
             increment(m_headIndex);
             if(m_tailIndex == m_headIndex)
             {
                 decrement(m_headIndex);
-                reserve(m_capacity() * 1.5);
+                reserve(m_capacity * 1.5);
                 increment(m_headIndex);
             }
         }
@@ -308,17 +324,15 @@ public:
     // Erases an element from logical front of the buffer.
     void pop_front()
     {
-        --debug_count;
-        allocator.destroy(m_data[m_tailIndex].get());
+        m_allocator.destroy(&m_data[m_tailIndex]);
         increment(m_tailIndex);
     }
 
     // Erase an element from the logical back of the buffer.
     void pop_back()
     {
-        --debug_count;
         decrement(m_headIndex);
-        allocator.destroy(m_data[m_headIndex-1].get());
+        m_allocator.destroy(m_data[m_headIndex-1]);
     }
 
 //===========================================================
@@ -327,12 +341,12 @@ public:
 
     reference front()
     {
-        return *m_data[m_tailIndex];
+        return m_data[m_tailIndex];
     }
 
     const_reference front() const
     {
-        return *m_data[m_tailIndex];
+        return m_data[m_tailIndex];
     }
 
     ///@brief Access the last element in the buffer.
@@ -343,9 +357,9 @@ public:
         // If the index is at the beginning border of the allocated memory area it needs to be wrapped around. 
         if (m_headIndex == 0)
         {
-            return *m_data[m_data.capacity() - 1];
+            return m_data[m_capacity - 1];
         }
-        return *m_data[m_headIndex-1];
+        return m_data[m_headIndex-1];
     }
 
     const_reference back() const
@@ -364,7 +378,7 @@ private:
     {   
         ++index;
         // Reaching equal is past the last element, then wraps around.
-        if(index >= m_capacity())
+        if(index >= m_capacity)
         {
             index = 0;
         }
@@ -375,7 +389,7 @@ private:
 
         if(index == 0)
         {
-            index = m_capacity() - 1;
+            index = m_capacity - 1;
         }
         else{
             --index;
@@ -392,7 +406,7 @@ private:
     size_type m_headIndex; /* Index of the last element in the buffer.*/ 
     size_type m_tailIndex;/* Index of the first element in the buffer.*/
 
-    size_type capacity;
+    size_type m_capacity;
     T* m_data;
     Allocator m_allocator;
     //std::vector <T,Allocator> m_data;/* Underlying vector to store the data*/

@@ -127,7 +127,7 @@ public:
     /// @return reference to the element at index
     reference operator[](const difference_type index) const
     {
-        return (*(*this + index));
+        return m_container[m_logicalIndex + index];
     }
 
     /// @brief Comparison operator== overload
@@ -306,7 +306,7 @@ public:
         return (m_logicalIndex - iterator.m_logicalIndex);
     }
 
-    /// @brief index operator
+    /// @brief Index operator
     /// @param offset 
     /// @return 
     reference operator[](const difference_type index) const
@@ -381,6 +381,6 @@ public:
     //What container is this iterator for.
     _rBuf* m_container;
     
-    //Pointer to an element.
+    // Offset from physical start from the buffer
     int m_logicalIndex;
 };
