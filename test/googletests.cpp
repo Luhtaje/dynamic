@@ -436,7 +436,7 @@ TEST(mainframe, data)
     RingBuffer<int> myBuf;
     myBuf.reserve(5);
     // TODO add test for data to rotate the buffer so that physical start matches logical start.
-    ASSERT_TRUE((myBuf.size()==0 && myBuf.capacity() > 0));
+    ASSERT_TRUE((myBuf.size()== 0 && myBuf.getCapacity() > 0));
     ASSERT_TRUE(myBuf.data() != nullptr);
 }
 

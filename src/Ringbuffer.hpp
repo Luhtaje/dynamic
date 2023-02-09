@@ -55,37 +55,21 @@ public:
     RingBuffer(std::initializer_list<T> init): m_headIndex(init.size()), m_tailIndex(0), m_capacity(init.size() + 2)
     {
         m_data = m_allocator.allocate(m_capacity);
+        for(const auto& element : init)
+        {
+            push_back(element);
+        }
     }
 
     /// @brief Copy constructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation.
     /// @param rhs Reference to a RingBuffer to create a copy from.
-    RingBuffer(const RingBuffer& rhs)
+    RingBuffer(const RingBuffer& rhs) : m_capacity(rhs.m_capacity), m_headIndex(rhs.m_headIndex), m_tailIndex(rhs.m_tailIndex)
     {
-        m_capacity = rhs.m_capacity;
         m_data = m_allocator.allocate(m_capacity);
-        m_headIndex = rhs.m_headIndex;
-        m_tailIndex = rhs.m_tailIndex;
-        // If contents of the buffer are pointers to some resource, this does not copy the resource. Somehow should call copyConstructor for those objects.
-        // Also memcpy for uninitialized objects is undefined behaviour
-        // One possible implementation is to use std::copy for the ranges possibly wrapped buffer. Maybe just leave uninitialized elements untouched.
-        //std::memcpy(rhs.m_data.get(), m_data.get(), m_capacity * sizeof(T));
-        // Copy the buffer in two sections, 
-        if(m_tailIndex > m_headIndex)
-        {   // Copy elements from:
-            //   [Tail]-[]...[]-[capacity-1] |
-            std::copy(rhs.begin(), rhs.begin(), begin());
-
-            // Copy elements from:
-            //   | [0]-[]...[]-[Head]
-            RingBuffer<T>::const_iterator begin = RingBuffer::iterator(this,0);
-            std::copy(rhs.end(), begin, end());
-        }
-        else
-        {
-            // Copy normal formation when buffer is in order (has not wrapped around).
-            std::copy(rhs.begin(),rhs.end(), begin());
-        }
+        
+        // This should copy the whole buffer correctly in every way, because the iterator implementation is *smuh*.
+        std::copy(rhs.begin(), rhs.end(), begin());
     }
 
     /// @brief Custom constructor.
@@ -100,7 +84,7 @@ public:
     /// @brief Copy assignment operator.
     /// @param copy A temporary RingBuffer created by a copy constructor.
     /// @return Returns reference to the left hand side RungBuffer after swap.
-    RingBuffer& operator=(const RingBuffer& other) noexcept
+    RingBuffer& operator=(const RingBuffer& other)
     {
         RingBuffer copy(other);
         copy.swap(*this);
@@ -130,7 +114,7 @@ public:
     {
         // Destroy initialized elements before deallocating.
 
-        m_allocator.deallocate(m_data, capacity());
+        m_allocator.deallocate(m_data, m_capacity);
     }
 
     /// @brief Member swap implementation. Swaps RingBuffers member to member.
@@ -241,13 +225,11 @@ public:
         return m_headIndex - m_tailIndex;
     }
 
-    size_type capacity() const
+    /// @brief Capacity getter.
+    /// @return m_capacity Returns how many elements have been allocated for the buffers use. 
+    size_type getCapacity() const
     {
-    }
-
-    size_type max_size() const noexcept
-    {
-
+        return m_capacity;
     }
 
     /// @brief Check if buffer is empty

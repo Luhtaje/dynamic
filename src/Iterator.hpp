@@ -14,20 +14,22 @@ public:
     using iterator_category = std::random_access_iterator_tag;
 
     using value_type = typename _rBuf::value_type;
-    using difference_type = size_t;
+    using difference_type = typename _rBuf::difference_type;
     using pointer = typename _rBuf::const_pointer;
     using reference = const value_type&;
     //using _Tptr = typename _rBuf::pointer;
 
 public:
 
+    _rBuf_const_iterator(): m_container(nullptr), m_logicalIndex(0) {}
+
     /// @brief Constructor.
     /// @param index Index representing the logical element of the.
-    _rBuf_const_iterator(const _rBuf* container = nullptr, int index = -1): m_container(container), m_logicalIndex(index) {}
+    explicit _rBuf_const_iterator(const _rBuf* container, int index): m_container(container), m_logicalIndex(index) {}
 
     /// @brief Conversion constructor
     /// @param const_iterator const iterator to construct from.
-    _rBuf_const_iterator(_rBuf_iterator<_rBuf>& iterator) : m_container(iterator.m_container), m_logicalIndex(iterator.m_logicalIndex) {}
+    _rBuf_const_iterator(const _rBuf_iterator<_rBuf>& iterator) : m_container(iterator.m_container), m_logicalIndex(iterator.m_logicalIndex) {}
 
     /// @brief Conversion assingment from non-const iterator
     /// @param iterator non-const iterator.
@@ -56,7 +58,7 @@ public:
     _rBuf_const_iterator& operator++()
     {
         //TODO: check value-initialization and over end() increment.
-        
+
         m_logicalIndex++;
         return (*this);
     }
@@ -89,8 +91,8 @@ public:
         return temp;
     }
 
-    /// @brief Moves iterator forward.
-    /// @param movement Amount of elements to move.
+    /// @brief Moves iterator.
+    /// @param offset Amount of elements to move. Negative values move iterator backwards.
     _rBuf_const_iterator& operator+=(difference_type offset)
     {
         m_logicalIndex += offset;
@@ -113,13 +115,21 @@ public:
         return (*this += -offset);
     }
 
+    /// @brief Decrement an iterator by offset.
+    /// @param offset Amount of elements to go backwards
+    /// @return Returns a new iterator which points to a new iterator decremented by amount of offset.
+    _rBuf_const_iterator operator-(const difference_type offset) const
+    {
+        _rBuf_const_iterator temp(m_container, m_logicalIndex);
+        return (temp -= offset);
+    }
+
     /// @brief Gets distance between two iterators.
     /// @param iterator Iterator to get distance to.
     /// @return Amount of elements between the iterators.
-    difference_type operator-(const _rBuf_const_iterator& iterator)
+    difference_type operator-(const _rBuf_const_iterator& other) const
     {
-        //TODO: compatibility check
-        return (m_logicalIndex - iterator.m_logicalIndex);
+        return (m_logicalIndex - other.m_logicalIndex);
     }
 
     /// @brief index operator
@@ -218,20 +228,24 @@ public:
 
 public:
 
-    /// @brief Constructor.
-    /// @param index Index pointing to the logical element of the RingBuffer.
-    _rBuf_iterator(_rBuf* container = nullptr, int index = -1): m_container(container), m_logicalIndex(index) {}
+    /// @brief Default constructor
+    _rBuf_iterator(): m_container(nullptr), m_logicalIndex(0) {}
 
-    /// @brief Const dereference operator
-    /// @return  Const object pointed by iterator.
+    /// @brief Constructor.
+    /// @param container Pointer to the RingBuffer element which owns this iterator.
+    /// @param index Index pointing to the logical element of the RingBuffer.
+    explicit _rBuf_iterator(_rBuf* container, int index): m_container(container), m_logicalIndex(index) {}
+
+    /// @brief Dereference operator
+    /// @return  Returns the object the iterator is currently pointing to.
     reference operator*() const
     {
         //TODO: bounds checking and value-initialization.
         return m_container[m_logicalIndex];
     }
 
-    /// @brief
-    /// @return 
+    /// @brief Pointer operator.
+    /// @return Returns a pointer to the object the iterator is currently pointing to.
     pointer operator->() const
     {
         //TODO: check value initialization and bounds.
@@ -275,12 +289,13 @@ public:
     }
 
     /// @brief Moves iterator forward.
-    /// @param movement Amount of elements to move.
+    /// @param offset Amount of elements to move.
     _rBuf_iterator& operator+=(difference_type offset)
     {
         m_logicalIndex += offset;
         return (*this);
     }
+    
     // "Deprecated" for now, no apparent use case and causes ambiguous function call with some C++ internal operator+ overload.
     /// @brief Move iterator forward by specified amount.
     /// @param movement Amount of elements to move the iterator.
@@ -295,6 +310,11 @@ public:
     _rBuf_iterator& operator-=(const difference_type offset)
     {
         return (*this += -offset);
+    }
+
+    _rBuf_iterator& operator-(const difference_type offset)
+    {
+        return _rBuf_iterator(m_logicalIndex - offset);
     }
 
     /// @brief Gets distance between two iterators.
