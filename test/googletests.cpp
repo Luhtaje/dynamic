@@ -36,10 +36,6 @@ public:
     }
 };
 
-TEST(AA, user)
-{   
-}
-
 //Tests requirement: LegacyInputIterator, ++r, (void)r++ , *r++;
 TEST(legacyIterators, IncrementOperators)
 {
@@ -86,8 +82,6 @@ TEST(legacyIterator, CopyConstruction)
     auto assignConstConstructed = (cinitial);
     ASSERT_EQ(cinitial, constConstructed);
     ASSERT_EQ(assignConstConstructed, constConstructed); 
-
-
 }
 
 // Tests requirement: MoveConstucrible
@@ -257,7 +251,7 @@ TEST(iterators, ConstantConversion)
 //Tests requirement: LegacyInputIterator, dereferenceable Expression i->m is equivalent to (*i).m.
 TEST(iterators, PointerReduction)
 {
-    RingBuffer<std::string> strBuf = {"bb"};
+    RingBuffer<std::string> strBuf{"abcd"};
     auto customIt = strBuf.begin();
     EXPECT_EQ(customIt->at(0), (*customIt).at(0));
 

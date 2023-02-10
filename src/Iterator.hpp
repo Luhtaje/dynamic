@@ -312,18 +312,19 @@ public:
         return (*this += -offset);
     }
 
-    _rBuf_iterator& operator-(const difference_type offset)
+    _rBuf_iterator& operator-(const difference_type offset) const
     {
-        return _rBuf_iterator(m_logicalIndex - offset);
+        _rBuf_iterator temp(m_container, m_logicalIndex);
+        return (temp -= offset);
     }
 
     /// @brief Gets distance between two iterators.
     /// @param iterator Iterator to get distance to.
     /// @return Amount of elements between the iterators.
-    difference_type operator-(const _rBuf_iterator& iterator)
+    difference_type operator-(const _rBuf_iterator& other) const
     {
         //TODO: compatibility check
-        return (m_logicalIndex - iterator.m_logicalIndex);
+        return (m_logicalIndex - other.m_logicalIndex);
     }
 
     /// @brief Index operator

@@ -43,7 +43,7 @@ public:
     //
     /// @brief Default constructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
-    /// @note Allocates memory for 2 elements.
+    /// @note Allocates memory for 2 elements. The buffer works on a principle that it never gets full.
     RingBuffer() : m_headIndex(0), m_tailIndex(0), m_capacity(2)
     {
         m_data = m_allocator.allocate(2);
@@ -68,8 +68,8 @@ public:
     {
         m_data = m_allocator.allocate(m_capacity);
         
-        // This should copy the whole buffer correctly in every way, because the iterator implementation is *smuh*.
-        std::copy(rhs.begin(), rhs.end(), begin());
+        // Copies the buffer by calling copyconstructor on each element. If T is triviallyCopyable memmove or something similiar might be used.
+        std::copy(rhs.cbegin(), rhs.cend(), begin());
     }
 
     /// @brief Custom constructor.
@@ -112,8 +112,10 @@ public:
     //Destructor
     ~RingBuffer()
     {
-        // Destroy initialized elements before deallocating.
+        // Calls destructor for each element in the buffer.
+        for_each(begin(),end(),[](T elem) { elem.~T(); });
 
+        // After destruction deallocate the memory.
         m_allocator.deallocate(m_data, m_capacity);
     }
 
@@ -252,9 +254,45 @@ public:
     {
     }
 
+    /// @brief Allocates more memory and copies the existing buffer to the new memory location.
+    /// @throw Throws std::bad_alloc if there is not enough memory for allocation. Throws std::bad_array_new_lenght if std::numeric_limits<std::size_t>::max() / sizeof(T) < newsize.
+    /// @param newsize Amount of memory to allocate.
     void reserve(size_type newsize)
     {
-        // TODO
+        if(newsize > m_capacity)
+        {
+            // Temporary buffer to help with copying the values to new memory location. -2 because the constructor adds 2 elements by default. This is far from optimal.
+            auto temp =  RingBuffer<T>(newsize - 2);
+            temp.m_headIndex = m_headIndex;
+            temp.m_tailIndex = m_tailIndex;
+
+            // Copy the buffer if it has wrapped around, ends needs to touch borders with the allocated memory area. No floating head or tail is allowed.
+            if(m_headIndex < m_tailIndex)
+            {
+                // Iterator refer to physical begin, not logical as the begin() member function does.
+                auto sourceBeginIt = const_iterator(this, 0);
+                auto destBeginIt = iterator(&temp, 0);
+
+                // Copy beginning sequence of wrapped buffer.
+                std::copy(sourceBeginIt, cend(), destBeginIt);
+
+                // Copy end sequence of buffer.
+                auto sourceEndIt = const_iterator(this, m_capacity);
+                // This iterator refers to the first element in the seuqence which touches the end border of the new memory area.
+                auto destEndIt = iterator(&temp, newsize - m_capacity + m_tailIndex);
+
+                // Copy the ending sequence of a wrapped buffer
+                std::copy(cbegin(), sourceEndIt, destEndIt);
+            }
+            else
+            {
+                // Trivial copy to new location.
+                std::copy(begin(), end(), temp.begin());
+            }
+
+            // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
+            this->swap(temp);
+        }
     }
 
     // Insert element to tail. The logical front of the buffer.
