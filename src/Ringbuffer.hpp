@@ -2,17 +2,12 @@
 #define MAIN_HPP
 
 #include <memory>
-#include <vector>
 #include <algorithm>
-#include <deque>
 #include "Iterator.hpp"
 
 //Forward decl
 template<typename T, typename Allocator = std::allocator<T>>
 class RingBuffer;
-
-//template<typename T>
-//using RingBufferSharedPtr = shared_ptr<RingBuffer<value_type>>;
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
 /// @tparam T type of the ringbuffer
@@ -31,16 +26,12 @@ public:
     using const_iterator = _rBuf_const_iterator<RingBuffer<T>>;
     using iterator = _rBuf_iterator<RingBuffer<T>>;
 
-    //TODO::are reverse iterators needed? Probably, hard to compete with stl container algorithms without reverse iterator.Right?
-    //using reverse_iterator = reverse_iterator<iterator>;
-    //using const_reverse_iterator = const_reverse_iterator<const_iterator>;
-
     using difference_type = ptrdiff_t;
     using size_type = std::size_t;
 
 public:
-    // TODO Implement user-defined constructors and what not. Need to implement destructor that destroys all the elements to take care of dynamic elements.
-    //
+
+
     /// @brief Default constructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 elements. The buffer works on a principle that it never gets full.
@@ -49,10 +40,31 @@ public:
         m_data = m_allocator.allocate(2);
     }
 
+    /// @brief Custom constructor. Initializes a buffer to a size without constructing any elements.
+    /// @param size Capacity of the buffer.
+    RingBuffer(size_type size) : m_headIndex(0), m_tailIndex(0)
+    {
+        m_capacity = size + 2;
+        m_data = m_allocator.allocate(m_capacity);
+    }
+
+    /// @brief Custom constructor. Constructs the buffer and initializes all of its elements to a given value.
+    /// @param size Size of the buffer.
+    /// @param val Value which the elements are initialized to.
+    RingBuffer(size_type size, T val) : m_headIndex(0), m_tailIndex(0)
+    {
+        m_capacity = size + 2;
+        m_data = m_allocator.allocate(m_capacity);
+        for(int i = 0 ; i < size ;  i++)
+        {
+            push_back(val);
+        }
+    }
+
     /// @brief Initializer list contructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
-    RingBuffer(std::initializer_list<T> init): m_headIndex(init.size()), m_tailIndex(0), m_capacity(init.size() + 2)
+    RingBuffer(std::initializer_list<T> init): m_headIndex(0), m_tailIndex(0), m_capacity(init.size() + 2)
     {
         m_data = m_allocator.allocate(m_capacity);
         for(const auto& element : init)
@@ -70,15 +82,6 @@ public:
         
         // Copies the buffer by calling copyconstructor on each element. If T is triviallyCopyable memmove or something similiar might be used.
         std::copy(rhs.cbegin(), rhs.cend(), begin());
-    }
-
-    /// @brief Custom constructor.
-    /// @param size Size of the buffer to initialize.
-    /// @param val Value to set every element to.
-    RingBuffer(size_type size, T val = 0) : m_headIndex(size), m_tailIndex(0)
-    {
-        m_capacity = size + 2;
-        m_data = m_allocator.allocate(m_capacity);
     }
 
     /// @brief Copy assignment operator.
@@ -102,7 +105,7 @@ public:
     }
 
     // Move assignment
-    RingBuffer& operator=(RingBuffer& other)
+    RingBuffer& operator=(RingBuffer&& other)
     {
         RingBuffer copy(std::move(other));
         copy.swap(*this);
@@ -259,86 +262,68 @@ public:
     /// @param newsize Amount of memory to allocate.
     void reserve(size_type newsize)
     {
-        if(newsize > m_capacity)
+        if(newsize <= m_capacity) return;
+
+        // Temporary buffer to help with copying the values to new memory location. -2 because the constructor adds 2 elements by default. This is far from optimal.
+        auto temp =  RingBuffer<T>(newsize - 2);
+        temp.m_headIndex = m_headIndex;
+        temp.m_tailIndex = m_tailIndex;
+
+        // Copy the buffer if it has wrapped around, ends needs to touch borders with the allocated memory area. No floating head or tail is allowed.
+        if(m_headIndex < m_tailIndex)
         {
-            // Temporary buffer to help with copying the values to new memory location. -2 because the constructor adds 2 elements by default. This is far from optimal.
-            auto temp =  RingBuffer<T>(newsize - 2);
-            temp.m_headIndex = m_headIndex;
-            temp.m_tailIndex = m_tailIndex;
+            // Iterator refer to physical begin, not logical as the begin() member function does.
+            auto sourceBeginIt = const_iterator(this, 0);
+            auto destBeginIt = iterator(&temp, 0);
 
-            // Copy the buffer if it has wrapped around, ends needs to touch borders with the allocated memory area. No floating head or tail is allowed.
-            if(m_headIndex < m_tailIndex)
-            {
-                // Iterator refer to physical begin, not logical as the begin() member function does.
-                auto sourceBeginIt = const_iterator(this, 0);
-                auto destBeginIt = iterator(&temp, 0);
+            // Copy beginning sequence of wrapped buffer.
+            std::copy(sourceBeginIt, cend(), destBeginIt);
 
-                // Copy beginning sequence of wrapped buffer.
-                std::copy(sourceBeginIt, cend(), destBeginIt);
+            // Copy end sequence of buffer.
+            auto sourceEndIt = const_iterator(this, m_capacity);
+            // This iterator refers to the first element in the seuqence which touches the end border of the new memory area.
+            auto destEndIt = iterator(&temp, newsize - m_capacity + m_tailIndex);
 
-                // Copy end sequence of buffer.
-                auto sourceEndIt = const_iterator(this, m_capacity);
-                // This iterator refers to the first element in the seuqence which touches the end border of the new memory area.
-                auto destEndIt = iterator(&temp, newsize - m_capacity + m_tailIndex);
-
-                // Copy the ending sequence of a wrapped buffer
-                std::copy(cbegin(), sourceEndIt, destEndIt);
-            }
-            else
-            {
-                // Trivial copy to new location.
-                std::copy(begin(), end(), temp.begin());
-            }
-
-            // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
-            this->swap(temp);
+            // Copy the ending sequence of a wrapped buffer
+            std::copy(cbegin(), sourceEndIt, destEndIt);
         }
+        else
+        {
+            // Simple copy to new location.
+            std::copy(begin(), end(), temp.begin());
+        }
+
+        // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
+        std::swap(*this,temp);
     }
 
-    // Insert element to tail. The logical front of the buffer.
+    /// @brief Inserts an element to the front of the buffer.
+    /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
+    /// @param val Element to insert.
     void push_front(value_type val)
     {
-
-        // Pushing to tail grows the buffer backwards.
         decrement(m_tailIndex);
         if(m_tailIndex == m_headIndex)
         {
-            // TODO Current implementation requires the buffer to be rotated to match physical layout before reserve.
-            // Otherwise buffer will end up cut in half if it has wrapped around. Wonder how vector would deal with uncontinuous structure.
-            reserve(floor(m_capacity* 1.3) + 2);
+            reserve(m_capacity* 1.5);
         }
-        // Pushing to front proposes a different problem with std::vector. Pushing back can be solved by resizing,
-        // but pushing to front should push the element possibly to the physical back of the vector. To make vector recognize this element,
-        // The resize should take up the whole capacity. TODO
-        T* _ptr = new(m_data + sizeof(T) * m_tailIndex) T(val);
+
+        T* _ptr = new(&m_data[m_tailIndex]) T(val);
     }
 
     /// @brief Inserts an element in the back of the buffer. If buffer is full, allocates more memory.
+    /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Value of type T to be inserted in to the buffer.
-    // TODO corner cases : first element, buffer full, buffer full and index at border. Poor design atm
     void push_back(value_type val)
     {
         // Empty buffer case.
         if(m_capacity == size())
         {
-            reserve(m_capacity * 1.5 + 1 );
-            T* _ptr = new(&m_data[m_headIndex]) T(val);
-            increment(m_headIndex);
+            reserve(m_capacity * 1.5);
         }
-        else
-        {
-            // Adds element, and after checks for if more capacity is needed. This pre-reserves memory for next element.
-            // The buffer is full for only a brief moment.
-            //m_data.resize(size() + 1);
-            T* _ptr = new(&m_data[m_headIndex]) T(val);
-            increment(m_headIndex);
-            if(m_tailIndex == m_headIndex)
-            {
-                decrement(m_headIndex);
-                reserve(m_capacity * 1.5);
-                increment(m_headIndex);
-            }
-        }
+
+        T* _ptr = new(&m_data[m_headIndex]) T(val);
+        increment(m_headIndex);
     }
 
     // Erases an element from logical front of the buffer.
