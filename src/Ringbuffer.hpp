@@ -144,42 +144,42 @@ public:
     /// @return Iterator pointing to first element.
     iterator begin() noexcept
     {
-        return iterator(this, m_tailIndex);
+        return iterator(this, 0);
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator begin() const noexcept
     {
-        return const_iterator(this, m_tailIndex);
+        return const_iterator(this, 0);
     }
 
     /// @brief Construct iterator at end.
     /// @return Iterator pointing past last element.
     iterator end() noexcept
     {
-        return iterator(this, m_headIndex);
+        return iterator(this, size());
     }
 
     /// @brief Construct const_iterator at end.
     /// @return Const_iterator pointing past last element.
     const_iterator end() const noexcept
     {
-        return const_iterator(this, m_headIndex);
+        return const_iterator(this, size());
     }
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
     const_iterator cbegin() const noexcept
     {
-        return const_iterator(this, m_tailIndex);
+        return const_iterator(this, 0);
     }
 
     /// @brief Construct const_iterator.
     /// @return Const_iterator pointing past last element.
     const_iterator cend() const noexcept
     {
-        return const_iterator(this, m_headIndex);
+        return const_iterator(this, size());
     }
 
     reference operator[](const size_type logicalIndex)
@@ -272,12 +272,16 @@ public:
         // Copy the buffer if it has wrapped around, ends needs to touch borders with the allocated memory area. No floating head or tail is allowed.
         if(m_headIndex < m_tailIndex)
         {
-            // Iterator refer to physical begin, not logical as the begin() member function does.
-            auto sourceBeginIt = const_iterator(this, 0);
-            auto destBeginIt = iterator(&temp, 0);
+            // Copy the elements at physical start only if such exists.
+            if(m_headIndex)
+            {
+                // Iterator refer to physical begin, not logical as the begin() member function does.
+                auto sourceBeginIt = const_iterator(this, 0);
+                auto destBeginIt = iterator(&temp, 0);
 
-            // Copy beginning sequence of wrapped buffer.
-            std::copy(sourceBeginIt, cend(), destBeginIt);
+                // Copy beginning sequence of wrapped buffer.
+               std::copy(sourceBeginIt, cend(), destBeginIt);
+            }
 
             // Copy end sequence of buffer.
             auto sourceEndIt = const_iterator(this, m_capacity);
@@ -290,11 +294,11 @@ public:
         else
         {
             // Simple copy to new location.
-            std::copy(begin(), end(), temp.begin());
+            std::copy(cbegin(), cend(), temp.begin());
         }
 
         // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
-        std::swap(*this,temp);
+        this->swap(temp);
     }
 
     /// @brief Inserts an element to the front of the buffer.
@@ -302,12 +306,11 @@ public:
     /// @param val Element to insert.
     void push_front(value_type val)
     {
-        decrement(m_tailIndex);
-        if(m_tailIndex == m_headIndex)
+        if(m_capacity - 1 == size())
         {
             reserve(m_capacity* 1.5);
         }
-
+        decrement(m_tailIndex);
         T* _ptr = new(&m_data[m_tailIndex]) T(val);
     }
 
@@ -317,7 +320,7 @@ public:
     void push_back(value_type val)
     {
         // Empty buffer case.
-        if(m_capacity == size())
+        if(m_capacity - 1 == size())
         {
             reserve(m_capacity * 1.5);
         }

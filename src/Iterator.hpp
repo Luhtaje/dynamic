@@ -60,6 +60,10 @@ public:
         //TODO: check value-initialization and over end() increment.
 
         m_logicalIndex++;
+        if(m_logicalIndex >= m_container->getCapacity())
+        {
+            m_logicalIndex = 0;
+        }
         return (*this);
     }
 
@@ -67,17 +71,23 @@ public:
     /// @param  int empty parameter to guide overload resolution.
     _rBuf_const_iterator operator++(int)
     {
-        //TODO: check value-initialization and over end() increment.
         auto temp (*this);
         ++m_logicalIndex;
+        if(m_logicalIndex >= m_container->getCapacity())
+        {
+            m_logicalIndex = 0;
+        }
         return temp;
     }
 
     /// @brief Prefix decrement
     _rBuf_const_iterator& operator--()
     {
-        //TODO:    check value initialization and "under" begin() decrement.
         --m_logicalIndex;
+        if(m_logicalIndex < 0)
+        {
+            m_logicalIndex = m_container->getCapacity() - 1;
+        }
         return(*this);
     }
 
@@ -88,6 +98,10 @@ public:
         //TODO:    check value initialization and "under" begin() decrement.
         auto temp (*this);
         --m_logicalIndex;
+        if(m_logicalIndex < 0)
+        {
+            m_logicalIndex = m_container->getCapacity() - 1;
+        }
         return temp;
     }
 
@@ -96,17 +110,26 @@ public:
     _rBuf_const_iterator& operator+=(difference_type offset)
     {
         m_logicalIndex += offset;
+        const auto capacity = m_container->getCapacity();
+        if(m_logicalIndex >= capacity)
+        {
+            m_logicalIndex -= capacity;
+        }
+        else if(m_logicalIndex < 0)
+        {
+            m_logicalIndex = capacity;
+        }
         return (*this);
     }
 
-    // "Deprecated" for now, nos apparent use case and causes ambiguous function call with some C++ internal operator+ overload.
-    /// @brief Move iterator forward by specified amount.
-    /// @param movement Amount of elements to move the iterator.
-    // _rBuf_const_iterator operator+(const difference_type offset)
-    // {
-    //     _rBuf_const_iterator temp = *this;
-    //     return (temp + offset);
-    // }
+    //"Deprecated" for now, nos apparent use case and causes ambiguous function call with some C++ internal operator+ overload.
+    // @brief Move iterator forward by specified amount.
+    // @param movement Amount of elements to move the iterator.
+    _rBuf_const_iterator operator+(const difference_type offset)
+    {
+        _rBuf_const_iterator temp(m_container, m_logicalIndex);
+        return (temp += offset);
+    }
 
     /// @brief Moves iterator backwards.
     /// @param movement Amount of elements to move.
@@ -257,6 +280,10 @@ public:
     {
         //TODO: check value-initialization and over end() increment.
         ++m_logicalIndex;
+        if(m_logicalIndex >= m_container->getCapacity())
+        {
+            m_logicalIndex = 0;
+        }
         return (*this);
     }
 
@@ -264,17 +291,23 @@ public:
     /// @param  int empty parameter to guide overload resolution.
     _rBuf_iterator operator++(int)
     {
-        //TODO: check value-initialization and over end() increment.
         auto temp (*this);
         ++m_logicalIndex;
+        if(m_logicalIndex >= m_container->getCapacity())
+        {
+            m_logicalIndex = 0;
+        }
         return temp; 
     }
 
     /// @brief prefix decrement
     _rBuf_iterator& operator--()
     {
-        //TODO:    check value initialization and "under" begin() decrement
         --m_logicalIndex;
+        if(m_logicalIndex < 0)
+        {
+            m_logicalIndex = m_container->getCapacity() - 1;
+        }
         return(*this);
     }
 
@@ -282,9 +315,12 @@ public:
     /// @param  int empty parameter to guide overload resolution.
     _rBuf_iterator operator--(int)
     {
-        //TODO:    check value initialization and "under" begin() decrement
         auto temp (*this);
         --m_logicalIndex;
+        if(m_logicalIndex < 0)
+        {
+            m_logicalIndex = m_container->getCapacity() - 1;
+        }
         return temp;
     }
 
@@ -293,17 +329,25 @@ public:
     _rBuf_iterator& operator+=(difference_type offset)
     {
         m_logicalIndex += offset;
+        const auto capacity = m_container->getCapacity();
+        if(m_logicalIndex >= capacity)
+        {
+            m_logicalIndex -= capacity;
+        }
+        else if(m_logicalIndex < 0)
+        {
+            m_logicalIndex = capacity;
+        }
         return (*this);
     }
-    
-    // "Deprecated" for now, no apparent use case and causes ambiguous function call with some C++ internal operator+ overload.
+
     /// @brief Move iterator forward by specified amount.
     /// @param movement Amount of elements to move the iterator.
-    // _rBuf_iterator operator+(const difference_type offset)
-    // {
-    //     _rBuf_iterator temp = *this;
-    //     return (temp + offset);
-    // }
+    _rBuf_iterator operator+(const difference_type offset)
+    {
+        _rBuf_iterator temp(m_container, m_logicalIndex);
+        return (temp += offset);
+    }
 
     /// @brief Moves iterator backwards.
     /// @param movement Amount of elements to move.
