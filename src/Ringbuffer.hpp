@@ -272,9 +272,13 @@ public:
         // Copy the buffer if it has wrapped around, ends needs to touch borders with the allocated memory area. No floating head or tail is allowed.
         if(m_headIndex < m_tailIndex)
         {
+            // Move the tail in temp.
+            temp.m_tailIndex += newsize - m_capacity;
+
             // Copy the elements at physical start only if such exists.
             if(m_headIndex)
             {
+
                 // Iterator refer to physical begin, not logical as the begin() member function does.
                 auto sourceBeginIt = const_iterator(this, 0);
                 auto destBeginIt = iterator(&temp, 0);

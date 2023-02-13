@@ -60,10 +60,10 @@ public:
         //TODO: check value-initialization and over end() increment.
 
         m_logicalIndex++;
-        if(m_logicalIndex >= m_container->getCapacity())
-        {
-            m_logicalIndex = 0;
-        }
+        // if(m_logicalIndex >= m_container->getCapacity())
+        // {
+        //     m_logicalIndex = 0;
+        // }
         return (*this);
     }
 
@@ -73,10 +73,10 @@ public:
     {
         auto temp (*this);
         ++m_logicalIndex;
-        if(m_logicalIndex >= m_container->getCapacity())
-        {
-            m_logicalIndex = 0;
-        }
+        // if(m_logicalIndex >= m_container->getCapacity())
+        // {
+        //     m_logicalIndex = 0;
+        // }
         return temp;
     }
 
@@ -111,6 +111,7 @@ public:
     {
         m_logicalIndex += offset;
         const auto capacity = m_container->getCapacity();
+
         if(m_logicalIndex >= capacity)
         {
             m_logicalIndex -= capacity;
@@ -280,11 +281,11 @@ public:
     {
         //TODO: check value-initialization and over end() increment.
         ++m_logicalIndex;
-        if(m_logicalIndex >= m_container->getCapacity())
-        {
-            m_logicalIndex = 0;
-        }
-        return (*this);
+        // if(m_logicalIndex >= m_container->getCapacity())
+        // {
+        //     m_logicalIndex = 0;
+        // }
+         return (*this);
     }
 
     /// @brief Postfix increment
@@ -293,10 +294,10 @@ public:
     {
         auto temp (*this);
         ++m_logicalIndex;
-        if(m_logicalIndex >= m_container->getCapacity())
-        {
-            m_logicalIndex = 0;
-        }
+        // if(m_logicalIndex >= m_container->getCapacity())
+        // {
+        //     m_logicalIndex = 0;
+        // }
         return temp; 
     }
 
@@ -384,7 +385,9 @@ public:
     /// @return true if underlying pointers are the same.
     bool operator==(const _rBuf_iterator& other) const
     {
-        return m_logicalIndex == other.m_logicalIndex && m_container == other.m_container;
+        // Compares remainders after getting module from the index, as index might be wrapped around but should still compare equal to iterators pointing to same object.
+        const auto pointsToSame = (m_logicalIndex % m_container->getCapacity() == other.m_logicalIndex % other.m_container->getCapacity());
+        return pointsToSame && m_container == other.m_container;
     }
 
     /// @brief Comparison operator != overload
@@ -392,7 +395,8 @@ public:
     /// @return ture if underlying pointers are not the same
     bool operator!=(const _rBuf_iterator& other) const
     {
-        return !(m_logicalIndex == other.m_logicalIndex && m_container == other.m_container);
+
+        return !(*this == other);
     }
 
     /// @brief Comparison operator < overload
