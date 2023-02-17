@@ -1,14 +1,13 @@
 #include <gtest/gtest.h>
-#include "RingBuffer.hpp"
+#include "Ringbuffer.hpp"
 #include <utility>
 #include <string>
 #include <vector>
+#include <ctime>
 #include <string>
 #include <iostream>
 #include <type_traits>
 
-const static int TEST_SIZE = 10;
-const static int TEST_INT_VALUE = 9;
 /**
  * @brief The tests for most parts match the named requirements laid out by cppreference. The iterator tests test iterators and const iterators.
  * Current layout of the tests:
@@ -20,26 +19,89 @@ const static int TEST_INT_VALUE = 9;
 /*
 *Tests the const and non-const iterators for the Ringbuffer.
 */
-
-//Control buffer for iterator tests.
-RingBuffer<int> itControl{1,2,3,4,5,6};
-
-class TestClass
+namespace 
 {
-    TestClass() = default;
 
-public:
-    bool foo(){
-        std::cout << "fooo" << std::endl;
-        return true;
+const static int TEST_SIZE = 10;
+const static int TEST_INT_VALUE = 9;
+
+// Define some factory functions.
+
+//=================
+// Default
+//=================
+template<class T>
+RingBuffer<T> CreateBuffer();
+
+template <>
+RingBuffer<int> CreateBuffer<int>()
+{
+    // Gyaahhh need to implement argument based constructor...
+    return RingBuffer<int>{1,2,3,4,5,6};
+}
+
+template <>
+RingBuffer<std::string> CreateBuffer<std::string>()
+{
+    return RingBuffer<std::string>{"abc", "def", "ghj"};
+}
+
+template <>
+RingBuffer<char> CreateBuffer<char>()
+{
+    return RingBuffer<char>{'a','b','c','d','e','f','g'};
+}
+
+//====================
+// Initializer list 
+//====================
+template<class T>
+RingBuffer<T> CreateBuffer(int size)
+{
+    return RingBuffer<T>(size);
+}
+
+template <>
+RingBuffer<char> CreateBuffer(int size)
+{
+    srand(time(0));
+    auto buf = RingBuffer<char>();
+    for(int i ; i < size; i++)
+    {
+        buf.push_back((char)(rand() % 26));
     }
+}
+
+
+template <class T>
+RingBuffer<T> CreateBuffer(std::initializer_list<T> list)
+{
+    return RingBuffer<T>(list);
+}
+
+//====================
+// Fixture
+//====================
+template<typename T>
+class RingBufferTest : public testing::Test
+{
+public:
+    RingBuffer<T> t_buffer;
+protected:
+    RingBufferTest() : t_buffer(CreateBuffer<T>()) {}
 };
 
+using Types = ::testing::Types<char, int, std::string>;
+TYPED_TEST_SUITE(RingBufferTest, Types);
+
+// Iterator tests dont use typed tests, hence they need a different buffer to work with. TODO make into a fixture and run the iterator tests with that.
+RingBuffer<int> itControl {1,2,3,4,5,6};
+
 //Tests requirement: LegacyInputIterator, ++r, (void)r++ , *r++;
-TEST(legacyIterators, IncrementOperators)
+TEST(Iterators, IncrementOperators)
 {
-    auto begin= itControl.begin();
-    auto cbegin= itControl.cbegin();
+    auto begin = itControl.begin();
+    auto cbegin = itControl.cbegin();
 
     //Copies value post increment
     auto pre = ++begin;
@@ -65,7 +127,7 @@ TEST(legacyIterators, IncrementOperators)
 }
 
 //Tests requirement: CopyConstructible.
-TEST(legacyIterator, CopyConstruction)
+TEST(Iterators, IterCopyConstruction)
 {
     RingBuffer<int>::iterator initial(itControl.begin());
 
@@ -84,7 +146,7 @@ TEST(legacyIterator, CopyConstruction)
 }
 
 // Tests requirement: MoveConstucrible
-TEST(legacyIterator, MoveConstruction)
+TEST(Iterators, IterMoveConstruction)
 {
     auto it = itControl.begin();
     it++;
@@ -98,21 +160,21 @@ TEST(legacyIterator, MoveConstruction)
 }
 
 // Tests requirement: CopyAssignable
-TEST(legacyIterator, CopyAssignable)
+TEST(Iterators, CopyAssignable)
 {
     EXPECT_EQ(std::is_copy_assignable<RingBuffer<int>::iterator>::value, true);
     EXPECT_EQ(std::is_copy_assignable<RingBuffer<int>::const_iterator>::value, true);
 }
 
 // Tests requirement: Destructible
-TEST(legacyIterator, Destructible)
+TEST(Iterators, Destructible)
 {
     EXPECT_EQ(std::is_destructible<RingBuffer<int>::iterator>::value, true);
     EXPECT_EQ(std::is_destructible<RingBuffer<int>::const_iterator>::value, true);
 }
 
 // Tests requirement: Swappable
-TEST(legacyIterator, Swappable)
+TEST(Iterators, Swappable)
 {
     //To satisfy the requirement, it is required to have std::swap in the context.
     using std::swap;
@@ -140,7 +202,7 @@ TEST(legacyIterator, Swappable)
 }
 
 // Tests requirement: EqualityComparable
-TEST(legacyInputIterator, EqualityComparable)
+TEST(Iterators, EqualityComparable)
 {
     auto begin(itControl.begin());
     auto end(itControl.end());
@@ -164,12 +226,12 @@ TEST(legacyInputIterator, EqualityComparable)
 }
 
 // Tests requirement: LegacyInputIterator, Expression i!=j.
-TEST(legacyInputOperator, Inequality)
+TEST(Iterators, Inequality)
 {
-    RingBuffer<int> someOtherBuffer({98,54,234,76});
+    RingBuffer<int> someOtherBuffer{98,54,234,76};
     
     auto control(itControl.begin());
-    auto experimental(someOtherBuffer.begin());
+    auto experimental(itControl.begin());
 
     // Index is same, but iterators point to different containers.
     ASSERT_TRUE(control != experimental);
@@ -181,7 +243,7 @@ TEST(legacyInputOperator, Inequality)
 
     // Same for const iterators
     auto constControl(itControl.cbegin());
-    auto constReference(someOtherBuffer.cbegin());
+    auto constReference(itControl.cbegin());
 
     ASSERT_TRUE(constControl != constReference);
 
@@ -195,7 +257,7 @@ TEST(legacyInputOperator, Inequality)
 }
 
 // Tests requirement: LegacyInputIterator, expression *i.
-TEST(legacyInputIterator, dereferencing)
+TEST(Iterators, dereferencing)
 {
     auto it(itControl.begin());
     
@@ -214,7 +276,7 @@ TEST(legacyInputIterator, dereferencing)
 
 //Tests requirement: DefaultConstructible
 //std::is_default_constructible does not test compilation, so compilation of different construction methods are also tested.
-TEST(iterators, DefaultConstruction)
+TEST(Iterators, IterDefaultConstruction)
 {
     RingBuffer<int>::iterator it;
     RingBuffer<int>::const_iterator cit;
@@ -230,7 +292,7 @@ TEST(iterators, DefaultConstruction)
 }
 
 //Tests requirement: constant_iterator construction from non-const version.
-TEST(iterators, ConstantConversion)
+TEST(Iterators, ConstantConversion)
 {
     auto it = itControl.begin();
 
@@ -248,7 +310,7 @@ TEST(iterators, ConstantConversion)
 
 
 //Tests requirement: LegacyInputIterator, dereferenceable Expression i->m is equivalent to (*i).m.
-TEST(iterators, PointerReduction)
+TEST(Iterators, PointerReduction)
 {
     RingBuffer<std::string> strBuf{"abcd"};
     auto customIt = strBuf.begin();
@@ -258,7 +320,7 @@ TEST(iterators, PointerReduction)
     EXPECT_EQ(constIt->at(0), (*constIt).at(0));
 }
 
-TEST(iterators, CopyAssignable)
+TEST(Iterators, IterCopyAssignable)
 {
     RingBuffer<int>::iterator it(itControl.begin());
     RingBuffer<int>::const_iterator cit(it);
@@ -273,59 +335,51 @@ TEST(iterators, CopyAssignable)
 //TODO Increase test coverage for iterators. By alot.
 
 //==================mainframe ===================//
-TEST(mainframe, DefaultConstruction)
+TYPED_TEST(RingBufferTest, DefaultConstruction)
 {
-    RingBuffer<int> defaultInitialized;
+    RingBuffer<TypeParam> defaultInitialized;
     EXPECT_EQ(defaultInitialized.empty(), true);
 
-    RingBuffer<int> defaultValueInitialized{};
+    RingBuffer<TypeParam> defaultValueInitialized{};
     EXPECT_EQ(defaultValueInitialized.empty(), true);
 
-    EXPECT_EQ(std::is_default_constructible<RingBuffer<int>>::value, true);
+    EXPECT_EQ(std::is_default_constructible<RingBuffer<TypeParam>>::value, true);
 }
 
-TEST(mainframe, CopyConstruction)
+TYPED_TEST(RingBufferTest, CopyConstruction)
 {
-    RingBuffer<int> control(TEST_SIZE);
-    RingBuffer<int> experiment(control);
+    RingBuffer<TypeParam> control(TEST_SIZE);
+    RingBuffer<TypeParam> experiment(control);
     EXPECT_EQ(experiment.size(), control.size());
     EXPECT_EQ(experiment, control);
-    EXPECT_EQ(std::is_copy_constructible<RingBuffer<int>>::value, true);
+    EXPECT_EQ(std::is_copy_constructible<RingBuffer<TypeParam>>::value, true);
 }
 
-TEST(mainframe, MoveConstruction)
+TYPED_TEST(RingBufferTest, MoveConstruction)
 {
-    GTEST_SKIP();
-    RingBuffer<std::string> initial = {"myfirst","mysecond","mythird"};
-    RingBuffer<std::string> tempcopy(initial);
-    EXPECT_EQ(initial.empty(), false);
+    RingBuffer<TypeParam> tempcopy(t_buffer);
+    EXPECT_EQ(t_buffer.empty(), false);
 
-    RingBuffer<std::string> moved(std::move(initial));
+    RingBuffer<TypeParam> moved(std::move(t_buffer));
 
     // Accessing moved memory gives weird error, expect_death did not work too well
     // EXPECT_DEATH(initial[0], "vector subscript is out of range");
     EXPECT_EQ(moved, tempcopy);
 }
 
-TEST(mainframe, MoveAssign)
+TYPED_TEST(RingBufferTest, MoveAssign)
 {
-    GTEST_SKIP();
-    RingBuffer<int> control(TEST_SIZE,TEST_INT_VALUE);
-    RingBuffer<int> temp = control;
-    RingBuffer<int> experiment;
-    experiment = std::move(control);
-    EXPECT_EQ(control.empty(), true);
-    EXPECT_EQ(experiment.empty(), false);
-    EXPECT_EQ(temp, experiment);
+    auto control(std::move(t_buffer));
 
+    ASSERT_NE(control.empty(), true);
     //TODO investigate why vector subscript goes out of range. Control is empty, something in the comparison tries to access with some index. prob
     //EXPECT_NE(control,temp);
 }
 
-TEST(mainframe, SizeValConstruction)
+TYPED_TEST(RingBufferTest, SizeValConstruction)
 {
-    RingBuffer<int> sizeVal (TEST_SIZE, TEST_INT_VALUE);
-    RingBuffer<int>::iterator it = sizeVal.begin();
+    RingBuffer<TypeParam> sizeVal (TEST_SIZE);
+    RingBuffer<TypeParam>::iterator it = sizeVal.begin();
 
     EXPECT_EQ(sizeVal.size(), TEST_SIZE);
     ++it;
@@ -333,7 +387,7 @@ TEST(mainframe, SizeValConstruction)
     EXPECT_EQ(*it, sizeVal[TEST_SIZE-1]);
 }
 
-TEST(mainframe, InitListConstruction)
+TYPED_TEST(RingBufferTest, InitListConstruction)
 {
     GTEST_SKIP();
     RingBuffer<std::string> stringBuf = {"mystring", "othermystring"};
@@ -342,94 +396,79 @@ TEST(mainframe, InitListConstruction)
     EXPECT_EQ(stringBuf[0], "mystring");
 }
 
-TEST(mainframe, CopyAssignment)
+TYPED_TEST(RingBufferTest, CopyAssignment)
 {
-    RingBuffer<int> control(TEST_SIZE);
-    RingBuffer<int> thirdWheel(9,5);
-    control = thirdWheel;
-    EXPECT_EQ(control, thirdWheel);
+    RingBuffer<TypeParam> control = t_buffer;
+    ASSERT_EQ(control, t_buffer);
 }
 
-TEST(mainframe, EqualityComparators)
+TYPED_TEST(RingBufferTest, EqualityComparators)
 {
-    RingBuffer<int> control(TEST_SIZE, TEST_INT_VALUE);
-    RingBuffer<int> experiment(5,99);
-    EXPECT_NE(control, experiment);
-    experiment = control;
-    EXPECT_EQ(control, experiment);
-    EXPECT_TRUE(control == experiment);
+    RingBuffer<TypeParam> copy(t_buffer);
+    EXPECT_TRUE(copy == t_buffer);
+
+    RingBuffer<TypeParam> randomBuffer(TEST_SIZE);
+    EXPECT_TRUE(randomBuffer != t_buffer);
 }
 
-TEST(mainframe, AccessOperator)
+TYPED_TEST(RingBufferTest, AccessOperator)
 {
-    itControl.pop_front();
-    auto val(itControl[0]);
-    itControl.pop_front();
-    auto val2(itControl[0]);
+    t_buffer.pop_front();
+    auto val(t_buffer[0]);
+    t_buffer.pop_front();
+    auto val2(t_buffer[0]);
 }
 
-TEST(mainframe, Swap)
+TYPED_TEST(RingBufferTest, Swap)
 {
     using std::swap;
-    RingBuffer<int> control(TEST_SIZE, TEST_INT_VALUE);
-    RingBuffer<int> experiment1(control);
-    RingBuffer<int> experiment2(TEST_SIZE - 3, TEST_INT_VALUE - 4);
+    RingBuffer<TypeParam> control(TEST_SIZE);
+    RingBuffer<TypeParam> experiment1(control);
     EXPECT_EQ(control, experiment1);
 
-    swap(experiment1, experiment2);
+    swap(experiment1, t_buffer);
 
-    EXPECT_EQ(control, experiment2);
+    EXPECT_EQ(control, t_buffer);
     EXPECT_NE(control, experiment1);
 }
 
-TEST(mainframe, Resize)
+TYPED_TEST(RingBufferTest, Resize)
 {
     GTEST_SKIP();
-    RingBuffer<int> control(TEST_SIZE);
+    RingBuffer<TypeParam> control(TEST_SIZE);
     EXPECT_EQ(control.size(), TEST_SIZE);
     control.resize(12);
     EXPECT_EQ(control.size(), 12);
 }
 
-TEST(mainframe, Size)
+TYPED_TEST(RingBufferTest, Size)
 {
-    RingBuffer<std::string> control1 = {"first", "second", "third", "fourth"};
-    RingBuffer<int> control2(TEST_SIZE, TEST_INT_VALUE);
-
-    EXPECT_EQ(control1.size(), std::distance(control1.begin(), control1.end()));
-    EXPECT_EQ(control2.size(), std::distance(control2.begin(), control2.end()));
+    EXPECT_EQ(t_buffer->size(), std::distance(t_buffer->begin(), t_buffer->end()));
 }
 
-TEST(mainframe, MaxSize)
+TYPED_TEST(RingBufferTest, MaxSize)
 {
     // TODO.
     // No immediate solution for testing max_size. How to get compiler / platform independent max size? MSVC uses some msvc exclusive "limits" header to get max size.
 }
 
-TEST(mainframe, Empty)
+TYPED_TEST(RingBufferTest, Empty)
 {
     GTEST_SKIP();
-    RingBuffer<int> control;
+    RingBuffer<TypeParam> control;
     //TODO This does not test the empty function
-    RingBuffer<int>::iterator begin = control.begin();
-    RingBuffer<int>::iterator end = control.end();
+    RingBuffer<TypeParam>::iterator begin = control.begin();
+    RingBuffer<TypeParam>::iterator end = control.end();
     EXPECT_EQ(control.end(), control.begin());
     EXPECT_EQ(begin, end);
 }
 
-TEST(mainframe, Emplace)
-{
-    GTEST_SKIP();
-    //Emplace not implemented
-    RingBuffer<int> control(TEST_SIZE, TEST_INT_VALUE);
-    //control.emplace_back(TEST_INT_VALUE + 1);
-    auto size = control.size();
-    EXPECT_EQ(control[size-1], TEST_INT_VALUE + 1);
-}
 
-TEST(mainframe, data)
+TYPED_TEST(RingBufferTest, data)
 {
-    RingBuffer<int> myBuf;
+    //Not implemented yet
+    GTEST_SKIP();
+    RingBuffer<TypeParam> myBuf;
     myBuf.reserve(5);
     // TODO add test for data to rotate the buffer so that physical start matches logical start.
     ASSERT_TRUE((myBuf.size()== 0 && myBuf.getCapacity() > 0));
@@ -446,51 +485,47 @@ TEST(mainframe, data)
 //     myBuf.push_back(TEST_SIZE);
 //     ASSERT_EQ(myBuf.back(), TEST_SIZE);
 
-//     itControl.push_back(TEST_INT_VALUE);
-//     ASSERT_EQ(itControl.back(), TEST_INT_VALUE);
+//     RingBufferTest::t_buffer.push_back(TEST_INT_VALUE);
+//     ASSERT_EQ(RingBufferTest::t_buffer.back(), TEST_INT_VALUE);
 // }
 
-TEST(mainframe, push_back)
+TYPED_TEST(RingBufferTest, push_back)
 {
-    RingBuffer<int> myBuf = {1,2,3,4,5,6,7};
+    // How to push back variable type?
+    t_buffer.push_back(8);
+    ASSERT_EQ(t_buffer.back(), 8);
+    ASSERT_EQ(t_buffer[7], 8);
+    t_buffer.push_back(9);
+    ASSERT_EQ(t_buffer[6], 7);
+    ASSERT_EQ(t_buffer[7], 8);
+    ASSERT_EQ(t_buffer[8], 9);
+    ASSERT_EQ(t_buffer.back(), 9);
 
-    myBuf.push_back(8);
-    ASSERT_EQ(myBuf.back(), 8);
-    ASSERT_EQ(myBuf[7], 8);
-    myBuf.push_back(9);
-    ASSERT_EQ(myBuf[6], 7);
-    ASSERT_EQ(myBuf[7], 8);
-    ASSERT_EQ(myBuf[8], 9);
-    ASSERT_EQ(myBuf.back(), 9);
+    t_buffer.push_back(10);
+    ASSERT_EQ(t_buffer.back(), 10);
 
-    myBuf.push_back(10);
-    ASSERT_EQ(myBuf.back(), 10);
-
-    myBuf.push_back(8);
-    ASSERT_EQ(myBuf.back(), 8);
+    t_buffer.push_back(8);
+    ASSERT_EQ(t_buffer.back(), 8);
 }
 
-TEST(mainframe, push_front)
+TYPED_TEST(RingBufferTest, push_front)
 {
-    RingBuffer<int> myBuf;
+    t_buffer.push_front(5);
+    ASSERT_EQ(myBut_bufferf.front(), 5);
 
-    myBuf.push_front(5);
-    ASSERT_EQ(myBuf.front(), 5);
+    t_buffer.push_front(6);
+    ASSERT_EQ(t_buffer.front(), 6);
 
-    myBuf.push_front(6);
-    ASSERT_EQ(myBuf.front(), 6);
+    t_buffer.push_front(7);
+    ASSERT_EQ(t_buffer.front(), 7);
 
-    myBuf.push_front(7);
-    ASSERT_EQ(myBuf.front(), 7);
-
-    myBuf.push_front(8);
-    ASSERT_EQ(myBuf.front(), 8);
+    t_buffer.push_front(8);
+    ASSERT_EQ(t_buffer.front(), 8);
 }
 
-TEST(sequencecontainer, front)
+TYPED_TEST(RingBufferTest, front)
 {
-    const RingBuffer<int> nonConst {1,2,3,5,6};
+    EXPECT_EQ(t_buffer.front(), *t_buffer.begin());
+}
 
-    EXPECT_EQ(nonConst.front(), *nonConst.begin());
-    EXPECT_EQ(itControl.front(), *itControl.begin());
 }

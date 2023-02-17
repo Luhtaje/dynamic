@@ -385,7 +385,7 @@ public:
     /// @return true if underlying pointers are the same.
     bool operator==(const _rBuf_iterator& other) const
     {
-        // Compares remainders after getting module from the index, as index might be wrapped around but should still compare equal to iterators pointing to same object.
+        // Compares remainders after getting module from the index, as index might be wrapped around but should still compare equal to iterators pointing to same element.
         const auto pointsToSame = (m_logicalIndex % m_container->getCapacity() == other.m_logicalIndex % other.m_container->getCapacity());
         return pointsToSame && m_container == other.m_container;
     }

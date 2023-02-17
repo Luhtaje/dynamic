@@ -6,13 +6,13 @@
 #include "Iterator.hpp"
 
 //Forward decl
-template<typename T, typename Allocator = std::allocator<T>>
-class RingBuffer;
+// template<typename T, typename Allocator = std::allocator<T>>
+// class RingBuffer;
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
 /// @tparam T type of the ringbuffer
 /// @tparam Allocator optional allocator for underlying vector. Defaults to std::allocator<T>
-template<typename T, typename Allocator> 
+template<typename T, typename Allocator = std::allocator<T>> 
 class RingBuffer
 {
 
@@ -30,7 +30,6 @@ public:
     using size_type = std::size_t;
 
 public:
-
 
     /// @brief Default constructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
@@ -84,16 +83,6 @@ public:
         std::copy(rhs.cbegin(), rhs.cend(), begin());
     }
 
-    /// @brief Copy assignment operator.
-    /// @param copy A temporary RingBuffer created by a copy constructor.
-    /// @return Returns reference to the left hand side RungBuffer after swap.
-    RingBuffer& operator=(const RingBuffer& other)
-    {
-        RingBuffer copy(other);
-        copy.swap(*this);
-        return *this;
-    }
-
     /// @brief Move constructor.
     /// @param other 
     RingBuffer(RingBuffer&& other) noexcept
@@ -104,22 +93,32 @@ public:
         m_tailIndex = std::exchange(other.m_tailIndex, 0);
     }
 
+    //Destructor
+    ~RingBuffer()
+    {
+        // Calls destructor for each element in the buffer.
+        if(size()) for_each(begin(),end(),[](T elem) { elem.~T(); });
+
+        // After destruction deallocate the memory.
+        m_allocator.deallocate(m_data, m_capacity);
+    }
+
+    /// @brief Copy assignment operator.
+    /// @param copy A temporary RingBuffer created by a copy constructor.
+    /// @return Returns reference to the left hand side RungBuffer after swap.
+    RingBuffer& operator=(const RingBuffer& other)
+    {
+        RingBuffer copy(other);
+        copy.swap(*this);
+        return *this;
+    }
+
     // Move assignment
     RingBuffer& operator=(RingBuffer&& other)
     {
         RingBuffer copy(std::move(other));
         copy.swap(*this);
         return *this;
-    }
-
-    //Destructor
-    ~RingBuffer()
-    {
-        // Calls destructor for each element in the buffer.
-        for_each(begin(),end(),[](T elem) { elem.~T(); });
-
-        // After destruction deallocate the memory.
-        m_allocator.deallocate(m_data, m_capacity);
     }
 
     /// @brief Member swap implementation. Swaps RingBuffers member to member.
