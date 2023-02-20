@@ -25,7 +25,7 @@ public:
 
     /// @brief Constructor.
     /// @param index Index representing the logical element of the.
-    explicit _rBuf_const_iterator(const _rBuf* container, int index): m_container(container), m_logicalIndex(index) {}
+    explicit _rBuf_const_iterator(const _rBuf* container, difference_type index): m_container(container), m_logicalIndex(index) {}
 
     /// @brief Conversion constructor
     /// @param const_iterator const iterator to construct from.
@@ -156,12 +156,12 @@ public:
         return (m_logicalIndex - other.m_logicalIndex);
     }
 
-    /// @brief index operator
-    /// @param index index
-    /// @return reference to the element at index
-    reference operator[](const difference_type index) const
+    /// @brief Index operator.
+    /// @param offset The offset from iterator.
+    /// @return Return reference to element pointed by the iterator with offset.
+    reference operator[](const difference_type offset) const
     {
-        return m_container[m_logicalIndex + index];
+        return m_container->operator[](m_logicalIndex + offset);
     }
 
     /// @brief Comparison operator== overload
@@ -258,7 +258,7 @@ public:
     /// @brief Constructor.
     /// @param container Pointer to the RingBuffer element which owns this iterator.
     /// @param index Index pointing to the logical element of the RingBuffer.
-    explicit _rBuf_iterator(_rBuf* container, int index): m_container(container), m_logicalIndex(index) {}
+    explicit _rBuf_iterator(_rBuf* container, difference_type index): m_container(container), m_logicalIndex(index) {}
 
     /// @brief Dereference operator
     /// @return  Returns the object the iterator is currently pointing to.
@@ -372,12 +372,12 @@ public:
         return (m_logicalIndex - other.m_logicalIndex);
     }
 
-    /// @brief Index operator
-    /// @param offset 
-    /// @return 
-    reference operator[](const difference_type index) const
+    /// @brief Index operator.
+    /// @param offset The offset from iterator.
+    /// @return Return object pointer by the iterator with an offset.
+    reference operator[](const difference_type offset) const
     {
-        return m_container[m_logicalIndex + index];
+        return return m_container->operator[](m_logicalIndex + offset);
     }
 
     /// @brief Comparison operator== overload
@@ -451,5 +451,5 @@ public:
     _rBuf* m_container;
     
     // Offset from physical start from the buffer
-    int m_logicalIndex;
+    difference_type m_logicalIndex;
 };

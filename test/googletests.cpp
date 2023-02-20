@@ -5,17 +5,8 @@
 #include <vector>
 #include <ctime>
 #include <string>
-#include <iostream>
 #include <type_traits>
 
-/**
- * @brief The tests for most parts match the named requirements laid out by cppreference. The iterator tests test iterators and const iterators.
- */
-
-//================Iterators=================//
-/*
-*Tests the const and non-const iterators for the Ringbuffer.
-*/
 namespace 
 {
 
@@ -77,7 +68,7 @@ RingBuffer<int> CreateBuffer<int>(int size)
     auto buf = RingBuffer<int>();
     for(int i = 0 ; i < size; i++)
     {
-        buf.push_back(floor(rand() % 26));
+        buf.push_back(rand() % 26);
     }
     return buf;
 }
@@ -92,7 +83,7 @@ RingBuffer<std::string> CreateBuffer<std::string>(int size)
         std::string someString("");
         for(int j = 0 ; j < 3 ; j++)
         {
-            someString.push_back(char(rand() % 26));
+            someString.push_back(char(rand() % 100));
         }
 
     buf.push_back(someString);
@@ -128,7 +119,7 @@ std::string getValue<std::string>()
     std::string str("");
     for(int i = 0; i < 5; i++)
     {
-        str.push_back(char(rand() % 26));
+        str.push_back(char(rand() % 100));
     }
     return str;
 }
@@ -150,6 +141,12 @@ TYPED_TEST_SUITE(RingBufferTest, Types);
 
 // Iterator tests dont use typed tests, hence they need a different buffer to work with. TODO make into a fixture and run the iterator tests with that.
 RingBuffer<int> itControl {1,2,3,4,5,6};
+
+
+//
+ /// @brief Tests the named requirements laid out by cppreference and thesis requirements if such apply.
+//================Iterators=================//
+
 
 //Tests requirement: LegacyInputIterator, ++r, (void)r++ , *r++;
 TEST(Iterators, IncrementOperators)
@@ -285,10 +282,10 @@ TEST(Iterators, Inequality)
     RingBuffer<int> someOtherBuffer{98,54,234,76};
     
     auto control(itControl.begin());
-    auto experimental(itControl.begin());
+    auto other(someOtherBuffer.begin());
 
     // Index is same, but iterators point to different containers.
-    ASSERT_TRUE(control != experimental);
+    ASSERT_TRUE(control != other);
     
     //Same buffer, but different indexes.
     auto snapshot(control);
@@ -297,9 +294,9 @@ TEST(Iterators, Inequality)
 
     // Same for const iterators
     auto constControl(itControl.cbegin());
-    auto constReference(itControl.cbegin());
+    auto constOther(someOtherBuffer.cbegin());
 
-    ASSERT_TRUE(constControl != constReference);
+    ASSERT_TRUE(constControl != constOther);
 
     auto constSnapshot(constControl);
     constControl++;
@@ -307,7 +304,7 @@ TEST(Iterators, Inequality)
 
     // Tests comparing non-const and const. Constness should not change the result.
     // Only works one way, when const_iterator is on the left. This is the requirement by the standard, additional setup is optional but preferred.
-    ASSERT_FALSE(constSnapshot!=snapshot);
+    ASSERT_FALSE(constSnapshot != snapshot);
 }
 
 // Tests requirement: LegacyInputIterator, expression *i.
@@ -386,8 +383,6 @@ TEST(Iterators, IterCopyAssignable)
     ASSERT_EQ(cit,const_experiment);
 }
 
-//TODO Increase test coverage for iterators. By alot.
-
 //==================mainframe ===================//
 TYPED_TEST(RingBufferTest, DefaultConstruction)
 {
@@ -442,13 +437,18 @@ TYPED_TEST(RingBufferTest, SizeValConstruction)
     EXPECT_EQ(*it, sizeVal[TEST_SIZE-1]);
 }
 
+
 TYPED_TEST(RingBufferTest, InitListConstruction)
 {
-    GTEST_SKIP();
-    RingBuffer<std::string> stringBuf = {"mystring", "othermystring"};
-    //TODO Size is broken
-    //EXPECT_EQ(stringBuf.size(), 2);
-    EXPECT_EQ(stringBuf[0], "mystring");
+    const auto firstElem = getValue<TypeParam>();
+    const auto secondElem = getValue<TypeParam>();
+    const auto ThirdElem = getValue<TypeParam>();
+    RingBuffer<TypeParam> buf{firstElem, secondElem, ThirdElem};
+
+    EXPECT_EQ(buf.size(), 3);
+    EXPECT_EQ(buf[0], firstElem);
+    EXPECT_EQ(buf[1], secondElem);
+    EXPECT_EQ(buf[2], ThirdElem);
 }
 
 TYPED_TEST(RingBufferTest, CopyAssignment)
@@ -546,39 +546,58 @@ TYPED_TEST(RingBufferTest, data)
 
 TYPED_TEST(RingBufferTest, push_back)
 {
-    // How to push back variable type?
-    // - like this
+    // Push few times to make buffer allocate more memory.
     const auto someVal = getValue<TypeParam>();
     t_buffer.push_back(someVal);
-    // t_buffer.push_back(8);
-    // ASSERT_EQ(t_buffer.back(), 8);
-    // ASSERT_EQ(t_buffer[7], 8);
-    // t_buffer.push_back(9);
-    // ASSERT_EQ(t_buffer[6], 7);
-    // ASSERT_EQ(t_buffer[7], 8);
-    // ASSERT_EQ(t_buffer[8], 9);
-    // ASSERT_EQ(t_buffer.back(), 9);
+    EXPECT_EQ(t_buffer.back(), someVal);
 
-    // t_buffer.push_back(10);
-    // ASSERT_EQ(t_buffer.back(), 10);
+    const auto someVal2 = getValue<TypeParam>();
+    t_buffer.push_back(someVal2);
+    EXPECT_EQ(t_buffer.back(), someVal2);
 
-    // t_buffer.push_back(8);
-    // ASSERT_EQ(t_buffer.back(), 8);
+    const auto someVal3 = getValue<TypeParam>();
+    t_buffer.push_back(someVal3);
+    EXPECT_EQ(t_buffer.back(), someVal3);
+
+    const auto someVal4 = getValue<TypeParam>();
+    t_buffer.push_back(someVal4);
+    EXPECT_EQ(t_buffer.back(),someVal4);
+
+    const auto someVal5 = getValue<TypeParam>();
+    t_buffer.push_back(someVal5);
+    EXPECT_EQ(t_buffer.back(), someVal5);
+
+    const auto someVal6 = getValue<TypeParam>();
+    t_buffer.push_back(someVal6);
+    EXPECT_EQ(t_buffer.back(), someVal6);
 }
 
 TYPED_TEST(RingBufferTest, push_front)
 {
-    // t_buffer.push_front(5);
-    // ASSERT_EQ(myBut_bufferf.front(), 5);
+    // Push few times to make buffer allocate more memory.
+    const auto someVal = getValue<TypeParam>();
+    t_buffer.push_front(someVal);
+    EXPECT_EQ(t_buffer.front(), someVal);
 
-    // t_buffer.push_front(6);
-    // ASSERT_EQ(t_buffer.front(), 6);
+    const auto someVal2 = getValue<TypeParam>();
+    t_buffer.push_front(someVal2);
+    EXPECT_EQ(t_buffer.front(), someVal2);
 
-    // t_buffer.push_front(7);
-    // ASSERT_EQ(t_buffer.front(), 7);
+    const auto someVal3 = getValue<TypeParam>();
+    t_buffer.push_front(someVal3);
+    EXPECT_EQ(t_buffer.front(), someVal3);
 
-    // t_buffer.push_front(8);
-    // ASSERT_EQ(t_buffer.front(), 8);
+    const auto someVal4 = getValue<TypeParam>();
+    t_buffer.push_front(someVal4);
+    EXPECT_EQ(t_buffer.front(), someVal4);
+
+    const auto someVal5 = getValue<TypeParam>();
+    t_buffer.push_front(someVal5);
+    EXPECT_EQ(t_buffer.front(), someVal5);
+
+    const auto someVal6 = getValue<TypeParam>();
+    t_buffer.push_front(someVal6);
+    EXPECT_EQ(t_buffer.front(), someVal6);
 }
 
 TYPED_TEST(RingBufferTest, front)

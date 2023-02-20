@@ -63,7 +63,7 @@ public:
     /// @brief Initializer list contructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
-    RingBuffer(std::initializer_list<T> init): m_headIndex(0), m_tailIndex(0), m_capacity(init.size() + 2)
+    explicit RingBuffer(std::initializer_list<T> init): m_headIndex(0), m_tailIndex(0), m_capacity(init.size() + 2)
     {
         m_data = m_allocator.allocate(m_capacity);
         for(const auto& element : init)
@@ -80,7 +80,8 @@ public:
         m_data = m_allocator.allocate(m_capacity);
         
         // Copies the buffer by calling copyconstructor on each element. If T is triviallyCopyable memmove or something similiar might be used.
-        std::copy(rhs.cbegin(), rhs.cend(), begin());
+        copy(rhs.cbegin(), rhs.cend(), begin());
+
     }
 
     /// @brief Move constructor.
@@ -243,19 +244,6 @@ public:
         return m_tailIndex == m_headIndex;
     }
 
-    /// @brief Resizes the container so that it contains n elements.
-    /// @param n Size to resize to.
-    void resize(size_type n)
-    {
-    }
-
-    /// @brief Resize overload.
-    /// @param n Size to resize to.
-    /// @param val Value to initialize new elements to, if N is larger than current container capacity. Checked implicitly in the vector implementation.
-    void resize(size_type n, const T& val)
-    {
-    }
-
     /// @brief Allocates more memory and copies the existing buffer to the new memory location.
     /// @throw Throws std::bad_alloc if there is not enough memory for allocation. Throws std::bad_array_new_lenght if std::numeric_limits<std::size_t>::max() / sizeof(T) < newsize.
     /// @param newsize Amount of memory to allocate.
@@ -271,33 +259,36 @@ public:
         // Copy the buffer if it has wrapped around, ends needs to touch borders with the allocated memory area. No floating head or tail is allowed.
         if(m_headIndex < m_tailIndex)
         {
+            const auto tailOffset = m_capacity - m_tailIndex;
             // Move the tail in temp.
             temp.m_tailIndex += newsize - m_capacity;
-
             // Copy the elements at physical start only if such exists.
             if(m_headIndex)
             {
 
                 // Iterator refer to physical begin, not logical as the begin() member function does.
-                auto sourceBeginIt = const_iterator(this, 0);
-                auto destBeginIt = iterator(&temp, 0);
+                // But since iterators itself use logical indexes, we need to give the offset from tail -> capacity to the iterator.
+                // to poin to the physical begin.
+                auto sourceBeginIt = const_iterator(this, tailOffset);
+                auto sourceEndIt = const_iterator(this, m_headIndex + tailOffset);
+                auto destBeginIt = iterator(&temp, tailOffset);
 
                 // Copy beginning sequence of wrapped buffer.
-               std::copy(sourceBeginIt, cend(), destBeginIt);
+               copy(sourceBeginIt, sourceEndIt, destBeginIt);
             }
 
             // Copy end sequence of buffer.
-            auto sourceEndIt = const_iterator(this, m_capacity);
+            auto sourceEndIt = const_iterator(this, tailOffset);
             // This iterator refers to the first element in the seuqence which touches the end border of the new memory area.
-            auto destEndIt = iterator(&temp, newsize - m_capacity + m_tailIndex);
+            auto destBeginIt = iterator(&temp, 0);
 
             // Copy the ending sequence of a wrapped buffer
-            std::copy(cbegin(), sourceEndIt, destEndIt);
+            copy(cbegin(), sourceEndIt, destBeginIt);
         }
         else
         {
             // Simple copy to new location.
-            std::copy(cbegin(), cend(), temp.begin());
+            copy(cbegin(), cend(), temp.begin());
         }
 
         // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
@@ -407,6 +398,17 @@ private:
         }
     }
 
+private:
+
+    void copy(const_iterator sourceBegin, const_iterator sourceEnd, iterator destBegin)
+    {
+        size_t size = sourceEnd - sourceBegin;
+
+        for(int i = 0; i != size ; i++)
+        {
+            m_allocator.construct(destBegin.m_container->m_data + i, sourceBegin[i]);
+        }
+    }
 
 //==========================================
 // Members 
