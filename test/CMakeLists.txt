@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.24)
 set(This googletests)
 
 set(Sources
-    googletests.cpp
+    test_iterators.cpp
+    test_ring_buffer.cpp
 )
 
 add_executable(${This} ${Sources})
