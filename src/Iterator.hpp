@@ -1,3 +1,6 @@
+#ifndef ITERATOR_HPP
+#define ITERATOR_HPP
+
 //Forward declarations
 //============================================================================
 template<typename _rBuf>
@@ -17,7 +20,6 @@ public:
     using difference_type = typename _rBuf::difference_type;
     using pointer = typename _rBuf::const_pointer;
     using reference = const value_type&;
-    //using _Tptr = typename _rBuf::pointer;
 
 public:
 
@@ -55,28 +57,22 @@ public:
     }
 
     /// @brief Postfix increment
+    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer handles overflown iterators. See Iterator::operator* and RingBuffer::operator[].
     _rBuf_const_iterator& operator++()
     {
-        //TODO: check value-initialization and over end() increment.
-
         m_logicalIndex++;
-        // if(m_logicalIndex >= m_container->getCapacity())
-        // {
-        //     m_logicalIndex = 0;
-        // }
+
         return (*this);
     }
 
     /// @brief Postfix increment
     /// @param  int empty parameter to guide overload resolution.
+    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer handles overflown iterators. See Iterator::operator* and RingBuffer::operator[].
     _rBuf_const_iterator operator++(int)
     {
         auto temp (*this);
         ++m_logicalIndex;
-        // if(m_logicalIndex >= m_container->getCapacity())
-        // {
-        //     m_logicalIndex = 0;
-        // }
+
         return temp;
     }
 
@@ -123,9 +119,9 @@ public:
         return (*this);
     }
 
-    //"Deprecated" for now, nos apparent use case and causes ambiguous function call with some C++ internal operator+ overload.
-    // @brief Move iterator forward by specified amount.
-    // @param movement Amount of elements to move the iterator.
+
+    /// @brief Move iterator forward by specified amount.
+    /// @param movement Amount of elements to move the iterator.
     _rBuf_const_iterator operator+(const difference_type offset)
     {
         _rBuf_const_iterator temp(m_container, m_logicalIndex);
@@ -208,10 +204,6 @@ public:
         return (!(m_logicalIndex < other.m_logicalIndex));
     }
 
-    /// @brief Default assingment operator overload.
-    /// @param iterator Source iterator to assign from
-    _rBuf_const_iterator& operator=(const _rBuf_const_iterator<_rBuf>& iterator) =default;
-
     /// @brief Custom assingment operator overload.
     /// @param index Logical index of the element which point to.
     _rBuf_const_iterator& operator=(size_t index) const
@@ -222,17 +214,17 @@ public:
 
     /// @brief Dereference operator.
     /// @return Object pointed by iterator.
-    reference operator*()
+    reference operator*() const
     {
         return (*m_container)[m_logicalIndex];
     }
-private:
-    //What container instance is this iterator for.
-    const _rBuf* m_container;
     
+    // The parent container.
+    const _rBuf* m_container;
+
     // The iterator does not point to any memory location, but is interfaced to the Ring Buffer via an index which is the logical index
-    // to an element. Logical index 0 is the first element in the buffer. 
-    int m_logicalIndex;
+    // to an element. Logical index 0 is the first element in the buffer and last is size - 1.
+    difference_type m_logicalIndex;
 };
 
 
@@ -265,7 +257,7 @@ public:
     reference operator*() const
     {
         //TODO: bounds checking and value-initialization.
-        return m_container[m_logicalIndex];
+        return (*m_container)[m_logicalIndex];
     }
 
     /// @brief Pointer operator.
@@ -277,27 +269,20 @@ public:
     }
 
     /// @brief Prefix increment
+    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer handles overflown iterators. See Iterator::operator* and RingBuffer::operator[].
     _rBuf_iterator& operator++()
     {
-        //TODO: check value-initialization and over end() increment.
         ++m_logicalIndex;
-        // if(m_logicalIndex >= m_container->getCapacity())
-        // {
-        //     m_logicalIndex = 0;
-        // }
-         return (*this);
+        return (*this);
     }
 
     /// @brief Postfix increment
     /// @param  int empty parameter to guide overload resolution.
+    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer handles overflown iterators. See Iterator::operator* and RingBuffer::operator[].
     _rBuf_iterator operator++(int)
     {
         auto temp (*this);
         ++m_logicalIndex;
-        // if(m_logicalIndex >= m_container->getCapacity())
-        // {
-        //     m_logicalIndex = 0;
-        // }
         return temp; 
     }
 
@@ -383,7 +368,8 @@ public:
     /// @brief Comparison operator== overload
     /// @param other iterator to compare
     /// @return true if underlying pointers are the same.
-    bool operator==(const _rBuf_iterator& other) const
+    template<typename iterator>
+    bool operator==(const iterator& other) const
     {
         // Compares remainders after getting module from the index, as index might be wrapped around but should still compare equal to iterators pointing to same element.
         const auto pointsToSame = (m_logicalIndex % m_container->getCapacity() == other.m_logicalIndex % other.m_container->getCapacity());
@@ -393,7 +379,8 @@ public:
     /// @brief Comparison operator != overload
     /// @param other iterator to compare
     /// @return ture if underlying pointers are not the same
-    bool operator!=(const _rBuf_iterator& other) const
+    template<typename iterator>
+    bool operator!=(const iterator& other) const
     {
 
         return !(*this == other);
@@ -428,10 +415,6 @@ public:
         return (!(m_logicalIndex < other.m_logicalIndex));
     }
 
-    /// @brief Default assingment operator overload.
-    /// @param iterator Source iterator to assign from
-    _rBuf_iterator& operator=(const _rBuf_iterator<_rBuf>& iterator) =default;
-
     /// @brief Custom assingment operator overload.
     /// @param index Logical index of the element to set the iterator to.
     _rBuf_iterator& operator=(difference_type index) const
@@ -440,16 +423,12 @@ public:
         return (*this);
     };
 
-    /// @brief Dereference operator.
-    /// @return Object pointed by iterator.
-    reference operator*()
-    {
-        return (*m_container)[m_logicalIndex];
-    }
-
-    //What container is this iterator for.
+    // The parent container.
     _rBuf* m_container;
-    
-    // Offset from physical start from the buffer
+
+    // The iterator does not point to any memory location, but is interfaced to the Ring Buffer via an index which is the logical index
+    // to an element. Logical index 0 is the first element in the buffer and last is size - 1.
     difference_type m_logicalIndex;
 };
+
+#endif /*ITERATOR_HPP*/

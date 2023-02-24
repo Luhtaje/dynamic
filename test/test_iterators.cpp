@@ -10,83 +10,63 @@ RingBuffer<int> itControl {6,4,2,1,3,5};
 //================Iterators=================//
 
 
-//Tests requirement: LegacyInputIterator, Expressions : ++r, (void)r++ , *r++;
-TEST(Iterators, IncrementOperators)
+//Tests requirement: LegacyForwardIterator / DefaultConstructible
+TEST(Iterators, DefaultConstructible)
 {
-    auto begin = itControl.begin();
-    auto cbegin = itControl.cbegin();
+    RingBuffer<int>::iterator it;
+    RingBuffer<int>::const_iterator cit;
 
-    auto pre = ++begin;
-    auto post = begin++;
-    //Values should be the same
-    ASSERT_EQ(pre, post);
-    ASSERT_EQ(*post, itControl[1]);
+    it.m_container = &itControl;
+    ASSERT_TRUE(*it);
 
-    //Same for constant iterator
-    auto cpre = ++cbegin;
-    auto cpost = cbegin++;
-    ASSERT_EQ(cpre, cpost);
-    ASSERT_EQ(*cpost, itControl[1]);
-    
-    ASSERT_EQ(*begin, itControl[2]);
-    ASSERT_EQ(*cbegin, itControl[2]);
+    cit.m_container = &itControl;
+    ASSERT_TRUE(*cit);
 
-    auto controlIt = begin;
-    ++begin;
-    ASSERT_NE(*controlIt++, *begin);
-    ASSERT_EQ(*controlIt, *begin);
+    RingBuffer<int>::iterator value_it{};
+    RingBuffer<int>::const_iterator value_cit{};
+
+    it = RingBuffer<int>::iterator();
+    cit = RingBuffer<int>::const_iterator();
+
+    it.m_container = &itControl;
+    ASSERT_TRUE(*it);
+
+    cit.m_container = &itControl;
+    ASSERT_TRUE(*cit);
+
+    EXPECT_EQ(std::is_default_constructible<RingBuffer<int>::iterator>::value, true);
+    EXPECT_EQ(std::is_default_constructible<RingBuffer<int>::const_iterator>::value, true);
 }
 
-//Tests requirement: CopyConstructible.
-TEST(Iterators, IterCopyConstruction)
+// Tests requirement: LegacyInputIterator / EqualityComparable
+TEST(Iterators, EqualityComparable)
 {
-    RingBuffer<int>::iterator initial(itControl.begin());
+    const auto begin(itControl.begin());
+    const auto end(itControl.end());
 
-    auto constructed(initial);
-    auto assignConstructed = (initial);
-    ASSERT_EQ(initial, constructed);
-    ASSERT_EQ(assignConstructed, constructed);
+    const auto refIt(begin);
+    ASSERT_TRUE(refIt == begin);
+    ASSERT_TRUE(begin == refIt);
+    ASSERT_FALSE(begin == end);
 
-    RingBuffer<int>::const_iterator cinitial = itControl.cbegin();
+    // Const iterators
+    const auto cbegin(itControl.cbegin());
+    const auto cend(itControl.cend());
 
-    auto constConstructed(cinitial);
-    auto assignConstConstructed = (cinitial);
-    ASSERT_EQ(cinitial, constConstructed);
-    ASSERT_EQ(assignConstConstructed, constConstructed); 
+    const auto crefIt(cbegin);
+    ASSERT_TRUE(crefIt == cbegin);
+    ASSERT_TRUE(cbegin == crefIt);
+    ASSERT_FALSE(cbegin == cend);
+
+    // Tests comparing non-const and const iterators both ways because of the const/non-const comparison semantics.
+    ASSERT_TRUE(cbegin == begin);
+    ASSERT_TRUE(begin == cbegin);
 }
 
-// Tests requirement: MoveConstucrible
-TEST(Iterators, IterMoveConstruction)
-{
-    auto it = itControl.begin();
-    it++;
-    auto reference(it);
-    auto movedIt(std::move(it));
-    ASSERT_EQ(*movedIt, *reference);
-    auto something = *it;
-
-    EXPECT_EQ(std::is_move_constructible<RingBuffer<int>::iterator>::value, true);
-    EXPECT_EQ(std::is_move_constructible<RingBuffer<int>::const_iterator>::value, true);
-}
-
-// Tests requirement: CopyAssignable
-TEST(Iterators, CopyAssignable)
-{
-    EXPECT_EQ(std::is_copy_assignable<RingBuffer<int>::iterator>::value, true);
-    EXPECT_EQ(std::is_copy_assignable<RingBuffer<int>::const_iterator>::value, true);
-}
-
-// Tests requirement: Destructible
-TEST(Iterators, Destructible)
-{
-    EXPECT_EQ(std::is_destructible<RingBuffer<int>::iterator>::value, true);
-    EXPECT_EQ(std::is_destructible<RingBuffer<int>::const_iterator>::value, true);
-}
-
-// Tests requirement: Swappable
+// Tests requirement: LegacyIterator / Swappable
 TEST(Iterators, Swappable)
 {
-    //To satisfy the requirement, it is required to have std::swap in the context.
+    //To satisfy the requirement, it is required to have std::swap in the context. Iterators dont have user defined swap, so *stud* swap is just used.
     using std::swap;
 
     auto begin = itControl.begin();
@@ -109,30 +89,82 @@ TEST(Iterators, Swappable)
     swap(cRef, cbegin);
     ASSERT_EQ(cend, cbegin);
 
+    ASSERT_TRUE(std::_Is_swappable<RingBuffer<int>::iterator>::value);
+    ASSERT_TRUE(std::_Is_swappable<RingBuffer<int>::const_iterator>::value);
 }
 
-// Tests requirement: EqualityComparable
-TEST(Iterators, EqualityComparable)
+// Tests requirement: LegacyIterator / Destructible
+TEST(Iterators, Destructible)
 {
-    auto begin(itControl.begin());
-    auto end(itControl.end());
-    // Requires implicit conversion to bool.
-    auto refIt(begin);
-    ASSERT_TRUE(refIt == begin);
-    ASSERT_TRUE(begin == refIt);
-    ASSERT_FALSE(begin == end);
+    ASSERT_TRUE(std::is_destructible<RingBuffer<int>::iterator>::value);
+    ASSERT_TRUE(std::is_destructible<RingBuffer<int>::const_iterator>::value);
+}
 
-    // Const iterators
-    auto cbegin(itControl.cbegin());
-    auto cend(itControl.cend());
-    // Requires implicit conversion to bool.
-    auto crefIt(cbegin);
-    ASSERT_TRUE(crefIt == cbegin);
-    ASSERT_TRUE(cbegin == crefIt);
-    ASSERT_FALSE(cbegin == cend);
+// Tests requirement: CopyAssignable / MoveAssignable
+TEST(Iterators, MoveAssignable)
+{
+    const auto beginIt = itControl.begin();
+    RingBuffer<int>::iterator moveAssigned;
+    moveAssigned = std::move(beginIt);
 
-    // Tests comparing non-const and const iterators
-    ASSERT_TRUE(begin == begin);
+    const auto cbeginIt = itControl.cbegin();
+    RingBuffer<int>::const_iterator cmoveAssigned;
+    cmoveAssigned = std::move(cbeginIt);
+
+    ASSERT_EQ(*moveAssigned, *cmoveAssigned);
+    ASSERT_EQ(moveAssigned, cmoveAssigned);
+
+    ASSERT_TRUE(std::is_move_assignable<RingBuffer<int>::iterator>::value);
+    ASSERT_TRUE(std::is_move_assignable<RingBuffer<int>::const_iterator>::value);
+}
+
+// Tests requirement: LegacyIterator / CopyAssignable
+TEST(Iterators, CopyAssignable)
+{
+    const auto beginIt = itControl.begin();
+    const auto otherIt = beginIt;
+    ASSERT_EQ(beginIt, otherIt);
+
+    const auto cbeginIt = itControl.cbegin();
+    const auto cotherIt = beginIt;
+    ASSERT_EQ(cbeginIt, cotherIt);
+
+    EXPECT_EQ(std::is_copy_assignable<RingBuffer<int>::iterator>::value, true);
+    EXPECT_EQ(std::is_copy_assignable<RingBuffer<int>::const_iterator>::value, true);
+}
+
+// Tests requirement: CopyConstructible / MoveConstucrible
+TEST(Iterators, MoveConstructible)
+{
+    const auto it = itControl.begin();
+    const auto movedIt(std::move(it));
+
+    const auto cit = itControl.cbegin();
+    const auto movedCit(std::move(cit));
+
+    ASSERT_EQ(movedIt,movedCit);
+    ASSERT_EQ(it,cit);
+
+    EXPECT_TRUE(std::is_move_constructible<RingBuffer<int>::iterator>::value);
+    EXPECT_TRUE(std::is_move_constructible<RingBuffer<int>::const_iterator>::value);
+}
+
+//Tests requirement: LegacyIterator / CopyConstructible.
+TEST(Iterators, CopyConstructible)
+{
+    const auto it = itControl.begin();
+    const auto copied(it);
+
+    const auto cit = itControl.cbegin();
+    const auto ccopied(cit);
+
+    ASSERT_EQ(it, cit);
+    ASSERT_EQ(it,copied);
+    ASSERT_EQ(cit, ccopied);
+    ASSERT_EQ(copied, ccopied);
+
+    EXPECT_TRUE(std::is_copy_constructible<RingBuffer<int>::iterator>::value);
+    EXPECT_TRUE(std::is_copy_constructible<RingBuffer<int>::const_iterator>::value);
 }
 
 // Tests requirement: LegacyInputIterator, Expression i!=j.
@@ -141,23 +173,23 @@ TEST(Iterators, Inequality)
     RingBuffer<int> someOtherBuffer{98,54,234,76};
     
     auto control(itControl.begin());
-    auto other(someOtherBuffer.begin());
+    const auto other(someOtherBuffer.begin());
 
     // Index is same, but iterators point to different containers.
     ASSERT_TRUE(control != other);
     
     //Same buffer, but different indexes.
-    auto snapshot(control);
+    const auto snapshot(control);
     control++;
     ASSERT_TRUE(snapshot != control);
 
     // Same for const iterators
     auto constControl(itControl.cbegin());
-    auto constOther(someOtherBuffer.cbegin());
+    const auto constOther(someOtherBuffer.cbegin());
 
     ASSERT_TRUE(constControl != constOther);
 
-    auto constSnapshot(constControl);
+    const auto constSnapshot(constControl);
     constControl++;
     ASSERT_TRUE(constControl != constSnapshot);
 
@@ -167,10 +199,10 @@ TEST(Iterators, Inequality)
 }
 
 // Tests requirement: LegacyInputIterator, expression *i.
-TEST(Iterators, dereferencing)
+TEST(Iterators, dereferenceable)
 {
-    auto it(itControl.begin());
-    
+    const auto it(itControl.begin());
+
     ASSERT_TRUE((std::is_same<decltype(*it), typename RingBuffer<int>::reference>::value));
 
     // Implicit conversion to value_type.
@@ -183,27 +215,49 @@ TEST(Iterators, dereferencing)
     ASSERT_EQ(convertibleToThis, 5);
 }
 
-//Tests requirement: DefaultConstructible
-//std::is_default_constructible does not test compilation, so compilation of different construction methods are also tested.
-TEST(Iterators, IterDefaultConstruction)
+//Tests requirement: LegacyInputIterator, Expression i->m is equivalent to (*i).m.
+TEST(Iterators, pointerReduction)
 {
-    RingBuffer<int>::iterator it;
-    RingBuffer<int>::const_iterator cit;
+    // Using a string here just to have some member to call.
+    RingBuffer<std::string> strBuf{"abcd"};
+    const auto customIt = strBuf.begin();
+    EXPECT_EQ(customIt->at(0), (*customIt).at(0));
 
-    RingBuffer<int>::iterator value_it{};
-    RingBuffer<int>::const_iterator value_cit{};
+    const auto constIt = strBuf.cbegin();
+    EXPECT_EQ(constIt->at(0), (*constIt).at(0));
+}
 
-    it = RingBuffer<int>::iterator();
-    cit = RingBuffer<int>::const_iterator();
+//Tests requirement: LegacyInputIterator, Expressions : ++r, (void)r++ , *r++;
+TEST(Iterators, IncrementOperators)
+{
+    auto begin = itControl.begin();
+    auto cbegin = itControl.cbegin();
 
-    EXPECT_EQ(std::is_default_constructible<RingBuffer<int>::iterator>::value, true);
-    EXPECT_EQ(std::is_default_constructible<RingBuffer<int>::const_iterator>::value, true);
+    const auto pre = ++begin;
+    const auto post = begin++;
+    //Values should be the same
+    ASSERT_EQ(pre, post);
+    ASSERT_EQ(*post, itControl[1]);
+
+    //Same for constant iterator
+    auto cpre = ++cbegin;
+    auto cpost = cbegin++;
+    ASSERT_EQ(cpre, cpost);
+    ASSERT_EQ(*cpost, itControl[1]);
+
+    ASSERT_EQ(*begin, itControl[2]);
+    ASSERT_EQ(*cbegin, itControl[2]);
+
+    auto controlIt = begin;
+    ++begin;
+    ASSERT_NE(*controlIt++, *begin);
+    ASSERT_EQ(*controlIt, *begin);
 }
 
 //Tests requirement: constant_iterator construction from non-const version.
 TEST(Iterators, ConstantConversion)
 {
-    auto it = itControl.begin();
+    const auto it = itControl.begin();
 
     //Conversion constructor
     RingBuffer<int>::const_iterator cit(it);
@@ -214,29 +268,36 @@ TEST(Iterators, ConstantConversion)
     ASSERT_TRUE((std::is_same<decltype(anotherCit), typename RingBuffer<int>::const_iterator>::value));
     ASSERT_TRUE((std::is_same<decltype(cit), typename RingBuffer<int>::const_iterator>::value));
     ASSERT_EQ(*cit, *it);
-
 }
 
-
-//Tests requirement: LegacyInputIterator, dereferenceable Expression i->m is equivalent to (*i).m.
-TEST(Iterators, PointerReduction)
+// Tests requirement: LegacyBidirectionalIterator, Expressions --a, a--, *a--
+TEST(Iterators, DecrementOperators)
 {
-    RingBuffer<std::string> strBuf{"abcd"};
-    auto customIt = strBuf.begin();
-    EXPECT_EQ(customIt->at(0), (*customIt).at(0));
+    auto end(itControl.end());
+    auto cend(itControl.cend());
+    const auto size = itControl.size();
 
-    auto constIt = strBuf.cbegin();
-    EXPECT_EQ(constIt->at(0), (*constIt).at(0));
-}
+    const auto pre = --end;
+    // Post increment return value is past the last element.
+    ASSERT_EQ(pre, end);
+    ASSERT_EQ(*pre, itControl[size - 1]);
 
-TEST(Iterators, IterCopyAssignable)
-{
-    RingBuffer<int>::iterator it(itControl.begin());
-    RingBuffer<int>::const_iterator cit(it);
+    const auto post = end--;
+    ASSERT_EQ(post, pre);
+    ASSERT_NE(post, end);
+    ASSERT_EQ(*end--, itControl[size - 2]);
 
-    auto experiment{it};
-    ASSERT_EQ(it, experiment);
+    ASSERT_EQ(*end, itControl[size - 3]);
 
-    auto const_experiment{cit};
-    ASSERT_EQ(cit,const_experiment);
+    const auto cpre = --cend;
+    // Post increment return value is past the last element.
+    ASSERT_EQ(cpre, cend);
+    ASSERT_EQ(*cpre, itControl[size - 1]);
+
+    const auto cpost = cend--;
+    ASSERT_EQ(cpost, cpre);
+    ASSERT_NE(cpost, cend);
+    ASSERT_EQ(*cend--, itControl[size - 2]);
+
+    ASSERT_EQ(*cend, itControl[size - 3]);
 }
