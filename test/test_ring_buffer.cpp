@@ -266,16 +266,28 @@ TYPED_TEST(RingBufferTest, Empty)
     EXPECT_TRUE(control.empty());
 }
 
-
 TYPED_TEST(RingBufferTest, data)
 {
-    //Not implemented yet
-    GTEST_SKIP();
     RingBuffer<TypeParam> myBuf;
     myBuf.reserve(5);
-    // TODO add test for data to rotate the buffer so that physical start matches logical start.
-    ASSERT_TRUE((myBuf.size()== 0 && myBuf.getCapacity() > 0));
+    ASSERT_TRUE((myBuf.size() == 0 && myBuf.capacity() > 0));
     ASSERT_TRUE(myBuf.data() != nullptr);
+
+    const auto firstAddress = &t_buffer[0];
+    const auto secondAddress = &t_buffer[1];
+    t_buffer.pop_front();
+    t_buffer.pop_front();
+
+    const auto testVal = getValue<TypeParam>();
+    t_buffer.push_front(testVal);
+    ASSERT_EQ(&t_buffer.front(), secondAddress);
+
+    RingBuffer<TypeParam> copy(t_buffer);
+    // Sorts the buffer.
+    t_buffer.data();
+    ASSERT_EQ(copy, t_buffer);
+    copy.data();
+    ASSERT_EQ(copy, t_buffer);
 }
 
 TYPED_TEST(RingBufferTest, push_back)

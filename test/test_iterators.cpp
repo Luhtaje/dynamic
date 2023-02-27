@@ -301,3 +301,50 @@ TEST(Iterators, DecrementOperators)
 
     ASSERT_EQ(*cend, itControl[size - 3]);
 }
+
+// Tests requirement: LegacyRandomAccessIterator, expressions r += n, a + n / n + a. n can be negative.
+TEST(Iterators, Addition)
+{
+    auto it = itControl.begin();
+    auto cit = itControl.cbegin();
+
+    const auto size = itControl.size();
+    it += 1;
+    ASSERT_EQ(*it, itControl[1]);
+
+    it += -1;
+    ASSERT_EQ(*it, itControl[0]);
+    // Test that operator works correctly when the index loops around a buffer boundary.
+    it += size * -1;
+    ASSERT_EQ(*it, itControl[0]);
+    it += size;
+    ASSERT_EQ(*it, itControl[0]);
+
+    // a + n returns temporary iterator.
+    ASSERT_EQ(*(it + 1), itControl[1]);
+    ASSERT_EQ(*(1 + it), itControl[1]);
+    ASSERT_EQ(*(it + (-1)), itControl[size - 1]);
+    ASSERT_EQ(*(-1 + it), itControl[size-1]);
+    // Make sure iterator was not moved.
+    ASSERT_EQ(*it, itControl[0]);
+
+
+    // Same tests for const_iterator
+    cit += 1;
+    ASSERT_EQ(*cit, itControl[1]);
+
+    cit += -1;
+    ASSERT_EQ(*cit, itControl[0]);
+
+    cit += size * -1;
+    ASSERT_EQ(*cit, itControl[0]);
+    cit += size;
+    ASSERT_EQ(*cit, itControl[0]);
+
+    ASSERT_EQ(*(cit+1), itControl[1]);
+    ASSERT_EQ(*(1 + cit), itControl[1]);
+    ASSERT_EQ(*(cit + (-1)), itControl[size -1]);
+    ASSERT_EQ(*(-1 + cit), itControl[size-1]);
+
+    ASSERT_EQ(*cit, itControl[0]);
+}

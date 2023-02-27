@@ -1,6 +1,7 @@
 #ifndef ITERATOR_HPP
 #define ITERATOR_HPP
 
+#include <iterator>
 //Forward declarations
 //============================================================================
 template<typename _rBuf>
@@ -57,7 +58,8 @@ public:
     }
 
     /// @brief Postfix increment
-    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer handles overflown iterators. See Iterator::operator* and RingBuffer::operator[].
+    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
+    /// See Iterator::operator* and RingBuffer::operator[].
     _rBuf_const_iterator& operator++()
     {
         m_logicalIndex++;
@@ -67,7 +69,8 @@ public:
 
     /// @brief Postfix increment
     /// @param  int empty parameter to guide overload resolution.
-    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer handles overflown iterators. See Iterator::operator* and RingBuffer::operator[].
+    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
+    /// See Iterator::operator* and RingBuffer::operator[].
     _rBuf_const_iterator operator++(int)
     {
         auto temp (*this);
@@ -82,7 +85,7 @@ public:
         --m_logicalIndex;
         if(m_logicalIndex < 0)
         {
-            m_logicalIndex = m_container->getCapacity() - 1;
+            m_logicalIndex = m_container->capacity() - 1;
         }
         return(*this);
     }
@@ -96,7 +99,7 @@ public:
         --m_logicalIndex;
         if(m_logicalIndex < 0)
         {
-            m_logicalIndex = m_container->getCapacity() - 1;
+            m_logicalIndex = m_container->capacity() - 1;
         }
         return temp;
     }
@@ -105,16 +108,28 @@ public:
     /// @param offset Amount of elements to move. Negative values move iterator backwards.
     _rBuf_const_iterator& operator+=(difference_type offset)
     {
-        m_logicalIndex += offset;
-        const auto capacity = m_container->getCapacity();
-
-        if(m_logicalIndex >= capacity)
+        const auto size = m_container->size();
+        // TODO : make this better. Absolutely terrible
+        if(offset < 0)
         {
-            m_logicalIndex -= capacity;
+            offset = abs(offset) % size;
+            if(offset > m_logicalIndex)
+            {
+                m_logicalIndex = size - (offset - m_logicalIndex);
+            }
+            else
+            {
+                m_logicalIndex = m_logicalIndex - offset;
+            }
         }
-        else if(m_logicalIndex < 0)
+        else 
         {
-            m_logicalIndex = capacity;
+            offset = offset % size;
+            m_logicalIndex += offset;
+            if(m_logicalIndex >= size)
+            {
+                m_logicalIndex -= size;
+            }
         }
         return (*this);
     }
@@ -128,16 +143,19 @@ public:
         return (temp += offset);
     }
 
-    /// @brief Moves iterator backwards.
-    /// @param movement Amount of elements to move.
-    _rBuf_const_iterator& operator-=(const difference_type offset)
+    /// @brief Returns an iterator that points to an element, which is the current element decremented by the given offset.
+    /// @param offset The number of positions to move the iterator backward.
+    /// @return An iterator pointing to the element that is offset positions before the current element.
+    /// @note Undefined behaviour for negative offset.
+    _rBuf_const_iterator& operator-=(const difference_type)
     {
         return (*this += -offset);
     }
 
-    /// @brief Decrement an iterator by offset.
-    /// @param offset Amount of elements to go backwards
-    /// @return Returns a new iterator which points to a new iterator decremented by amount of offset.
+    /// @brief Returns an iterator that points to an element, which is the current element decremented by the given offset.
+    /// @param offset The number of positions to move the iterator backward.
+    /// @return An iterator pointing to the element that is offset positions before the current element.
+    /// @note Undefined behaviour for negative offset.
     _rBuf_const_iterator operator-(const difference_type offset) const
     {
         _rBuf_const_iterator temp(m_container, m_logicalIndex);
@@ -269,7 +287,8 @@ public:
     }
 
     /// @brief Prefix increment
-    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer handles overflown iterators. See Iterator::operator* and RingBuffer::operator[].
+    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
+    /// See Iterator::operator* and RingBuffer::operator[].
     _rBuf_iterator& operator++()
     {
         ++m_logicalIndex;
@@ -278,7 +297,8 @@ public:
 
     /// @brief Postfix increment
     /// @param  int empty parameter to guide overload resolution.
-    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer handles overflown iterators. See Iterator::operator* and RingBuffer::operator[].
+    /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
+    ///  See Iterator::operator* and RingBuffer::operator[].
     _rBuf_iterator operator++(int)
     {
         auto temp (*this);
@@ -292,7 +312,7 @@ public:
         --m_logicalIndex;
         if(m_logicalIndex < 0)
         {
-            m_logicalIndex = m_container->getCapacity() - 1;
+            m_logicalIndex = m_container->capacity() - 1;
         }
         return(*this);
     }
@@ -305,7 +325,7 @@ public:
         --m_logicalIndex;
         if(m_logicalIndex < 0)
         {
-            m_logicalIndex = m_container->getCapacity() - 1;
+            m_logicalIndex = m_container->capacity() - 1;
         }
         return temp;
     }
@@ -314,15 +334,28 @@ public:
     /// @param offset Amount of elements to move.
     _rBuf_iterator& operator+=(difference_type offset)
     {
-        m_logicalIndex += offset;
-        const auto capacity = m_container->getCapacity();
-        if(m_logicalIndex >= capacity)
+        const auto size = m_container->size();
+        // TODO : make this better. Absolutely terrible
+        if(offset < 0)
         {
-            m_logicalIndex -= capacity;
+            offset = abs(offset) % size;
+            if(offset > m_logicalIndex)
+            {
+                m_logicalIndex = size - (offset - m_logicalIndex);
+            }
+            else
+            {
+                m_logicalIndex = m_logicalIndex - offset;
+            }
         }
-        else if(m_logicalIndex < 0)
+        else
         {
-            m_logicalIndex = capacity;
+            offset = offset % size;
+            m_logicalIndex += offset;
+            if(m_logicalIndex >= size)
+            {
+                m_logicalIndex -= size;
+            }
         }
         return (*this);
     }
@@ -335,13 +368,18 @@ public:
         return (temp += offset);
     }
 
-    /// @brief Moves iterator backwards.
-    /// @param movement Amount of elements to move.
+    /// @brief Returns an iterator that points to an element, which is the current element decremented by the given offset.
+    /// @param offset The number of positions to move the iterator backward.
+    /// @return An iterator pointing to the element that is offset positions before the current element.
+    /// @note Undefined behavior for negative offset.
     _rBuf_iterator& operator-=(const difference_type offset)
     {
         return (*this += -offset);
     }
 
+    /// @brief Returns an iterator that points to an element, which is the current element decremented by the given offset.
+    /// @param offset The number of positions to move the iterator backward.
+    /// @return An iterator pointing to the element that is offset positions before the current element.
     _rBuf_iterator& operator-(const difference_type offset) const
     {
         _rBuf_iterator temp(m_container, m_logicalIndex);
@@ -362,7 +400,7 @@ public:
     /// @return Return object pointer by the iterator with an offset.
     reference operator[](const difference_type offset) const
     {
-        return return m_container->operator[](m_logicalIndex + offset);
+        return m_container->operator[](m_logicalIndex + offset);
     }
 
     /// @brief Comparison operator== overload
@@ -372,7 +410,7 @@ public:
     bool operator==(const iterator& other) const
     {
         // Compares remainders after getting module from the index, as index might be wrapped around but should still compare equal to iterators pointing to same element.
-        const auto pointsToSame = (m_logicalIndex % m_container->getCapacity() == other.m_logicalIndex % other.m_container->getCapacity());
+        const auto pointsToSame = (m_logicalIndex % m_container->capacity() == other.m_logicalIndex % other.m_container->capacity());
         return pointsToSame && m_container == other.m_container;
     }
 
@@ -417,7 +455,8 @@ public:
 
     /// @brief Custom assingment operator overload.
     /// @param index Logical index of the element to set the iterator to.
-    _rBuf_iterator& operator=(difference_type index) const
+    /// @note Undefined behaviour for negative index.
+    _rBuf_iterator& operator=(size_t index)
     {
         m_logicalIndex = index;
         return (*this);
@@ -430,5 +469,32 @@ public:
     // to an element. Logical index 0 is the first element in the buffer and last is size - 1.
     difference_type m_logicalIndex;
 };
+
+
+/// @brief Non-member addition operator to match the expression (n + a) where a is the iterator and n an integer offset.
+/// @tparam T Value type.
+/// @param offset Integral type offset. Can be negative.
+/// @param iterator Base iterator.
+/// @return Returns an iterator that points to an element of the base iterator + offset.
+template <typename T>
+_rBuf_iterator<T> operator+(typename std::iterator_traits<_rBuf_iterator<T>>::difference_type offset, _rBuf_iterator<T>& iterator)
+{
+    auto temp = iterator;
+    temp += offset;
+    return temp;
+}
+
+/// @brief Non-member addition operator to match the expression (n + a) where a is the iterator and n an integer offset.
+/// @tparam T Value type.
+/// @param offset Integral type offset. Can be negative.
+/// @param iterator Base iterator.
+/// @return Returns a const-iterator that points to an element of the base iterator + offset.
+template <typename T>
+_rBuf_const_iterator<T> operator+(typename std::iterator_traits<_rBuf_const_iterator<T>>::difference_type offset, _rBuf_const_iterator<T>& iterator)
+{
+    auto temp = iterator;
+    temp += offset;
+    return temp;
+}
 
 #endif /*ITERATOR_HPP*/
