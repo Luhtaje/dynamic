@@ -7,7 +7,7 @@
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
 /// @tparam T type of the ringbuffer
-/// @tparam Allocator optional allocator for underlying vector. Defaults to std::allocator<T>
+/// @tparam Allocator Defaults to std::allocator<T>
 template<typename T, typename Allocator = std::allocator<T>> 
 class RingBuffer
 {
@@ -176,6 +176,7 @@ public:
     /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
     /// @param logicalIndex Index of the element.
     /// @return Returns a reference to the element.
+    /// @note Does not check bounds, and behaviour for accessing index larger than size() - 1 is undefined.
     reference operator[](const size_type logicalIndex)
     {
         // If sum of tailIndex (physical first element) and logical index(logical element) is larger than vector capacity, 
@@ -193,6 +194,7 @@ public:
     /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
     /// @param logicalIndex Index of the element.
     /// @return Returns a const reference the the element.
+    /// @note Does not check bounds, and behaviour for accessing index larger than size() - 1 is undefined.
     const_reference operator[](const size_type logicalIndex) const
     {
         auto index(m_tailIndex + logicalIndex);
@@ -216,7 +218,7 @@ public:
         }
 
         // This function rotates the buffer by doing a double copy: copies the buffer to temporary location and then back to original but matching the first
-        // element to the beginning of the allocated area. Inefficient for sure but linear in complexity depending on length of the buffer.
+        // element to the beginning of the allocated area. Inefficient but linear in complexity related to the length of the buffer.
 
         // Create a temporary buffer and copy existing buffers elements to the start of the temporary memory.
         auto temp = RingBuffer<T>(capacity());
@@ -265,50 +267,26 @@ public:
 
     /// @brief Allocates more memory and copies the existing buffer to the new memory location.
     /// @throw Throws std::bad_alloc if there is not enough memory for allocation. Throws std::bad_array_new_lenght if std::numeric_limits<std::size_t>::max() / sizeof(T) < newsize.
-    /// @param newCapacity Amount of memory to allocate.
+    /// @param newCapacity Amount of memory to allocate. if newCapacity is less than or equal to m_capacity, function does nothing.
+    /// @note If any exception is thrown, this function has no effect. Strong exception guarantee.
     void reserve(size_type newCapacity)
     {
         if(newCapacity <= m_capacity) return;
 
-        // Temporary buffer to help with copying the values to new memory location.
+        // Temporary buffer to take hits if exceptions occur.
         auto temp =  RingBuffer<T>(newCapacity);
         temp.m_headIndex = m_headIndex;
         temp.m_tailIndex = m_tailIndex;
 
-        // Copy the buffer if it has wrapped around, ends needs to touch borders with the allocated memory area. No floating head or tail is allowed.
+        // If buffer is wrapped, move the tail. 
         if(m_headIndex < m_tailIndex)
         {
-            const auto tailOffset = m_capacity - m_tailIndex;
-            // Move the tail in temp.
+            // Moves the tail so that the distance from the end border of allocated memory stays the same.
             temp.m_tailIndex += newCapacity - m_capacity;
-            // Copy the elements at physical start only if such exists.
-            if(m_headIndex)
-            {
-
-                // Iterator refer to physical begin, not logical as the begin() member function does.
-                // But since iterators itself use logical indexes, we need to give the offset from tail -> capacity to the iterator.
-                // to poin to the physical begin.
-                auto sourceBeginIt = const_iterator(this, tailOffset);
-                auto sourceEndIt = const_iterator(this, m_headIndex + tailOffset);
-                auto destBeginIt = iterator(&temp, tailOffset);
-
-                // Copy beginning sequence of wrapped buffer.
-               copy(sourceBeginIt, sourceEndIt, destBeginIt);
-            }
-
-            // Copy end sequence of buffer.
-            auto sourceEndIt = const_iterator(this, tailOffset);
-            // This iterator refers to the first element in the seuqence which touches the end border of the new memory area.
-            auto destBeginIt = iterator(&temp, 0);
-
-            // Copy the ending sequence of a wrapped buffer
-            copy(cbegin(), sourceEndIt, destBeginIt);
         }
-        else
-        {
-            // Simple copy to new location.
-            copy(cbegin(), cend(), temp.begin());
-        }
+
+        // Copy to temp memory.
+        copy(cbegin(), cend(), temp.begin());
 
         // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
         this->swap(temp);
@@ -344,18 +322,18 @@ public:
         increment(m_headIndex);
     }
 
-    // Erases an element from logical front of the buffer.
-    void pop_front()
+    /// @brief Remove the first element in the buffer.
+    void pop_front() noexcept
     {
         m_allocator.destroy(&m_data[m_tailIndex]);
         increment(m_tailIndex);
     }
 
     // Erase an element from the logical back of the buffer.
-    void pop_back()
+    void pop_back() noexcept
     {
         decrement(m_headIndex);
-        m_allocator.destroy(m_data[m_headIndex-1]);
+        m_allocator.destroy(&m_data[m_headIndex-1]);
     }
 
 //===========================================================
@@ -404,7 +382,9 @@ public:
 
 private:
 
-    void increment(size_t& index)
+    /// @brief  Increments an index. If the index reaches capacity, set index to 0.
+    /// @param index The index to increment.
+    void increment(size_t& index) noexcept
     {   
         ++index;
         // Reaching equal is past the last element, then wraps around.
@@ -414,9 +394,10 @@ private:
         }
     }
 
-    void decrement(size_t& index)
+    /// @brief Decrements an index. If the index is at 0, set index to m_capacity - 1.
+    /// @param index The index to decrement.
+    void decrement(size_t& index) noexcept
     {
-
         if(index == 0)
         {
             index = m_capacity - 1;
@@ -450,7 +431,7 @@ private:
     size_type m_tailIndex; /*!< Index of the tail. Index to the "first" element in the buffer.*/
     size_type m_capacity;  /*!< Capacity of the buffer. How many elements of type T the buffer has currently allocated memory for.*/
     
-    T* m_data;  /*!< Pointer to teh buffers data.*/
+    T* m_data;  /*!< Pointer to allocated memory.*/
     Allocator m_allocator;  /*!< Allocator used to allocate/ deallocate and construct/ destruct elements. Default is std::allocator<T>*/
 };
 

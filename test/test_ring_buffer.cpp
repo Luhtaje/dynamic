@@ -143,42 +143,52 @@ TYPED_TEST_SUITE(RingBufferTest, Types);
 TYPED_TEST(RingBufferTest, DefaultConstruction)
 {
     RingBuffer<TypeParam> defaultInitialized;
-    EXPECT_EQ(defaultInitialized.empty(), true);
+    EXPECT_TRUE(defaultInitialized.empty());
 
     RingBuffer<TypeParam> defaultValueInitialized{};
-    EXPECT_EQ(defaultValueInitialized.empty(), true);
+    EXPECT_TRUE(defaultValueInitialized.empty());
 
-    EXPECT_EQ(std::is_default_constructible<RingBuffer<TypeParam>>::value, true);
+    EXPECT_TRUE(std::is_default_constructible<RingBuffer<TypeParam>>::value);
 }
 
 TYPED_TEST(RingBufferTest, CopyConstruction)
 {
-    RingBuffer<TypeParam> control(TEST_SIZE);
-    RingBuffer<TypeParam> experiment(control);
-    EXPECT_EQ(experiment.size(), control.size());
-    EXPECT_EQ(experiment, control);
-    EXPECT_EQ(std::is_copy_constructible<RingBuffer<TypeParam>>::value, true);
+    RingBuffer<TypeParam> copy(t_buffer);
+    ASSERT_EQ(copy, t_buffer);
+    ASSERT_TRUE(std::is_copy_constructible<RingBuffer<TypeParam>>::value);
+
 }
+
+TYPED_TEST(RingBufferTest, CopyAssignment)
+{
+    RingBuffer<TypeParam> control = t_buffer;
+    ASSERT_EQ(control, t_buffer);
+    ASSERT_TRUE(std::is_copy_assignable<RingBuffer<TypeParam>>::value);
+}
+
 
 TYPED_TEST(RingBufferTest, MoveConstruction)
 {
-    RingBuffer<TypeParam> tempcopy(t_buffer);
+    RingBuffer<TypeParam> copy(t_buffer);
     EXPECT_EQ(t_buffer.empty(), false);
 
     RingBuffer<TypeParam> moved(std::move(t_buffer));
 
-    // Accessing moved memory gives weird error, expect_death did not work too well
-    // EXPECT_DEATH(initial[0], "vector subscript is out of range");
-    EXPECT_EQ(moved, tempcopy);
+    EXPECT_EQ(moved, copy);
+    EXPECT_EQ(t_buffer.size(), 0);
+
+    ASSERT_TRUE(std::is_move_constructible<RingBuffer<TypeParam>>::value);
 }
 
 TYPED_TEST(RingBufferTest, MoveAssign)
 {
-    auto control(std::move(t_buffer));
+    const auto copy(t_buffer);
+    const auto moved = std::move(t_buffer);
 
-    ASSERT_NE(control.empty(), true);
-    //TODO investigate why vector subscript goes out of range. Control is empty, something in the comparison tries to access with some index. prob
-    //EXPECT_NE(control,temp);
+    ASSERT_EQ(copy, moved);
+    EXPECT_EQ(t_buffer.size(), 0);
+
+    ASSERT_TRUE(std::is_move_assignable<RingBuffer<TypeParam>>::value);
 }
 
 TYPED_TEST(RingBufferTest, SizeValConstruction)
@@ -207,15 +217,15 @@ TYPED_TEST(RingBufferTest, InitListConstruction)
     EXPECT_EQ(buf[2], ThirdElem);
 }
 
-TYPED_TEST(RingBufferTest, CopyAssignment)
-{
-    RingBuffer<TypeParam> control = t_buffer;
-    ASSERT_EQ(control, t_buffer);
-}
-
-TYPED_TEST(RingBufferTest, EqualityComparators)
+TYPED_TEST(RingBufferTest, EqualityComparable)
 {
     RingBuffer<TypeParam> copy(t_buffer);
+    EXPECT_TRUE(copy == t_buffer);
+
+    copy.pop_back();
+    EXPECT_TRUE(copy != t_buffer);
+
+    t_buffer.pop_back();
     EXPECT_TRUE(copy == t_buffer);
 
     RingBuffer<TypeParam> randomBuffer(TEST_SIZE);
@@ -224,10 +234,13 @@ TYPED_TEST(RingBufferTest, EqualityComparators)
 
 TYPED_TEST(RingBufferTest, AccessOperator)
 {
-    t_buffer.pop_front();
-    auto val(t_buffer[0]);
-    t_buffer.pop_front();
-    auto val2(t_buffer[0]);
+    const auto frontVal = getValue<TypeParam>();
+    t_buffer.push_front(frontVal);
+    ASSERT_EQ(frontVal, t_buffer[0]);
+
+    const auto backVal = getValue<TypeParam>();
+    t_buffer.push_back(backVal);
+    ASSERT_EQ(backVal, t_buffer[t_buffer.size() -1]);
 }
 
 TYPED_TEST(RingBufferTest, Swap)
@@ -266,7 +279,7 @@ TYPED_TEST(RingBufferTest, Empty)
     EXPECT_TRUE(control.empty());
 }
 
-TYPED_TEST(RingBufferTest, data)
+TYPED_TEST(RingBufferTest, Data)
 {
     RingBuffer<TypeParam> myBuf;
     myBuf.reserve(5);
@@ -290,7 +303,7 @@ TYPED_TEST(RingBufferTest, data)
     ASSERT_EQ(copy, t_buffer);
 }
 
-TYPED_TEST(RingBufferTest, push_back)
+TYPED_TEST(RingBufferTest, Push_back)
 {
     // Push few times to make buffer allocate more memory.
     const auto someVal = getValue<TypeParam>();
@@ -318,7 +331,7 @@ TYPED_TEST(RingBufferTest, push_back)
     EXPECT_EQ(t_buffer.back(), someVal6);
 }
 
-TYPED_TEST(RingBufferTest, push_front)
+TYPED_TEST(RingBufferTest, Push_front)
 {
     // Push few times to make buffer allocate more memory.
     const auto someVal = getValue<TypeParam>();
@@ -346,7 +359,7 @@ TYPED_TEST(RingBufferTest, push_front)
     EXPECT_EQ(t_buffer.front(), someVal6);
 }
 
-TYPED_TEST(RingBufferTest, front)
+TYPED_TEST(RingBufferTest, Front)
 {
     EXPECT_EQ(t_buffer.front(), *t_buffer.begin());
 }

@@ -199,7 +199,7 @@ TEST(Iterators, Inequality)
 }
 
 // Tests requirement: LegacyInputIterator, expression *i.
-TEST(Iterators, dereferenceable)
+TEST(Iterators, Dereferenceable)
 {
     const auto it(itControl.begin());
 
@@ -216,7 +216,7 @@ TEST(Iterators, dereferenceable)
 }
 
 //Tests requirement: LegacyInputIterator, Expression i->m is equivalent to (*i).m.
-TEST(Iterators, pointerReduction)
+TEST(Iterators, PointerReduction)
 {
     // Using a string here just to have some member to call.
     RingBuffer<std::string> strBuf{"abcd"};
@@ -225,6 +225,22 @@ TEST(Iterators, pointerReduction)
 
     const auto constIt = strBuf.cbegin();
     EXPECT_EQ(constIt->at(0), (*constIt).at(0));
+}
+
+//Tests requirement: constant_iterator construction from non-const version.
+TEST(Iterators, ConstantConversion)
+{
+    const auto it = itControl.begin();
+
+    //Conversion constructor
+    RingBuffer<int>::const_iterator cit(it);
+
+    //Conversion assignment.
+    auto anotherCit = itControl.cbegin();
+
+    ASSERT_TRUE((std::is_same<decltype(anotherCit), typename RingBuffer<int>::const_iterator>::value));
+    ASSERT_TRUE((std::is_same<decltype(cit), typename RingBuffer<int>::const_iterator>::value));
+    ASSERT_EQ(*cit, *it);
 }
 
 //Tests requirement: LegacyInputIterator, Expressions : ++r, (void)r++ , *r++;
@@ -254,23 +270,7 @@ TEST(Iterators, IncrementOperators)
     ASSERT_EQ(*controlIt, *begin);
 }
 
-//Tests requirement: constant_iterator construction from non-const version.
-TEST(Iterators, ConstantConversion)
-{
-    const auto it = itControl.begin();
-
-    //Conversion constructor
-    RingBuffer<int>::const_iterator cit(it);
-
-    //Conversion assignment.
-    auto anotherCit = itControl.cbegin();
-
-    ASSERT_TRUE((std::is_same<decltype(anotherCit), typename RingBuffer<int>::const_iterator>::value));
-    ASSERT_TRUE((std::is_same<decltype(cit), typename RingBuffer<int>::const_iterator>::value));
-    ASSERT_EQ(*cit, *it);
-}
-
-// Tests requirement: LegacyBidirectionalIterator, Expressions --a, a--, *a--
+// Tests requirement: LegacyBidirectionalIterator, Expressions --a, (void)a--, *a--
 TEST(Iterators, DecrementOperators)
 {
     auto end(itControl.end());
