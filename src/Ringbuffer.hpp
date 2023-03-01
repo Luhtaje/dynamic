@@ -3,11 +3,12 @@
 
 #include <memory>
 #include <algorithm>
+#include <limits>
 #include "Iterator.hpp"
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
-/// @tparam T type of the ringbuffer
-/// @tparam Allocator Defaults to std::allocator<T>
+/// @tparam T Type of the ringbuffer
+/// @tparam Allocator Allocator used for (de)allocation and (de)construction. Defaults to std::allocator<T>
 template<typename T, typename Allocator = std::allocator<T>> 
 class RingBuffer
 {
@@ -52,6 +53,21 @@ public:
         }
     }
 
+    /// @brief Custom constructor. Construct the buffer from range [begin,end).
+    /// @param begin Iterator to first element of range.
+    /// @param end Iterator past-the-last element of range.
+    /// @note Behavior is undefined if elements in range are not initialized.
+    RingBuffer(const_iterator beginIt, const_iterator endIt)
+    {
+        const auto size = endIt - beginIt;
+        m_capacity = size + 2;
+        m_data = m_allocator.allocate(m_capacity);
+        m_headIndex = size;
+        m_tailIndex = 0;
+
+        copy(beginIt, endIt, begin());
+    }
+
     /// @brief Initializer list contructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
@@ -76,7 +92,7 @@ public:
     }
 
     /// @brief Move constructor.
-    /// @param other 
+    /// @param other Rvalue reference to other buffer.
     RingBuffer(RingBuffer&& other) noexcept
     {
         m_data = std::exchange(other.m_data, nullptr);
@@ -85,7 +101,6 @@ public:
         m_tailIndex = std::exchange(other.m_tailIndex, 0);
     }
 
-    //Destructor
     ~RingBuffer()
     {
         // Calls destructor for each element in the buffer.
@@ -95,9 +110,23 @@ public:
         m_allocator.deallocate(m_data, m_capacity);
     }
 
+    iterator insert(iterator point, value_type value)
+    {
+        if(m_capacity - 1 == size())
+        {
+            reserve(m_capacity * 1.5);
+        }
+
+        shift(point, 1);
+        m_allocator.construct(&(*point), value);
+
+        return point;
+    }
+
     /// @brief Copy assignment operator.
     /// @param copy A temporary RingBuffer created by a copy constructor.
     /// @return Returns reference to the left hand side RungBuffer after swap.
+    /// @note Strong exception guarantee. 
     RingBuffer& operator=(const RingBuffer& other)
     {
         RingBuffer copy(other);
@@ -105,12 +134,48 @@ public:
         return *this;
     }
 
-    // Move assignment
+    /// @brief Move assignment operator.
+    /// @param other Rvalue ref to other buffer.
+    /// @return Reference to the buffer.
     RingBuffer& operator=(RingBuffer&& other) noexcept
     {
         RingBuffer copy(std::move(other));
         copy.swap(*this);
         return *this;
+    }
+
+    /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
+    /// @param logicalIndex Index of the element.
+    /// @return Returns a reference to the element.
+    /// @note Does not check bounds, and behaviour for accessing index larger than size() - 1 is undefined.
+    reference operator[](const size_type logicalIndex)
+    {
+        // If sum of tailIndex (physical first element) and logical index(logical element) is larger than vector capacity, 
+        // wrap index around to begin.
+        auto index(m_tailIndex + logicalIndex);
+
+        if(m_capacity <= index)
+        {
+            index -= m_capacity;
+        }
+
+        return m_data[index];
+    }
+
+    /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
+    /// @param logicalIndex Index of the element.
+    /// @return Returns a const reference the the element.
+    /// @note Does not check bounds, and behaviour for accessing index larger than size() - 1 is undefined.
+    const_reference operator[](const size_type logicalIndex) const
+    {
+        auto index(m_tailIndex + logicalIndex);
+
+        if(m_capacity <= index)
+        {
+            index -= m_capacity;
+        }
+
+        return m_data[index];
     }
 
     /// @brief Member swap implementation. Swaps RingBuffers member to member.
@@ -126,6 +191,8 @@ public:
     }
 
     /// @brief Friend swap.
+    /// @param a Swap candidate.
+    /// @param b Swap candidate.
     friend void swap(RingBuffer& a, RingBuffer& b) noexcept
     {
         a.swap(b);
@@ -173,43 +240,10 @@ public:
         return const_iterator(this, size());
     }
 
-    /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
-    /// @param logicalIndex Index of the element.
-    /// @return Returns a reference to the element.
-    /// @note Does not check bounds, and behaviour for accessing index larger than size() - 1 is undefined.
-    reference operator[](const size_type logicalIndex)
-    {
-        // If sum of tailIndex (physical first element) and logical index(logical element) is larger than vector capacity, 
-        // wrap index around to begin.
-        auto index(m_tailIndex + logicalIndex);
-
-        if(m_capacity <= index)
-        {
-            index -= m_capacity;
-        }
-
-        return m_data[index];
-    }
-
-    /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
-    /// @param logicalIndex Index of the element.
-    /// @return Returns a const reference the the element.
-    /// @note Does not check bounds, and behaviour for accessing index larger than size() - 1 is undefined.
-    const_reference operator[](const size_type logicalIndex) const
-    {
-        auto index(m_tailIndex + logicalIndex);
-
-        if(m_capacity <= index)
-        {
-            index -= m_capacity;
-        }
-
-        return m_data[index];
-    }
-
 	/// @brief Sorts ringbuffer so that logical tail matches the first element in physical memory.
     /// @return Returns a pointer to the first element.
-    /// @note Invalidates all existing pointers to buffer elements. Iterators are not invalidated. Expensive function because of allocation and multiple copies.
+    /// @note Invalidates all existing pointers to buffer elements. Iterators are not invalidated. Expensive function because of allocation and multiple copies. No exception guarantee.
+    /// @throw Can throw exceptions from memory allocation and constructors when copying elements.
     pointer data()
     {
         if(!size())
@@ -218,7 +252,7 @@ public:
         }
 
         // This function rotates the buffer by doing a double copy: copies the buffer to temporary location and then back to original but matching the first
-        // element to the beginning of the allocated area. Inefficient but linear in complexity related to the length of the buffer.
+        // element to the beginning of the allocated area. Inefficient but linear in complexity related to the length of the buffer, and consecutive calls to data() does not invalidate previous pointer.
 
         // Create a temporary buffer and copy existing buffers elements to the start of the temporary memory.
         auto temp = RingBuffer<T>(capacity());
@@ -249,6 +283,11 @@ public:
         }
 
         return m_headIndex - m_tailIndex;
+    }
+    size_type max_size() const noexcept
+    {
+        const auto maxSize = std::numeric_limits<std::size_t>::max();
+        return maxSize / sizeof(T);
     }
 
     /// @brief Capacity getter.
@@ -394,6 +433,18 @@ private:
         }
     }
 
+    /// @brief Increments an index multiple times.
+    /// @param index Index to increment.
+    /// @param times Amount of increments.
+    void increment(size_t& index, size_t times) noexcept
+    {
+        while(times > 0)
+        {
+            increment(index);
+            times--;
+        }
+    }
+
     /// @brief Decrements an index. If the index is at 0, set index to m_capacity - 1.
     /// @param index The index to decrement.
     void decrement(size_t& index) noexcept
@@ -406,12 +457,25 @@ private:
             --index;
         }
     }
+    
+    /// @brief Decrements an index multiple times.
+    /// @param index Index to decrement.
+    /// @param times Amount of decrements.
+    void decrement(size_t& index, size_t times) noexcept
+    {
+        while(times > 0)
+        {
+            decrement(index);
+            times--;
+        }
+    }
 
     /// @brief Copies elements by calling allocators construct() to ensure deep copy.
     /// @param sourceBegin Iterator to begin of source data.
     /// @param sourceEnd Iterator to past-the-end element of of source data.
     /// @param destBegin Iterator to beginning of destination range.
     /// @note Copies all elements in range [sourceBegin, sourceEnd), from sourceBegin to  sourceEnd - 1. The behaviour is undefined destBegin overlaps the range [sourceBegin, sourceEnd).
+    /// @exception If exceptions are thrown during construction the target buffer will have uninitialized elements.
     void copy(const_iterator sourceBegin, const_iterator sourceEnd, iterator destBegin)
     {
         size_t size = sourceEnd - sourceBegin;
@@ -420,6 +484,54 @@ private:
         {
             m_allocator.construct(&destBegin[i], sourceBegin[i]);
         }
+    }
+
+    /// @brief Shifts a range of elements forward or backwards with the copy and swap idiom. Deduces if shift happens to forward or backward based on distance to border from given iterator.
+    /// @param sourceBegin Iterator to range start.
+    /// @param offset Amount of elements to shift the range.
+    /// @exception Might throw exceptions from memory allocation and element constructors. If exceptions are thrown, nothing happens (Strong exception safety guarantee).
+    void shift(const_iterator sourceBegin, difference_type offset)
+    {
+        const auto endIt = end();
+        const auto beginIt = begin();
+        // Shift is inteded to be used as a way to make room for emplace and insert operations. If the iterator is at a border of the buffer, just return.
+        if(sourceBegin == endIt || sourceBegin == beginIt)
+        {
+            return;
+        }
+
+        // Do I want to allocate memory here?
+        RingBuffer<T> temp(m_capacity + offset);
+        temp.m_tailIndex = m_tailIndex;
+        temp.m_headIndex = m_headIndex;
+
+        // Distance to the shift-point iterator from each end.
+        const auto fromEnd = abs(sourceBegin - endIt);
+        const auto fromBegin = abs(sourceBegin - beginIt);
+
+        // Shift the elements in the direction based on distance from borders.
+        if(fromEnd >= fromBegin)
+        {   
+            increment(temp.m_headIndex, offset);
+
+            // Iterator to first element after the "cut off" caused by shifting. 
+            auto destCutOff = RingBuffer<T>::iterator(&temp, sourceBegin.getIndex() + offset);
+            copy(sourceBegin, endIt, destCutOff);
+
+            copy(beginIt, sourceBegin, temp.begin());
+        }
+        else
+        {
+            decrement(temp.m_tailIndex, offset);
+
+            // Iterator to first element after the "cut off" caused by shifting.
+            auto destCutOff = RingBuffer<T>::iterator(&temp, sourceBegin.getIndex());
+            copy(beginIt, sourceBegin, temp.begin());
+
+            copy(sourceBegin, endIt, destCutOff);
+        }
+
+        this->swap(temp);
     }
 
 //==========================================

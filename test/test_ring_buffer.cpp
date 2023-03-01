@@ -166,6 +166,15 @@ TYPED_TEST(RingBufferTest, CopyAssignment)
     ASSERT_TRUE(std::is_copy_assignable<RingBuffer<TypeParam>>::value);
 }
 
+TYPED_TEST(RingBufferTest, RangeConstruction)
+{
+    RingBuffer<TypeParam> rangeConstructed(t_buffer.begin(), t_buffer.end());
+    EXPECT_EQ(rangeConstructed, t_buffer);
+
+    const auto ranged = RingBuffer<TypeParam>(t_buffer.begin(), t_buffer.end());
+    EXPECT_EQ(ranged, t_buffer);
+}
+
 
 TYPED_TEST(RingBufferTest, MoveConstruction)
 {
@@ -228,7 +237,7 @@ TYPED_TEST(RingBufferTest, EqualityComparable)
     t_buffer.pop_back();
     EXPECT_TRUE(copy == t_buffer);
 
-    RingBuffer<TypeParam> randomBuffer(TEST_SIZE);
+    const auto randomBuffer(CreateBuffer<TypeParam>(TEST_SIZE));
     EXPECT_TRUE(randomBuffer != t_buffer);
 }
 
@@ -246,8 +255,8 @@ TYPED_TEST(RingBufferTest, AccessOperator)
 TYPED_TEST(RingBufferTest, Swap)
 {
     using std::swap;
-    RingBuffer<TypeParam> control(TEST_SIZE);
-    RingBuffer<TypeParam> experiment1(control);
+    auto control = CreateBuffer<TypeParam>(TEST_SIZE);
+    auto experiment1(control);
     EXPECT_EQ(control, experiment1);
 
     swap(experiment1, t_buffer);
@@ -259,12 +268,15 @@ TYPED_TEST(RingBufferTest, Swap)
 TYPED_TEST(RingBufferTest, Size)
 {
     EXPECT_EQ(t_buffer.size(), std::distance(t_buffer.cbegin(), t_buffer.cend()));
+
+    RingBuffer<TypeParam> emptyBuf(0);
+    EXPECT_EQ(emptyBuf.size(), 0);
 }
 
 TYPED_TEST(RingBufferTest, MaxSize)
 {
-    // TODO.
-    // No immediate solution for testing max_size. How to get compiler / platform independent max size? MSVC uses some msvc exclusive "limits" header to get max size.
+    // Yeah.
+    EXPECT_NE(t_buffer.max_size(), 1);
 }
 
 TYPED_TEST(RingBufferTest, Empty)
@@ -277,6 +289,8 @@ TYPED_TEST(RingBufferTest, Empty)
     EXPECT_EQ(begin, end);
 
     EXPECT_TRUE(control.empty());
+    ASSERT_FALSE(t_buffer.empty());
+
 }
 
 TYPED_TEST(RingBufferTest, Data)
@@ -295,7 +309,7 @@ TYPED_TEST(RingBufferTest, Data)
     t_buffer.push_front(testVal);
     ASSERT_EQ(&t_buffer.front(), secondAddress);
 
-    RingBuffer<TypeParam> copy(t_buffer);
+    auto copy(t_buffer);
     // Sorts the buffer.
     t_buffer.data();
     ASSERT_EQ(copy, t_buffer);
@@ -362,6 +376,17 @@ TYPED_TEST(RingBufferTest, Push_front)
 TYPED_TEST(RingBufferTest, Front)
 {
     EXPECT_EQ(t_buffer.front(), *t_buffer.begin());
+}
+
+TYPED_TEST(RingBufferTest, Insert)
+{
+    const auto value = getValue<TypeParam>();
+    t_buffer.insert(t_buffer.begin() + 1, value);
+    ASSERT_EQ(t_buffer[1], value);
+
+    const auto othertValue = getValue<TypeParam>();
+    t_buffer.insert(t_buffer.begin() + 4, othertValue);
+    ASSERT_EQ(t_buffer[4], othertValue);
 }
 
 }

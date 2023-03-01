@@ -180,10 +180,11 @@ public:
 
     /// @brief Comparison operator== overload
     /// @param other iterator to compare
-    /// @return true if underlying pointers are the same.
+    /// @return True if iterators point to same element in same container. Does not compare c-qualification.
     bool operator==(const _rBuf_const_iterator& other) const
     {
-        return m_logicalIndex == other.m_logicalIndex && m_container == other.m_container;
+        const auto pointsToSame = (m_logicalIndex % m_container->capacity() == other.m_logicalIndex % other.m_container->capacity());
+        return pointsToSame && m_container == other.m_container;
     }
 
     /// @brief Comparison operator != overload
@@ -236,7 +237,13 @@ public:
     {
         return (*m_container)[m_logicalIndex];
     }
+
+    difference_type getIndex() noexcept
+    {
+        return m_logicalIndex;
+    }
     
+private:
     // The parent container.
     const _rBuf* m_container;
 
@@ -261,6 +268,9 @@ public:
     using reference = value_type&;
 
 public:
+
+    /// @brief  Const iterator is friend to enable conversion.
+    friend class _rBuf_const_iterator<_rBuf>;
 
     /// @brief Default constructor
     _rBuf_iterator(): m_container(nullptr), m_logicalIndex(0) {}
@@ -405,13 +415,12 @@ public:
 
     /// @brief Comparison operator== overload
     /// @param other iterator to compare
-    /// @return true if underlying pointers are the same.
+    /// @return True if iterators point to same element in same container. Does not compare c-qualification.
+    /// @note As a matter of fact, just blatantly calls const-iterators operator, to access private members via friendness. All non-const iterators are converted to const for this comparison.
     template<typename iterator>
     bool operator==(const iterator& other) const
     {
-        // Compares remainders after getting module from the index, as index might be wrapped around but should still compare equal to iterators pointing to same element.
-        const auto pointsToSame = (m_logicalIndex % m_container->capacity() == other.m_logicalIndex % other.m_container->capacity());
-        return pointsToSame && m_container == other.m_container;
+        return _rBuf_const_iterator<_rBuf>(*this).operator==(other);
     }
 
     /// @brief Comparison operator != overload
@@ -462,6 +471,12 @@ public:
         return (*this);
     };
 
+    difference_type getIndex() noexcept
+    {
+        return m_logicalIndex;
+    }
+
+private:
     // The parent container.
     _rBuf* m_container;
 
