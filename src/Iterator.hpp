@@ -108,14 +108,14 @@ public:
     /// @param offset Amount of elements to move. Negative values move iterator backwards.
     _rBuf_const_iterator& operator+=(difference_type offset)
     {
-        const auto size = m_container->size();
+        const auto capacity = m_container->capacity();
         // TODO : make this better. Absolutely terrible
         if(offset < 0)
         {
-            offset = abs(offset) % size;
+            offset = abs(offset) % capacity;
             if(offset > m_logicalIndex)
             {
-                m_logicalIndex = size - (offset - m_logicalIndex);
+                m_logicalIndex = capacity - (offset - m_logicalIndex);
             }
             else
             {
@@ -124,20 +124,19 @@ public:
         }
         else 
         {
-            offset = offset % size;
+            offset = offset % capacity;
             m_logicalIndex += offset;
-            if(m_logicalIndex >= size)
+            if(m_logicalIndex >= capacity)
             {
-                m_logicalIndex -= size;
+                m_logicalIndex -= capacity;
             }
         }
         return (*this);
     }
 
-
     /// @brief Move iterator forward by specified amount.
     /// @param movement Amount of elements to move the iterator.
-    _rBuf_const_iterator operator+(const difference_type offset)
+    _rBuf_const_iterator operator+(const difference_type offset) const
     {
         _rBuf_const_iterator temp(m_container, m_logicalIndex);
         return (temp += offset);
@@ -344,14 +343,14 @@ public:
     /// @param offset Amount of elements to move.
     _rBuf_iterator& operator+=(difference_type offset)
     {
-        const auto size = m_container->size();
+        const auto capacity = m_container->capacity();
         // TODO : make this better. Absolutely terrible
         if(offset < 0)
         {
-            offset = abs(offset) % size;
+            offset = abs(offset) % capacity;
             if(offset > m_logicalIndex)
             {
-                m_logicalIndex = size - (offset - m_logicalIndex);
+                m_logicalIndex = capacity - (offset - m_logicalIndex);
             }
             else
             {
@@ -360,11 +359,11 @@ public:
         }
         else
         {
-            offset = offset % size;
+            offset = offset % capacity;
             m_logicalIndex += offset;
-            if(m_logicalIndex >= size)
+            if(m_logicalIndex >= capacity)
             {
-                m_logicalIndex -= size;
+                m_logicalIndex -= capacity;
             }
         }
         return (*this);
@@ -372,7 +371,7 @@ public:
 
     /// @brief Move iterator forward by specified amount.
     /// @param movement Amount of elements to move the iterator.
-    _rBuf_iterator operator+(const difference_type offset)
+    _rBuf_iterator operator+(const difference_type offset) const
     {
         _rBuf_iterator temp(m_container, m_logicalIndex);
         return (temp += offset);

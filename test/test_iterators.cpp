@@ -14,27 +14,20 @@ RingBuffer<int> itControl {6,4,2,1,3,5};
 TEST(Iterators, DefaultConstructible)
 {
     // After making iterator internals private, need to figure out something else for test.
-    GTEST_SKIP();
     RingBuffer<int>::iterator it;
     RingBuffer<int>::const_iterator cit;
 
-    //it.m_container = &itControl;
-    ASSERT_TRUE(*it);
-
-    //cit.m_container = &itControl;
-    ASSERT_TRUE(*cit);
+    ASSERT_TRUE(it.getIndex() == cit.getIndex());
 
     RingBuffer<int>::iterator value_it{};
     RingBuffer<int>::const_iterator value_cit{};
 
+    ASSERT_TRUE(value_it.getIndex() == value_cit.getIndex());
+
     it = RingBuffer<int>::iterator();
     cit = RingBuffer<int>::const_iterator();
 
-    //it.m_container = &itControl;
-    ASSERT_TRUE(*it);
-
-    //cit.m_container = &itControl;
-    ASSERT_TRUE(*cit);
+    ASSERT_TRUE(it.getIndex() == cit.getIndex());
 
     EXPECT_EQ(std::is_default_constructible<RingBuffer<int>::iterator>::value, true);
     EXPECT_EQ(std::is_default_constructible<RingBuffer<int>::const_iterator>::value, true);
@@ -307,29 +300,33 @@ TEST(Iterators, DecrementOperators)
 // Tests requirement: LegacyRandomAccessIterator, expressions r += n, a + n / n + a. n can be negative.
 TEST(Iterators, Addition)
 {
-    auto it = itControl.begin();
-    auto cit = itControl.cbegin();
-
+    const auto capacity = itControl.capacity();
     const auto size = itControl.size();
+
+    auto it = itControl.begin();
+    auto end = itControl.end();
+
     it += 1;
     ASSERT_EQ(*it, itControl[1]);
 
     it += -1;
     ASSERT_EQ(*it, itControl[0]);
-    // Test that operator works correctly when the index loops around a buffer boundary.
-    it += size * -1;
+    // Test that operator works correctly when the index loops around a buffer boundary. Moving iterator by capacity loops it to same element.
+    it += capacity * -1;
     ASSERT_EQ(*it, itControl[0]);
-    it += size;
+    it += capacity;
     ASSERT_EQ(*it, itControl[0]);
 
     // a + n returns temporary iterator.
     ASSERT_EQ(*(it + 1), itControl[1]);
     ASSERT_EQ(*(1 + it), itControl[1]);
-    ASSERT_EQ(*(it + (-1)), itControl[size - 1]);
-    ASSERT_EQ(*(-1 + it), itControl[size-1]);
+    ASSERT_EQ(*(end + (-1)), itControl[size - 1]);
+    ASSERT_EQ(*(-1 + end), itControl[size-1]);
     // Make sure iterator was not moved.
     ASSERT_EQ(*it, itControl[0]);
 
+    auto cit = itControl.cbegin();
+    auto cend = itControl.cend();
 
     // Same tests for const_iterator
     cit += 1;
@@ -338,15 +335,15 @@ TEST(Iterators, Addition)
     cit += -1;
     ASSERT_EQ(*cit, itControl[0]);
 
-    cit += size * -1;
+    cit += capacity * -1;
     ASSERT_EQ(*cit, itControl[0]);
-    cit += size;
+    cit += capacity;
     ASSERT_EQ(*cit, itControl[0]);
 
     ASSERT_EQ(*(cit+1), itControl[1]);
     ASSERT_EQ(*(1 + cit), itControl[1]);
-    ASSERT_EQ(*(cit + (-1)), itControl[size -1]);
-    ASSERT_EQ(*(-1 + cit), itControl[size-1]);
+    ASSERT_EQ(*(cend + (-1)), itControl[size -1]);
+    ASSERT_EQ(*(-1 + cend), itControl[size-1]);
 
     ASSERT_EQ(*cit, itControl[0]);
 }

@@ -5,6 +5,7 @@
 #include <ctime>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 namespace 
 {
@@ -380,13 +381,23 @@ TYPED_TEST(RingBufferTest, Front)
 
 TYPED_TEST(RingBufferTest, Insert)
 {
+
+    const auto it = t_buffer.begin();
+
     const auto value = getValue<TypeParam>();
-    t_buffer.insert(t_buffer.begin() + 1, value);
+    t_buffer.insert(it + 1, value);
     ASSERT_EQ(t_buffer[1], value);
 
-    const auto othertValue = getValue<TypeParam>();
-    t_buffer.insert(t_buffer.begin() + 4, othertValue);
-    ASSERT_EQ(t_buffer[4], othertValue);
+    const auto otherValue = getValue<TypeParam>();
+    t_buffer.insert(it + 2, TEST_SIZE, otherValue);
+    for(int i= 0; i < TEST_SIZE; i++)
+    {
+        ASSERT_EQ(t_buffer[2 + i], otherValue);
+    }
+
+    const auto thirdVal = getValue<TypeParam>();
+    t_buffer.insert(it + 3, std::move(thirdVal));
+    ASSERT_EQ(t_buffer[3], thirdVal)
 }
 
 }

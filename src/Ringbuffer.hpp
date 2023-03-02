@@ -110,6 +110,11 @@ public:
         m_allocator.deallocate(m_data, m_capacity);
     }
 
+    /// @brief Inserts an element to the buffer.
+    /// @param point Iterator where the the element should be inserted
+    /// @param value Value to insert.
+    /// @return Iterator that points to the inserted element.
+    /// @exception Can throw std::bad_alloc, or something from element construction. Allocation failure is critical, construction not as much. TODO improve exception safety.
     iterator insert(iterator point, value_type value)
     {
         if(m_capacity - 1 == size())
@@ -119,6 +124,52 @@ public:
 
         shift(point, 1);
         m_allocator.construct(&(*point), value);
+
+        return point;
+    }
+
+    /// @brief Inserts an element to the buffer.
+    /// @param point Iterator where the the element should be inserted
+    /// @param value Value to insert.
+    /// @return Iterator that points to the inserted element.
+    /// @exception Can throw std::bad_alloc, or something from element construction. Allocation failure is critical, construction not as much. TODO improve exception safety.
+    iterator insert(iterator point, value_type&& value)
+    {
+        if(m_capacity - 1 == size())
+        {
+            reserve(m_capacity * 1.5);
+        }
+
+        shift(point, 1);
+
+        // Move if movable.
+        if(std::is_move_constructible<value_type>::value)
+        {
+            m_allocator.construct(&(*point), std::move(value));
+            return point;
+        }
+
+        m_allocator.construct(&(*point), value);
+        return point;
+    }
+
+    /// @brief Inserts an element to the buffer.
+    /// @param point Iterator where the the element should be inserted
+    /// @param value Value to insert.
+    /// @return Iterator that points to the inserted element.
+    /// @exception Can throw std::bad_alloc, or something from element construction. Allocation failure is critical, construction not as much. TODO improve exception safety.
+    iterator insert(iterator point, size_type amount, value_type value)
+    {
+        while(m_capacity - 1 <= size() + amount)
+        {
+            reserve(m_capacity * 1.5);
+        }
+
+        shift(point, amount);
+        for(int i = 0; i < amount; i++)
+        {
+            m_allocator.construct(&point[i], value);
+        }
 
         return point;
     }
@@ -486,22 +537,22 @@ private:
         }
     }
 
-    /// @brief Shifts a range of elements forward or backwards with the copy and swap idiom. Deduces if shift happens to forward or backward based on distance to border from given iterator.
-    /// @param sourceBegin Iterator to range start.
-    /// @param offset Amount of elements to shift the range.
+    /// @brief Shifts a range of elements forward or backwards with the copy and swap idiom. Deduces shifts direction based on distance to each border from the given iterator.
+    /// @param sourceBegin Iterator to the shift point.
+    /// @param offset Size of shift. How many steps each element will be shifted.
     /// @exception Might throw exceptions from memory allocation and element constructors. If exceptions are thrown, nothing happens (Strong exception safety guarantee).
+    /// @note Undefined behaviour if buffer does not have enough memory allocated for the shift.
     void shift(const_iterator sourceBegin, difference_type offset)
     {
         const auto endIt = end();
         const auto beginIt = begin();
         // Shift is inteded to be used as a way to make room for emplace and insert operations. If the iterator is at a border of the buffer, just return.
-        if(sourceBegin == endIt || sourceBegin == beginIt)
+        if(sourceBegin == endIt || sourceBegin == beginIt || sourceBegin == endIt -1)
         {
             return;
         }
 
-        // Do I want to allocate memory here?
-        RingBuffer<T> temp(m_capacity + offset);
+        RingBuffer<T> temp(m_capacity);
         temp.m_tailIndex = m_tailIndex;
         temp.m_headIndex = m_headIndex;
 
@@ -510,11 +561,11 @@ private:
         const auto fromBegin = abs(sourceBegin - beginIt);
 
         // Shift the elements in the direction based on distance from borders.
-        if(fromEnd >= fromBegin)
+        if(fromBegin >= fromEnd)
         {   
             increment(temp.m_headIndex, offset);
 
-            // Iterator to first element after the "cut off" caused by shifting. 
+            // Iterator to first element after the "cut off" caused by shifting.
             auto destCutOff = RingBuffer<T>::iterator(&temp, sourceBegin.getIndex() + offset);
             copy(sourceBegin, endIt, destCutOff);
 
@@ -522,13 +573,15 @@ private:
         }
         else
         {
-            decrement(temp.m_tailIndex, offset);
-
             // Iterator to first element after the "cut off" caused by shifting.
             auto destCutOff = RingBuffer<T>::iterator(&temp, sourceBegin.getIndex());
-            copy(beginIt, sourceBegin, temp.begin());
+            copy(beginIt, sourceBegin, temp.begin() - offset);
 
             copy(sourceBegin, endIt, destCutOff);
+
+            // Decrementing the tail pointer changes what element the sourceBegin pointer deferences to so it has to be done last.
+            decrement(temp.m_tailIndex, offset);
+
         }
 
         this->swap(temp);
