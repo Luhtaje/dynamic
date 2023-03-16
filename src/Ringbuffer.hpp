@@ -7,7 +7,7 @@
 #include "Iterator.hpp"
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
-/// @tparam T Type of the ringbuffer
+/// @tparam T Type of the elements. Must meet the requirement
 /// @tparam Allocator Allocator used for (de)allocation and (de)construction. Defaults to std::allocator<T>
 template<typename T, typename Allocator = std::allocator<T>> 
 class RingBuffer
@@ -111,67 +111,89 @@ public:
     }
 
     /// @brief Inserts an element to the buffer.
-    /// @param point Iterator where the the element should be inserted
+    /// @param pos Iterator where the the element should be inserted. 
     /// @param value Value to insert.
     /// @return Iterator that points to the inserted element.
-    /// @exception Can throw std::bad_alloc, or something from element construction. Allocation failure is critical, construction not as much. TODO improve exception safety.
-    iterator insert(iterator point, value_type value)
+    /// @exception Can throw std::bad_alloc, or 
+    iterator insert(const_iterator pos, const value_type& value)
     {
-        if(m_capacity - 1 == size())
+        while(m_capacity - 1 == size())
         {
             reserve(m_capacity * 1.5);
         }
 
-        shift(point, 1);
-        m_allocator.construct(&(*point), value);
+        shift(pos, 1);
+        m_allocator.construct(&(*pos), value); 
 
-        return point;
+        return iterator(this, pos.getIndex());
     }
 
     /// @brief Inserts an element to the buffer.
-    /// @param point Iterator where the the element should be inserted
+    /// @param pos Iterator where the the element should be inserted
     /// @param value Value to insert.
-    /// @return Iterator that points to the inserted element.
-    /// @exception Can throw std::bad_alloc, or something from element construction. Allocation failure is critical, construction not as much. TODO improve exception safety.
-    iterator insert(iterator point, value_type&& value)
+    /// @return Iterator that pos to the inserted element.
+    /// @exception Can throw std::bad_alloc, or something from element construction. 
+    iterator insert(const_iterator pos, const value_type&& value)
     {
-        if(m_capacity - 1 == size())
+        while(m_capacity - 1 == size())
         {
             reserve(m_capacity * 1.5);
         }
 
-        shift(point, 1);
+        shift(pos, 1);
 
         // Move if movable.
         if(std::is_move_constructible<value_type>::value)
         {
-            m_allocator.construct(&(*point), std::move(value));
-            return point;
+            m_allocator.construct(&(*pos), std::forward<const value_type>(value));
+            return iterator(this, pos.getIndex());
         }
 
-        m_allocator.construct(&(*point), value);
-        return point;
+        m_allocator.construct(&(*pos), value);
+        return iterator(this, pos.getIndex());
     }
 
     /// @brief Inserts an element to the buffer.
-    /// @param point Iterator where the the element should be inserted
-    /// @param value Value to insert.
-    /// @return Iterator that points to the inserted element.
+    /// @param pos Iterator where the the element should be inserted
+    /// @param value Value to insert. T must meet the requirements of CopyInsertable.
+    /// @return Iterator that pos to the inserted element.
     /// @exception Can throw std::bad_alloc, or something from element construction. Allocation failure is critical, construction not as much. TODO improve exception safety.
-    iterator insert(iterator point, size_type amount, value_type value)
+    iterator insert(iterator pos, const size_type amount, const value_type& value)
     {
         while(m_capacity - 1 <= size() + amount)
         {
             reserve(m_capacity * 1.5);
         }
 
-        shift(point, amount);
+        shift(pos, amount);
         for(int i = 0; i < amount; i++)
         {
-            m_allocator.construct(&point[i], value);
+            m_allocator.construct(&pos[i], value);
         }
 
-        return point;
+        return pos;
+    }
+
+    /// @brief Inserts a range of elements into the buffer to a specific position.
+    /// @tparam sourceIterator Type of iterator for the range.
+    /// @param pos Iterator to the position where range will be inserted to.
+    /// @param begin Iterator to first element of the range.
+    /// @param sourceEnd Iterator past the last element of the range.
+    /// @return Returns an iterator to an element in the buffer which is copy of the first element in the range.
+    /// @note Type of elements in the range need to be convertible to T. Elements of range must not be part of *this.
+    /// @exception Can throw std::bad_alloc, TODO and is this strong or basic or weak guarantee? shift should not throw but... it could?
+    template<typename sourceIterator>
+    iterator insert(const_iterator pos, sourceIterator sourceBegin, sourceIterator sourceEnd)
+    {
+        while(m_capacity - 1 <= size() + amount)
+        {
+            reserve(m_capacity * 1.5);
+        }
+
+        shift(pos, amount);
+        copy(sourceBegin, sourceEnd, pos);
+
+        return iterator(pos);
     }
 
     /// @brief Copy assignment operator.
@@ -358,7 +380,7 @@ public:
     /// @brief Allocates more memory and copies the existing buffer to the new memory location.
     /// @throw Throws std::bad_alloc if there is not enough memory for allocation. Throws std::bad_array_new_lenght if std::numeric_limits<std::size_t>::max() / sizeof(T) < newsize.
     /// @param newCapacity Amount of memory to allocate. if newCapacity is less than or equal to m_capacity, function does nothing.
-    /// @note If any exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
     void reserve(size_type newCapacity)
     {
         if(newCapacity <= m_capacity) return;
@@ -386,6 +408,7 @@ public:
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Element to insert.  Needs to be CopyConstructible.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
+    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
     void push_front(value_type val)
     {
         if(m_capacity - 1 == size())
@@ -400,6 +423,7 @@ public:
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Value of type T to be inserted in to the buffer. Needs to be CopyConstructible.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
+    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
     void push_back(value_type val)
     {
         // Empty buffer case.
@@ -432,21 +456,21 @@ public:
 
     /// @brief Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer.
     /// @return Reference to the first element.
-    reference front()
+    reference front() noexcept
     {
         return m_data[m_tailIndex];
     }
 
     /// @brief Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer.
     /// @return const-Reference to the first element.
-    const_reference front() const
+    const_reference front() const noexcept
     {
         return m_data[m_tailIndex];
     }
 
     ///@brief Returns a reference to the last element in the buffer. Behaviour is undefined for empty buffer.
     ///@return Reference to the last element in the buffer.
-    reference back()
+    reference back() noexcept
     {
         // Since head points to next-to-last element, it needs to be decremented once to get the correct element. 
         // If the index is at the beginning border of the allocated memory area it needs to be wrapped around. 
@@ -459,7 +483,7 @@ public:
 
     /// @brief Returns a const-reference to the last element in the buffer. Behaviour is undefined for empty buffer.
     /// @return const-reference to the last element in the buffer.
-    const_reference back() const
+    const_reference back() const noexcept
     {
         // Since head points to next-to-last element, it needs to be decremented once to get the correct element. 
         // If the index is at the beginning border of the allocated memory area it needs to be wrapped around. 
@@ -521,33 +545,43 @@ private:
         }
     }
 
-    /// @brief Copies elements by calling allocators construct() to ensure deep copy.
+    /// @brief Copies elements by calling allocators construct().
     /// @param sourceBegin Iterator to begin of source data.
     /// @param sourceEnd Iterator to past-the-end element of of source data.
     /// @param destBegin Iterator to beginning of destination range.
     /// @note Copies all elements in range [sourceBegin, sourceEnd), from sourceBegin to  sourceEnd - 1. The behaviour is undefined destBegin overlaps the range [sourceBegin, sourceEnd).
-    /// @exception If exceptions are thrown during construction the target buffer will have uninitialized elements.
+    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
     void copy(const_iterator sourceBegin, const_iterator sourceEnd, iterator destBegin)
     {
         size_t size = sourceEnd - sourceBegin;
 
-        for(ptrdiff_t i = 0; i != size ; i++)
+        if(std::is_move_constructible<value_type>::value)
         {
-            m_allocator.construct(&destBegin[i], sourceBegin[i]);
+            for(ptrdiff_t i = 0; i != size ; i++)
+            {
+                m_allocator.construct(&destBegin[i], std::move(sourceBegin[i]));
+            }
+        }
+        else
+        {
+            for(ptrdiff_t i = 0; i != size ; i++)
+            {
+                m_allocator.construct(&destBegin[i], sourceBegin[i]);
+            }
         }
     }
 
     /// @brief Shifts a range of elements forward or backwards with the copy and swap idiom. Deduces shifts direction based on distance to each border from the given iterator.
-    /// @param sourceBegin Iterator to the shift point.
-    /// @param offset Size of shift. How many steps each element will be shifted.
+    /// @param shiftPoint Iterator to the shift point. The shift point is an element, which is the first index that will be empty after shift. "Where to spawn empty elements".
+    /// @param offset Size of shift. How many steps each element will be shifted, eg, "How many empty elements".
     /// @exception Might throw exceptions from memory allocation and element constructors. If exceptions are thrown, nothing happens (Strong exception safety guarantee).
     /// @note Undefined behaviour if buffer does not have enough memory allocated for the shift.
-    void shift(const_iterator sourceBegin, difference_type offset)
+    void shift(const_iterator shiftPoint, difference_type offset)
     {
         const auto endIt = end();
         const auto beginIt = begin();
         // Shift is inteded to be used as a way to make room for emplace and insert operations. If the iterator is at a border of the buffer, just return.
-        if(sourceBegin == endIt || sourceBegin == beginIt || sourceBegin == endIt -1)
+        if(shiftPoint == endIt || shiftPoint == beginIt || shiftPoint == endIt -1)
         {
             return;
         }
@@ -557,8 +591,8 @@ private:
         temp.m_headIndex = m_headIndex;
 
         // Distance to the shift-point iterator from each end.
-        const auto fromEnd = abs(sourceBegin - endIt);
-        const auto fromBegin = abs(sourceBegin - beginIt);
+        const auto fromEnd = abs(shiftPoint - endIt);
+        const auto fromBegin = abs(shiftPoint - beginIt);
 
         // Shift the elements in the direction based on distance from borders.
         if(fromBegin >= fromEnd)
@@ -566,18 +600,18 @@ private:
             increment(temp.m_headIndex, offset);
 
             // Iterator to first element after the "cut off" caused by shifting.
-            auto destCutOff = RingBuffer<T>::iterator(&temp, sourceBegin.getIndex() + offset);
-            copy(sourceBegin, endIt, destCutOff);
+            auto destCutOff = RingBuffer<T>::iterator(&temp, shiftPoint.getIndex() + offset);
+            copy(shiftPoint, endIt, destCutOff);
 
-            copy(beginIt, sourceBegin, temp.begin());
+            copy(beginIt, shiftPoint, temp.begin());
         }
         else
         {
             // Iterator to first element after the "cut off" caused by shifting.
-            auto destCutOff = RingBuffer<T>::iterator(&temp, sourceBegin.getIndex());
-            copy(beginIt, sourceBegin, temp.begin() - offset);
+            auto destCutOff = RingBuffer<T>::iterator(&temp, shiftPoint.getIndex());
+            copy(beginIt, shiftPoint, temp.begin() - offset);
 
-            copy(sourceBegin, endIt, destCutOff);
+            copy(shiftPoint, endIt, destCutOff);
 
             // Decrementing the tail pointer changes what element the sourceBegin pointer deferences to so it has to be done last.
             decrement(temp.m_tailIndex, offset);

@@ -10,8 +10,8 @@
 namespace 
 {
 
-const static int TEST_SIZE = 10;
-const static int TEST_INT_VALUE = 9;
+const static size_t TEST_SIZE = 10;
+const static size_t TEST_INT_VALUE = 9;
 
 // Define some factory functions.
 
@@ -31,7 +31,7 @@ RingBuffer<int> CreateBuffer<int>()
 template <>
 RingBuffer<std::string> CreateBuffer<std::string>()
 {
-    return RingBuffer<std::string>{"abc", "def", "ghj"};
+    return RingBuffer<std::string>{"abc", "def", "ghj", "cjk", "okm", "tyu", "qwe"};
 }
 
 template <>
@@ -379,14 +379,22 @@ TYPED_TEST(RingBufferTest, Front)
     EXPECT_EQ(t_buffer.front(), *t_buffer.begin());
 }
 
+// Tests requiremet: SequenceContainer, Insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
 TYPED_TEST(RingBufferTest, Insert)
 {
 
     const auto it = t_buffer.begin();
+    const auto size = t_buffer.size();
 
+    // Test that returned iterator points to correct element, the value is correct 
     const auto value = getValue<TypeParam>();
-    t_buffer.insert(it + 1, value);
+    auto pointIt = t_buffer.insert(it + 1, value);
+    ASSERT_EQ(*pointIt, value);
     ASSERT_EQ(t_buffer[1], value);
+
+    const auto pointIt2 = t_buffer.insert(it + (size), value);
+    ASSERT_EQ(*pointIt2, value);
+    ASSERT_EQ(t_buffer[size], value);
 
     const auto otherValue = getValue<TypeParam>();
     t_buffer.insert(it + 2, TEST_SIZE, otherValue);
@@ -397,7 +405,36 @@ TYPED_TEST(RingBufferTest, Insert)
 
     const auto thirdVal = getValue<TypeParam>();
     t_buffer.insert(it + 3, std::move(thirdVal));
-    ASSERT_EQ(t_buffer[3], thirdVal)
+    ASSERT_EQ(t_buffer[3], thirdVal);
+
+}
+
+// Tests requiremet: SequenceContainer, Insert() expression a.insert(a, rv) where a is a postion iterator and rv is an rvalue.
+TYPED_TEST(RingBufferTest, InsertRV)
+{
+    const auto it = t_buffer.begin();
+    const auto size = t_buffer.size();
+
+    const auto value = getValue<TypeParam>();
+    auto pointIt = t_buffer.insert(it + 1, value);
+    ASSERT_EQ(*pointIt, value);
+    ASSERT_EQ(t_buffer[1], value);
+    ASSERT_EQ(*(it +1), value);
+
+    const auto pointIt2 = t_buffer.insert(it + (size), value);
+    ASSERT_EQ(*pointIt2, value);
+    ASSERT_EQ(t_buffer[size], value);
+
+    const auto otherValue = getValue<TypeParam>();
+    t_buffer.insert(it + 2, TEST_SIZE, otherValue);
+    for(int i= 0; i < TEST_SIZE; i++)
+    {
+        ASSERT_EQ(t_buffer[2 + i], otherValue);
+    }
+
+    const auto thirdVal = getValue<TypeParam>();
+    t_buffer.insert(it + 3, std::move(thirdVal));
+    ASSERT_EQ(t_buffer[3], thirdVal);
 }
 
 }
