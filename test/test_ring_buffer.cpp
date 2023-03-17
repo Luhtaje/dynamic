@@ -7,10 +7,13 @@
 #include <type_traits>
 #include <vector>
 
+// Set true to enable tests for private functions of the buffer. Also need to remove private identifier from RingBuffer code.
+#define TEST_INTERNALS 1
+
 namespace 
 {
 
-const static size_t TEST_SIZE = 10;
+const static size_t TEST_BUFFER_SIZE = 10;
 const static size_t TEST_INT_VALUE = 9;
 
 // Define some factory functions.
@@ -31,13 +34,13 @@ RingBuffer<int> CreateBuffer<int>()
 template <>
 RingBuffer<std::string> CreateBuffer<std::string>()
 {
-    return RingBuffer<std::string>{"abc", "def", "ghj", "cjk", "okm", "tyu", "qwe"};
+    return RingBuffer<std::string>{"abc", "def", "ghj", "cjk", "okm", "tyu"};
 }
 
 template <>
 RingBuffer<char> CreateBuffer<char>()
 {
-    return RingBuffer<char>{'a','b','c','d','e','f','g'};
+    return RingBuffer<char>{'a','b','c','d','e','f'};
 }
 
 //====================
@@ -204,13 +207,13 @@ TYPED_TEST(RingBufferTest, MoveAssign)
 TYPED_TEST(RingBufferTest, SizeValConstruction)
 {
     const auto value = getValue<TypeParam>();
-    RingBuffer<TypeParam> sizeVal (TEST_SIZE, value);
+    RingBuffer<TypeParam> sizeVal (TEST_BUFFER_SIZE, value);
     RingBuffer<TypeParam>::iterator it = sizeVal.begin();
 
-    EXPECT_EQ(sizeVal.size(), TEST_SIZE);
+    EXPECT_EQ(sizeVal.size(), TEST_BUFFER_SIZE);
     ++it;
     EXPECT_EQ(*it, value);
-    EXPECT_EQ(*it, sizeVal[TEST_SIZE-1]);
+    EXPECT_EQ(*it, sizeVal[TEST_BUFFER_SIZE-1]);
 }
 
 
@@ -238,7 +241,7 @@ TYPED_TEST(RingBufferTest, EqualityComparable)
     t_buffer.pop_back();
     EXPECT_TRUE(copy == t_buffer);
 
-    const auto randomBuffer(CreateBuffer<TypeParam>(TEST_SIZE));
+    const auto randomBuffer(CreateBuffer<TypeParam>(TEST_BUFFER_SIZE));
     EXPECT_TRUE(randomBuffer != t_buffer);
 }
 
@@ -256,7 +259,7 @@ TYPED_TEST(RingBufferTest, AccessOperator)
 TYPED_TEST(RingBufferTest, Swap)
 {
     using std::swap;
-    auto control = CreateBuffer<TypeParam>(TEST_SIZE);
+    auto control = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
     auto experiment1(control);
     EXPECT_EQ(control, experiment1);
 
@@ -386,7 +389,7 @@ TYPED_TEST(RingBufferTest, Insert)
     const auto it = t_buffer.begin();
     const auto size = t_buffer.size();
 
-    // Test that returned iterator points to correct element, the value is correct 
+    // Test that returned iterator points to correct element and that the value is correct
     const auto value = getValue<TypeParam>();
     auto pointIt = t_buffer.insert(it + 1, value);
     ASSERT_EQ(*pointIt, value);
@@ -395,17 +398,6 @@ TYPED_TEST(RingBufferTest, Insert)
     const auto pointIt2 = t_buffer.insert(it + (size), value);
     ASSERT_EQ(*pointIt2, value);
     ASSERT_EQ(t_buffer[size], value);
-
-    const auto otherValue = getValue<TypeParam>();
-    t_buffer.insert(it + 2, TEST_SIZE, otherValue);
-    for(int i= 0; i < TEST_SIZE; i++)
-    {
-        ASSERT_EQ(t_buffer[2 + i], otherValue);
-    }
-
-    const auto thirdVal = getValue<TypeParam>();
-    t_buffer.insert(it + 3, std::move(thirdVal));
-    ASSERT_EQ(t_buffer[3], thirdVal);
 
 }
 
@@ -415,26 +407,61 @@ TYPED_TEST(RingBufferTest, InsertRV)
     const auto it = t_buffer.begin();
     const auto size = t_buffer.size();
 
+    // Test that returned iterator points to correct element and that the value is correct
     const auto value = getValue<TypeParam>();
-    auto pointIt = t_buffer.insert(it + 1, value);
+    auto pointIt = t_buffer.insert(it + 1, std::move(value));
     ASSERT_EQ(*pointIt, value);
     ASSERT_EQ(t_buffer[1], value);
-    ASSERT_EQ(*(it +1), value);
-
-    const auto pointIt2 = t_buffer.insert(it + (size), value);
-    ASSERT_EQ(*pointIt2, value);
-    ASSERT_EQ(t_buffer[size], value);
-
-    const auto otherValue = getValue<TypeParam>();
-    t_buffer.insert(it + 2, TEST_SIZE, otherValue);
-    for(int i= 0; i < TEST_SIZE; i++)
-    {
-        ASSERT_EQ(t_buffer[2 + i], otherValue);
-    }
-
-    const auto thirdVal = getValue<TypeParam>();
-    t_buffer.insert(it + 3, std::move(thirdVal));
-    ASSERT_EQ(t_buffer[3], thirdVal);
 }
+
+// Tests private functions of the buffer, requires the "private" identifier to be removed / commented in the ringbuffer code and TEST_INTERNALS to be set to 1 at the top of this file.
+// NOTE! Using private functions like this leaves the buffer in unreliable state, and should only be used through the public API functions.
+#if TEST_INTERNALS
+// Test internal shift function, used in insert and emplace operations. NOTE! Leaving the element uninitialized makes destructor try to destry uninitialized memory. After each shift initialize an elemetn to the spot.
+TYPED_TEST(RingBufferTest, shiftBegin)
+{
+    // Test borders
+    auto beginIt = t_buffer.begin();
+    auto firstVal = t_buffer[0];
+    auto secondVal  = t_buffer[1];
+
+    // Shift at begin by one, expect elements to be shifted by one.
+    t_buffer.shift(beginIt,1);
+    EXPECT_EQ(t_buffer[1], firstVal);
+    EXPECT_EQ(t_buffer[2], secondVal);
+    t_buffer.m_allocator.construct(&(*beginIt), getValue<TypeParam>());
+}
+
+TYPED_TEST(RingBufferTest, shiftMiddle)
+{
+    auto middleIt = t_buffer.begin() + 3;
+    auto currentVal = *middleIt;
+    auto nextVal = *(middleIt + 1);
+    auto prevVal = *(middleIt - 1);
+
+    // Shift at begin by one, expect elements to be shifted by one.
+    t_buffer.shift(middleIt, 1);
+    EXPECT_EQ(*(middleIt + 1), currentVal);
+    EXPECT_EQ(*(middleIt - 1), prevVal);
+    EXPECT_EQ(*(middleIt + 2), nextVal);
+
+    t_buffer.m_allocator.construct(&(*middleIt), getValue<TypeParam>());
+}
+
+TYPED_TEST(RingBufferTest, shiftEnd)
+{
+    auto endIt = t_buffer.end();
+    auto lastVal = *(endIt-1);
+    auto secondToLastVal = *(endIt -2);
+
+    t_buffer.shift(endIt, 1);
+
+    EXPECT_EQ(*(endIt - 1), lastVal);
+    EXPECT_EQ(*(endIt - 2), secondToLastVal);
+
+    t_buffer.m_allocator.construct(&(*endIt), getValue<TypeParam>());
+}
+
+#endif
 
 }

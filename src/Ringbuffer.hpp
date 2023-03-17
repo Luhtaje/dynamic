@@ -494,7 +494,8 @@ public:
         return *m_data[m_headIndex-1];
     }
 
-private:
+// Ugly testing solution, to enable tests for private methods enable "TEST_INTERNALS" from ring_buffer_tests and comment out the private identifier.
+//private:
 
     /// @brief  Increments an index. If the index reaches capacity, set index to 0.
     /// @param index The index to increment.
@@ -580,11 +581,6 @@ private:
     {
         const auto endIt = end();
         const auto beginIt = begin();
-        // Shift is inteded to be used as a way to make room for emplace and insert operations. If the iterator is at a border of the buffer, just return.
-        if(shiftPoint == endIt || shiftPoint == beginIt || shiftPoint == endIt -1)
-        {
-            return;
-        }
 
         RingBuffer<T> temp(m_capacity);
         temp.m_tailIndex = m_tailIndex;
@@ -625,7 +621,6 @@ private:
 // Members 
 //==========================================
 
-private:
     size_type m_headIndex; /*!< Index of the head. Index past the last element, acts as "back" of the buffer.*/ 
     size_type m_tailIndex; /*!< Index of the tail. Index to the "first" element in the buffer.*/
     size_type m_capacity;  /*!< Capacity of the buffer. How many elements of type T the buffer has currently allocated memory for.*/
