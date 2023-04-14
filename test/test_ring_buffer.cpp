@@ -142,6 +142,85 @@ protected:
 using Types = ::testing::Types<char, int, std::string>;
 TYPED_TEST_SUITE(RingBufferTest, Types);
 
+//=======================================================================================================================================================================================
+// Tests private functions of the buffer, requires the "private" identifier to be removed / commented in the ringbuffer code and TEST_INTERNALS to be set to 1 at the top of this file.
+// NOTE! Using private functions like this leaves the buffer in unreliable state, and should only be used through the public API functions.
+//=======================================================================================================================================================================================
+#if TEST_INTERNALS
+// Test internal shift function, used in insert and emplace operations. NOTE! Leaving the element uninitialized makes destructor try to destry uninitialized memory. After each shift initialize an element to the spot.
+
+TYPED_TEST(RingBufferTest, increment)
+{
+    // Size() evaluates size by indexes.
+    const auto size = t_buffer.size();
+
+    t_buffer.increment(t_buffer.m_headIndex);
+
+    for(int i = 0; i <= size; i++)
+    {
+        t_buffer.increment(t_buffer.m_headIndex);
+    }
+}
+
+TYPED_TEST(RingBufferTest, shiftBegin)
+{
+    // Test borders
+    auto beginIt = t_buffer.begin();
+    auto firstVal = t_buffer[0];
+    auto secondVal  = t_buffer[1];
+
+    // Shift at begin by one, expect elements to be shifted by one.
+    t_buffer.shift(beginIt,1);
+    EXPECT_EQ(t_buffer[1], firstVal);
+    EXPECT_EQ(t_buffer[2], secondVal);
+    t_buffer.m_allocator.construct(&(*beginIt), getValue<TypeParam>());
+}
+
+TYPED_TEST(RingBufferTest, shiftMiddle)
+{
+    auto middleIt = t_buffer.begin() + 3;
+    auto currentVal = *middleIt;
+    auto nextVal = *(middleIt + 1);
+    auto prevVal = *(middleIt - 1);
+
+    // Shift at begin by one, expect elements to be shifted by one.
+    t_buffer.shift(middleIt, 1);
+    EXPECT_EQ(*(middleIt + 1), currentVal);
+    EXPECT_EQ(*(middleIt - 1), prevVal);
+    EXPECT_EQ(*(middleIt + 2), nextVal);
+
+    t_buffer.m_allocator.construct(&(*middleIt), getValue<TypeParam>());
+}
+
+TYPED_TEST(RingBufferTest, shiftEnd)
+{
+    auto endIt = t_buffer.end();
+    auto lastVal = *(endIt-1);
+    auto secondToLastVal = *(endIt -2);
+
+    t_buffer.shift(endIt, 1);
+
+    EXPECT_EQ(*(endIt - 1), lastVal);
+    EXPECT_EQ(*(endIt - 2), secondToLastVal);
+
+    t_buffer.m_allocator.construct(&(*endIt), getValue<TypeParam>());
+}
+
+TYPED_TEST(RingBufferTest, copy)
+{
+    RingBuffer<TypeParam> copy(t_buffer.capacity());
+    copy.m_headIndex = t_buffer.m_headIndex;
+    copy.m_tailIndex = t_buffer.m_tailIndex;
+    const auto begin = t_buffer.begin();
+    const auto end = t_buffer.end();
+
+    t_buffer.copy(begin, end, copy.begin());
+
+    for(int i = 0 ; i < t_buffer.size(); i++)
+    {
+        ASSERT_EQ(t_buffer[i], copy[i]);
+    }
+}
 
 //==================mainframe ===================//
 TYPED_TEST(RingBufferTest, DefaultConstruction)
@@ -385,7 +464,6 @@ TYPED_TEST(RingBufferTest, Front)
 // Tests requiremet: SequenceContainer, Insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
 TYPED_TEST(RingBufferTest, Insert)
 {
-
     const auto it = t_buffer.begin();
     const auto size = t_buffer.size();
 
@@ -414,54 +492,6 @@ TYPED_TEST(RingBufferTest, InsertRV)
     ASSERT_EQ(t_buffer[1], value);
 }
 
-// Tests private functions of the buffer, requires the "private" identifier to be removed / commented in the ringbuffer code and TEST_INTERNALS to be set to 1 at the top of this file.
-// NOTE! Using private functions like this leaves the buffer in unreliable state, and should only be used through the public API functions.
-#if TEST_INTERNALS
-// Test internal shift function, used in insert and emplace operations. NOTE! Leaving the element uninitialized makes destructor try to destry uninitialized memory. After each shift initialize an elemetn to the spot.
-TYPED_TEST(RingBufferTest, shiftBegin)
-{
-    // Test borders
-    auto beginIt = t_buffer.begin();
-    auto firstVal = t_buffer[0];
-    auto secondVal  = t_buffer[1];
-
-    // Shift at begin by one, expect elements to be shifted by one.
-    t_buffer.shift(beginIt,1);
-    EXPECT_EQ(t_buffer[1], firstVal);
-    EXPECT_EQ(t_buffer[2], secondVal);
-    t_buffer.m_allocator.construct(&(*beginIt), getValue<TypeParam>());
-}
-
-TYPED_TEST(RingBufferTest, shiftMiddle)
-{
-    auto middleIt = t_buffer.begin() + 3;
-    auto currentVal = *middleIt;
-    auto nextVal = *(middleIt + 1);
-    auto prevVal = *(middleIt - 1);
-
-    // Shift at begin by one, expect elements to be shifted by one.
-    t_buffer.shift(middleIt, 1);
-    EXPECT_EQ(*(middleIt + 1), currentVal);
-    EXPECT_EQ(*(middleIt - 1), prevVal);
-    EXPECT_EQ(*(middleIt + 2), nextVal);
-
-    t_buffer.m_allocator.construct(&(*middleIt), getValue<TypeParam>());
-}
-
-TYPED_TEST(RingBufferTest, shiftEnd)
-{
-    auto endIt = t_buffer.end();
-    auto lastVal = *(endIt-1);
-    auto secondToLastVal = *(endIt -2);
-
-    t_buffer.shift(endIt, 1);
-
-    EXPECT_EQ(*(endIt - 1), lastVal);
-    EXPECT_EQ(*(endIt - 2), secondToLastVal);
-
-    t_buffer.m_allocator.construct(&(*endIt), getValue<TypeParam>());
-}
-
-#endif
+#endif /*TEST_INTERNALS*/
 
 }

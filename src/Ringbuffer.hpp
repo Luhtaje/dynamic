@@ -497,16 +497,16 @@ public:
 // Ugly testing solution, to enable tests for private methods enable "TEST_INTERNALS" from ring_buffer_tests and comment out the private identifier.
 //private:
 
-    /// @brief  Increments an index. If the index reaches capacity, set index to 0.
+    /// @brief Increment an index.
     /// @param index The index to increment.
     void increment(size_t& index) noexcept
     {   
         ++index;
         // Reaching equal is past the last element, then wraps around.
-        if(index >= m_capacity)
-        {
-            index = 0;
-        }
+        // if(index >= m_capacity)
+        // {
+        //     index = 0;
+        // }
     }
 
     /// @brief Increments an index multiple times.
@@ -521,7 +521,7 @@ public:
         }
     }
 
-    /// @brief Decrements an index. If the index is at 0, set index to m_capacity - 1.
+    /// @brief Decrements an index.
     /// @param index The index to decrement.
     void decrement(size_t& index) noexcept
     {
@@ -590,11 +590,10 @@ public:
         const auto fromEnd = abs(shiftPoint - endIt);
         const auto fromBegin = abs(shiftPoint - beginIt);
 
-        // Shift the elements in the direction based on distance from borders.
+        // Shift the elements in the direction based on distance from borders. Does not shift if shiftPoint is at a border of the buffer.
         if(fromBegin >= fromEnd)
-        {   
+        {
             increment(temp.m_headIndex, offset);
-
             // Iterator to first element after the "cut off" caused by shifting.
             auto destCutOff = RingBuffer<T>::iterator(&temp, shiftPoint.getIndex() + offset);
             copy(shiftPoint, endIt, destCutOff);
@@ -608,7 +607,6 @@ public:
             copy(beginIt, shiftPoint, temp.begin() - offset);
 
             copy(shiftPoint, endIt, destCutOff);
-
             // Decrementing the tail pointer changes what element the sourceBegin pointer deferences to so it has to be done last.
             decrement(temp.m_tailIndex, offset);
 
