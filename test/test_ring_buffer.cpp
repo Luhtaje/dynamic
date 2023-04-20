@@ -8,7 +8,7 @@
 #include <vector>
 
 // Set true to enable tests for private functions of the buffer. Also need to remove private identifier from RingBuffer code.
-#define TEST_INTERNALS 1
+#define TEST_INTERNALS 0
 
 namespace 
 {
@@ -221,6 +221,8 @@ TYPED_TEST(RingBufferTest, copy)
         ASSERT_EQ(t_buffer[i], copy[i]);
     }
 }
+
+#endif /*TEST_INTERNALS*/
 
 //==================mainframe ===================//
 TYPED_TEST(RingBufferTest, DefaultConstruction)
@@ -492,6 +494,27 @@ TYPED_TEST(RingBufferTest, InsertRV)
     ASSERT_EQ(t_buffer[1], value);
 }
 
-#endif /*TEST_INTERNALS*/
+// Tests requirement: SequenceContainer, erase() expression erase(q) where q is a valid dereferenceable const iterator into a.
+TYPED_TEST(RingBufferTest, erase)
+{
+    const auto beginIt = t_buffer.cbegin();
+    const auto secondVal = t_buffer[1];
+
+    const auto erasedIt =  t_buffer.erase(beginIt);
+    ASSERT_EQ(erasedIt, beginIt);
+    ASSERT_EQ(t_buffer[0], secondVal);
+
+}
+
+TYPED_TEST(RingBufferTest, eraseLast)
+{
+    const auto endIt = t_buffer.cend();
+    const auto refIt = t_buffer.cend() - 1;
+    const auto newLastValue = *refIt;
+
+    const auto erasedIt = t_buffer.erase(endIt);
+    ASSERT_EQ(erasedIt, refIt);
+    ASSERT_EQ(newLastValue, *erasedIt);
+}
 
 }

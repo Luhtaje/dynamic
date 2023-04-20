@@ -133,7 +133,7 @@ public:
     /// @param value Value to insert.
     /// @return Iterator that pos to the inserted element.
     /// @exception Can throw std::bad_alloc, or something from element construction. 
-    iterator insert(const_iterator pos, const value_type&& value)
+    iterator insert(const_iterator pos, value_type&& value)
     {
         while(m_capacity - 1 == size())
         {
@@ -194,6 +194,32 @@ public:
         copy(sourceBegin, sourceEnd, pos);
 
         return iterator(pos);
+    }
+
+    /// @brief Erase an element at a given position. 
+    /// @param pos Pointer to the element to be erased.
+    /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.
+    /// @pre T Must be MoveAssignable.
+    /// @return Returns an iterator that was immediately following the ereased element. If the erased element was last in the buffer, returns a pointer to the new last element.
+    iterator erase(const_iterator pos)
+    {
+        auto posIndex = pos.getIndex();
+        auto endIndex = end().getIndex();
+        iterator it(this, posIndex);
+
+        m_allocator.destroy(&pos);
+        decrement(m_headIndex);
+        for(; posIndex + 1 < endIndex; posIndex++)
+        {
+            it[posIndex] = std::move(it[posIndex + 1]);
+        }
+
+        if(posIndex == endIndex)
+        {
+            return end();
+        }
+
+        return it;
     }
 
     /// @brief Copy assignment operator.
@@ -495,7 +521,7 @@ public:
     }
 
 // Ugly testing solution, to enable tests for private methods enable "TEST_INTERNALS" from ring_buffer_tests and comment out the private identifier.
-//private:
+private:
 
     /// @brief Increment an index.
     /// @param index The index to increment.

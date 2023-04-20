@@ -146,7 +146,7 @@ public:
     /// @param offset The number of positions to move the iterator backward.
     /// @return An iterator pointing to the element that is offset positions before the current element.
     /// @note Undefined behaviour for negative offset.
-    _rBuf_const_iterator& operator-=(const difference_type)
+    _rBuf_const_iterator& operator-=(const difference_type offset)
     {
         return (*this += -offset);
     }
