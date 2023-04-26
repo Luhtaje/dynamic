@@ -174,6 +174,18 @@ public:
         return pos;
     }
 
+    /// @brief Destroys all elements in a buffer.
+    void clear()
+    {
+        for(m_tailIndex; m_tailIndex < m_headIndex ; m_tailIndex++)
+        {
+            m_allocator.destroy(&m_data[m_tailIndex]);
+        }
+
+        m_headIndex = 0;
+        m_tailIndex = 0;
+    }
+
     /// @brief Inserts a range of elements into the buffer to a specific position.
     /// @tparam sourceIterator Type of iterator for the range.
     /// @param pos Iterator to the position where range will be inserted to.
@@ -196,7 +208,7 @@ public:
         return iterator(pos);
     }
 
-    /// @brief Erase an element at a given position. 
+    /// @brief Erase an element at a given position.
     /// @param pos Pointer to the element to be erased.
     /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.
     /// @pre T Must be MoveAssignable.
@@ -204,19 +216,39 @@ public:
     iterator erase(const_iterator pos)
     {
         auto posIndex = pos.getIndex();
-        auto endIndex = end().getIndex();
+        const auto endIndex = end().getIndex();
         iterator it(this, posIndex);
 
+        // Destroy element and move remaining elements to fill the void.
         m_allocator.destroy(&pos);
         decrement(m_headIndex);
-        for(; posIndex + 1 < endIndex; posIndex++)
+        for(auto i = 0; i + posIndex + 1 < endIndex; i++)
         {
-            it[posIndex] = std::move(it[posIndex + 1]);
+            it[i] = std::move(it[i + 1]);
         }
 
         if(posIndex == endIndex)
         {
             return end();
+        }
+
+        return it;
+    }
+
+    /// @brief Erase the specified elements from the container according to the range [first,last).
+    /// @param first iterator to the first element to erase.
+    /// @param last iterator past the last element to erase.
+    /// @return Returns an iterator to the element that was immediately following the erased elements. If last == end(), then end() is returned.
+    iterator erase(const_iterator first, const_iterator last)
+    {
+        auto rangeSize = last - first -1;
+        const auto isLast  = (last == end());
+        iterator it(this, first.getIndex());
+
+        // Destroy elements
+        for(auto i = 0; i <= rangeSize; i++)
+        {
+            it = erase(first);
         }
 
         return it;

@@ -497,24 +497,63 @@ TYPED_TEST(RingBufferTest, InsertRV)
 // Tests requirement: SequenceContainer, erase() expression erase(q) where q is a valid dereferenceable const iterator into a.
 TYPED_TEST(RingBufferTest, erase)
 {
-    const auto beginIt = t_buffer.cbegin();
-    const auto secondVal = t_buffer[1];
+    const auto offset = 1;
+    const auto beginIt = t_buffer.cbegin() + offset;
+    const auto refBuffer(t_buffer);
 
     const auto erasedIt =  t_buffer.erase(beginIt);
     ASSERT_EQ(erasedIt, beginIt);
-    ASSERT_EQ(t_buffer[0], secondVal);
-
+    for(auto i = offset; i < t_buffer.size() - offset; i++)
+    {
+        ASSERT_EQ(refBuffer[i + 1], t_buffer[i]);
+    }
 }
 
 TYPED_TEST(RingBufferTest, eraseLast)
 {
+    const auto offset = 1;
     const auto endIt = t_buffer.cend();
-    const auto refIt = t_buffer.cend() - 1;
+    const auto refIt = t_buffer.cend() - offset;
+    const auto refBuffer(t_buffer);
     const auto newLastValue = *refIt;
 
     const auto erasedIt = t_buffer.erase(endIt);
     ASSERT_EQ(erasedIt, refIt);
     ASSERT_EQ(newLastValue, *erasedIt);
+
+    for(auto i = 0; i < t_buffer.size(); i++)
+    {
+        ASSERT_EQ(refBuffer[i], t_buffer[i]);
+    }
+}
+
+TYPED_TEST(RingBufferTest, eraseRange)
+{
+    const auto beginIndex = 2;
+    const auto endIndex = 4;
+    const auto beginIt = t_buffer.begin() + beginIndex;
+    const auto endIt = t_buffer.begin() + endIndex;
+    const auto refBuffer(t_buffer);
+    const auto refValue = *endIt;
+
+    const auto erasedIt = t_buffer.erase(beginIt, endIt);
+    ASSERT_EQ(refValue, *erasedIt);
+
+    for(auto i = 0; i < beginIndex; i++)
+    {
+        ASSERT_EQ(refBuffer[i], t_buffer[i]);
+    }
+
+    for(auto i = endIndex; i < t_buffer.size(); i++)
+    {
+        ASSERT_EQ(refBuffer[i], t_buffer[i]);
+    }
+}
+
+TYPED_TEST(RingBufferTest, clear)
+{
+    t_buffer.clear();
+    ASSERT_EQ(t_buffer.size(), 0);
 }
 
 }
