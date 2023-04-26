@@ -174,18 +174,6 @@ public:
         return pos;
     }
 
-    /// @brief Destroys all elements in a buffer.
-    void clear()
-    {
-        for(m_tailIndex; m_tailIndex < m_headIndex ; m_tailIndex++)
-        {
-            m_allocator.destroy(&m_data[m_tailIndex]);
-        }
-
-        m_headIndex = 0;
-        m_tailIndex = 0;
-    }
-
     /// @brief Inserts a range of elements into the buffer to a specific position.
     /// @tparam sourceIterator Type of iterator for the range.
     /// @param pos Iterator to the position where range will be inserted to.
@@ -194,8 +182,7 @@ public:
     /// @return Returns an iterator to an element in the buffer which is copy of the first element in the range.
     /// @note Type of elements in the range need to be convertible to T. Elements of range must not be part of *this.
     /// @exception Can throw std::bad_alloc, TODO and is this strong or basic or weak guarantee? shift should not throw but... it could?
-    template<typename sourceIterator>
-    iterator insert(const_iterator pos, sourceIterator sourceBegin, sourceIterator sourceEnd)
+    iterator insert(const_iterator pos, const_iterator sourceBegin, const_iterator sourceEnd)
     {
         while(m_capacity - 1 <= size() + amount)
         {
@@ -253,6 +240,19 @@ public:
 
         return it;
     }
+
+    /// @brief Destroys all elements in a buffer.
+    void clear()
+    {
+        for(m_tailIndex; m_tailIndex < m_headIndex ; m_tailIndex++)
+        {
+            m_allocator.destroy(&m_data[m_tailIndex]);
+        }
+
+        m_headIndex = 0;
+        m_tailIndex = 0;
+    }
+
 
     /// @brief Copy assignment operator.
     /// @param copy A temporary RingBuffer created by a copy constructor.

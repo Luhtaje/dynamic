@@ -494,6 +494,39 @@ TYPED_TEST(RingBufferTest, InsertRV)
     ASSERT_EQ(t_buffer[1], value);
 }
 
+// Tests requirement: SequeanceContainer, insert() exprssion a.insert(p, n, t) where p is position iterator, n is a size_type and t is a value of value type a::value_type.
+TYPED_TEST(RingBufferTest, InsertSizeVal)
+{
+    const auto amount = 3;
+    const auto insertPosIndex = 2;
+    const auto value = getValue<TypeParam>();
+    const auto insertPosIt = t_buffer.begin() + insertPosIndex;
+
+    const auto refBuffer(t_buffer);
+
+    t_buffer.insert(insertPosIt, amount, value);
+
+    // Check inserted elements are correct
+    for(auto i = 0; i < amount; i++)
+    {
+        ASSERT_EQ(t_buffer[i + insertPosIndex], value);
+    }
+
+    // Check buffer outside inserted elements remains untouched.
+    for(auto i = 0; i < refBuffer.size(); i++)
+    {
+        if(i < insertPosIndex)
+        {
+            ASSERT_EQ(t_buffer[i], refBuffer[i]);
+        }
+        else
+        {
+            ASSERT_EQ(t_buffer[i + amount], refBuffer[i]);
+        }
+    }
+}
+
+
 // Tests requirement: SequenceContainer, erase() expression erase(q) where q is a valid dereferenceable const iterator into a.
 TYPED_TEST(RingBufferTest, erase)
 {
