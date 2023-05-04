@@ -13,7 +13,7 @@
 namespace 
 {
 
-const static size_t TEST_BUFFER_SIZE = 10;
+const static size_t TEST_BUFFER_SIZE = 6;
 const static size_t TEST_INT_VALUE = 9;
 
 // Define some factory functions.
@@ -466,16 +466,17 @@ TYPED_TEST(RingBufferTest, Front)
 // Tests requiremet: SequenceContainer, Insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
 TYPED_TEST(RingBufferTest, Insert)
 {
-    const auto it = t_buffer.begin();
+    const auto beginIt = t_buffer.begin();
     const auto size = t_buffer.size();
 
-    // Test that returned iterator points to correct element and that the value is correct
+    // Test the returned iterator and inserted value.
     const auto value = getValue<TypeParam>();
-    auto pointIt = t_buffer.insert(it + 1, value);
+    auto pointIt = t_buffer.insert(beginIt + 1, value);
     ASSERT_EQ(*pointIt, value);
     ASSERT_EQ(t_buffer[1], value);
 
-    const auto pointIt2 = t_buffer.insert(it + (size), value);
+    // Tests the same things for the last element.
+    const auto pointIt2 = t_buffer.insert(beginIt + (size), value);
     ASSERT_EQ(*pointIt2, value);
     ASSERT_EQ(t_buffer[size], value);
 
@@ -523,6 +524,27 @@ TYPED_TEST(RingBufferTest, InsertSizeVal)
         {
             ASSERT_EQ(t_buffer[i + amount], refBuffer[i]);
         }
+    }
+}
+
+// Tests requirement: SequeanceContainer, insert() exprssion a.insert(p, i, j) where p is position iterator and [i, j) is a valid range.
+TYPED_TEST(RingBufferTest, insertRange)
+{
+    const auto beginOffset = 2;
+    const auto endOffset = 5;
+    const auto pos = 3;
+    RingBuffer<TypeParam> rangeSource = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+
+    const auto rangeBeginIt = rangeSource.begin() + beginOffset;
+    const auto rangeEndIt = rangeSource.begin() + endOffset;
+    const auto posIt = t_buffer.begin() + pos;
+
+    const auto returnIt = t_buffer.insert(posIt, rangeBeginIt, rangeEndIt);
+
+    for(auto i = 0; i < (endOffset - beginOffset); i ++)
+    {
+        ASSERT_EQ(*(returnIt + i), *(posIt + i));
+        ASSERT_EQ(rangeSource[beginOffset + i], t_buffer[pos + i]);
     }
 }
 

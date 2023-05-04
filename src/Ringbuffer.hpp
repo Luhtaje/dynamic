@@ -142,14 +142,7 @@ public:
 
         shift(pos, 1);
 
-        // Move if movable.
-        if(std::is_move_constructible<value_type>::value)
-        {
-            m_allocator.construct(&(*pos), std::forward<const value_type>(value));
-            return iterator(this, pos.getIndex());
-        }
-
-        m_allocator.construct(&(*pos), value);
+        m_allocator.construct(&(*pos), std::forward<const value_type>(value));
         return iterator(this, pos.getIndex());
     }
 
@@ -184,15 +177,22 @@ public:
     /// @exception Can throw std::bad_alloc, TODO and is this strong or basic or weak guarantee? shift should not throw but... it could?
     iterator insert(const_iterator pos, const_iterator sourceBegin, const_iterator sourceEnd)
     {
+        const auto amount = sourceEnd - sourceBegin;
         while(m_capacity - 1 <= size() + amount)
         {
             reserve(m_capacity * 1.5);
         }
 
         shift(pos, amount);
-        copy(sourceBegin, sourceEnd, pos);
+        for(int i = 0; i < amount; i++)
+        {
+            m_allocator.construct(&pos[i], *(sourceBegin + i));
+        }
 
-        return iterator(pos);
+        auto destIt = iterator(this, pos.getIndex());
+        copy(sourceBegin, sourceEnd, destIt);
+
+        return destIt;
     }
 
     /// @brief Erase an element at a given position.
@@ -614,19 +614,9 @@ private:
     {
         size_t size = sourceEnd - sourceBegin;
 
-        if(std::is_move_constructible<value_type>::value)
+        for(ptrdiff_t i = 0; i != size ; i++)
         {
-            for(ptrdiff_t i = 0; i != size ; i++)
-            {
-                m_allocator.construct(&destBegin[i], std::move(sourceBegin[i]));
-            }
-        }
-        else
-        {
-            for(ptrdiff_t i = 0; i != size ; i++)
-            {
-                m_allocator.construct(&destBegin[i], sourceBegin[i]);
-            }
+            m_allocator.construct(&destBegin[i], sourceBegin[i]);
         }
     }
 
@@ -648,7 +638,7 @@ private:
         const auto fromEnd = abs(shiftPoint - endIt);
         const auto fromBegin = abs(shiftPoint - beginIt);
 
-        // Shift the elements in the direction based on distance from borders. Does not shift if shiftPoint is at a border of the buffer.
+        // Shift the elements in the direction based on distance from borders.
         if(fromBegin >= fromEnd)
         {
             increment(temp.m_headIndex, offset);
