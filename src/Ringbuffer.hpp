@@ -195,6 +195,24 @@ public:
         return destIt;
     }
 
+    iterator insert(const_iterator pos, std::initializer_list<T> list)
+    {
+        const auto amount = list.size();
+        while(m_capacity - 1 <= size() + amount)
+        {
+            reserve(m_capacity * 1.5);
+        }
+
+        auto destIt = iterator(this, pos.getIndex());
+
+        for(auto i= 0; i < amount; i++)
+        {
+            m_allocator.construct(&destIt[i], *(list.begin() + i));
+        }
+
+        return destIt;
+    }
+
     /// @brief Erase an element at a given position.
     /// @param pos Pointer to the element to be erased.
     /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.

@@ -532,8 +532,11 @@ TYPED_TEST(RingBufferTest, insertRange)
 {
     const auto beginOffset = 2;
     const auto endOffset = 5;
+    const auto amount = endOffset - beginOffset;
     const auto pos = 3;
+
     RingBuffer<TypeParam> rangeSource = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+    const auto refBuffer(t_buffer);
 
     const auto rangeBeginIt = rangeSource.begin() + beginOffset;
     const auto rangeEndIt = rangeSource.begin() + endOffset;
@@ -541,13 +544,50 @@ TYPED_TEST(RingBufferTest, insertRange)
 
     const auto returnIt = t_buffer.insert(posIt, rangeBeginIt, rangeEndIt);
 
-    for(auto i = 0; i < (endOffset - beginOffset); i ++)
+    // Verify buffer state.
+    for(auto i = 0; i < refBuffer.size(); i ++)
     {
-        ASSERT_EQ(*(returnIt + i), *(posIt + i));
+        // Check beginning of buffer is unchanged
+        if(i < pos)
+        {
+            ASSERT_EQ(t_buffer[i], refBuffer[i]);
+        }
+        // Check remainder after range insertion is unchanged
+        else if ((amount + pos) < i)
+        {
+            ASSERT_EQ(t_buffer[i + amount], refBuffer[i]);
+        }
+        // Check range is inserted correctly.
+    }
+
+    for(auto i = 0; i < amount ; i++)
+    {
+        ASSERT_EQ(returnIt[i], posIt[i]);
         ASSERT_EQ(rangeSource[beginOffset + i], t_buffer[pos + i]);
     }
 }
 
+TYPED_TEST(RingBufferTest, insertInitializerList)
+{
+    const auto pos = 3;
+    const auto posIt = t_buffer.begin() + pos;
+    const auto refBuffer(t_buffer);
+    std::initializer_list<TypeParam> initList {static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>())};
+
+    t_buffer.insert(posIt, initList);
+
+    for(auto i = 0; i < t_buffer.size(); i++)
+    {
+        if(i < pos || (pos + initList.size()) < i)
+        {
+            ASSERT_EQ(refBuffer[i], t_buffer[i]);
+        }
+        else
+        {
+            ASSERT_EQ(*(initList.begin() + (i - pos)), t_buffer[i]);
+        }
+    }
+}
 
 // Tests requirement: SequenceContainer, erase() expression erase(q) where q is a valid dereferenceable const iterator into a.
 TYPED_TEST(RingBufferTest, erase)
