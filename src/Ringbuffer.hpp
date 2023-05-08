@@ -7,7 +7,7 @@
 #include "Iterator.hpp"
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
-/// @tparam T Type of the elements. Must meet the requirement
+/// @tparam T Type of the elements. Must meet the requirement EmplaceCostructible.
 /// @tparam Allocator Allocator used for (de)allocation and (de)construction. Defaults to std::allocator<T>
 template<typename T, typename Allocator = std::allocator<T>> 
 class RingBuffer
@@ -173,6 +173,7 @@ public:
     /// @param begin Iterator to first element of the range.
     /// @param sourceEnd Iterator past the last element of the range.
     /// @return Returns an iterator to an element in the buffer which is copy of the first element in the range.
+    /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.
     /// @note Type of elements in the range need to be convertible to T. Elements of range must not be part of *this.
     /// @exception Can throw std::bad_alloc, TODO and is this strong or basic or weak guarantee? shift should not throw but... it could?
     iterator insert(const_iterator pos, const_iterator sourceBegin, const_iterator sourceEnd)
@@ -195,6 +196,11 @@ public:
         return destIt;
     }
 
+    /// @brief Inserts initializer list to buffer.
+    /// @param pos Iterator where the list will be inserted.
+    /// @param list Initiliazer list to insert.
+    /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.
+    /// @return Returns Iterator to the first element inserted, or the element pointed by pos if the initializer list was empty.
     iterator insert(const_iterator pos, std::initializer_list<T> list)
     {
         const auto amount = list.size();
@@ -229,6 +235,7 @@ public:
         decrement(m_headIndex);
         for(auto i = 0; i + posIndex + 1 < endIndex; i++)
         {
+            // Move elements back one by one.
             it[i] = std::move(it[i + 1]);
         }
 
@@ -260,6 +267,7 @@ public:
     }
 
     /// @brief Destroys all elements in a buffer.
+    /// @note All references, pointers and iterators are invalidated. Leaves capacity unchanged.
     void clear()
     {
         for(m_tailIndex; m_tailIndex < m_headIndex ; m_tailIndex++)
@@ -271,6 +279,42 @@ public:
         m_tailIndex = 0;
     }
 
+    /// @brief Replaces the elements in the buffer with copy of [sourceBegin, sourceEnd)
+    /// @pre T is EmplaceConstructible and [sourceBegin, sourceEnd) are not in the buffer.
+    /// @post All existing pointers, references and iterators are to be considered invalid.
+    void assign(const_iterator sourceBegin, const_iterator sourceEnd)
+    {
+        clear();
+        for (; sourceBegin != sourceEnd; sourceBegin++)
+        {
+            push_back(*sourceBegin);
+        }
+    }
+
+    /// @brief Replaces the elements in the buffer.
+    /// @param list Initializer list containing the elements to replace the existing ones.
+    /// @pre T is EmplaceConstructible.
+    /// @note Leaves capacity of the buffer unchanged.
+    void assign(std::initializer_list<T> list)
+    {
+        clear();
+        for(auto i = 0; i < list.size(); i++)
+        {
+            push_back(*(list.begin() + i));
+        }
+    }
+
+    /// @brief Replaces the elements in the buffer with given value.
+    /// @param amount Size of the buffer after the assignment.
+    /// @param value Value of all elements after the assignment.
+    void assign(const size_type amount, value_type value)
+    {
+        clear();
+        for(auto i = 0; i < amount; i++)
+        {
+            push_back(value);
+        }
+    }
 
     /// @brief Copy assignment operator.
     /// @param copy A temporary RingBuffer created by a copy constructor.
@@ -324,6 +368,45 @@ public:
             index -= m_capacity;
         }
 
+        return m_data[index];
+    }
+
+    /// @brief Get a specific element of the buffer.
+    /// @param logicalIndex Index of the element.
+    /// @return Returns a reference the the element at index.
+    /// @throw Throws std::out_of_range if index is larger or equal to buffers size.
+    reference at(size_type logicalIndex)
+    {
+        if(logicalIndex >= size())
+        {
+            throw std::out_of_range("Index is out of range");
+        }
+
+        auto index = m_tailIndex + logicalIndex;
+
+        if(m_capacity <= index)
+        {
+            index -= m_capacity;
+        }
+        return m_data[index];
+    }
+
+    /// @brief Get a specific element of the buffer.
+    /// @param logicalIndex Index of the element.
+    /// @return Returns a const reference the the element at index.
+    /// @throw Throws std::out_of_range if index is larger or equal to buffers size.
+    const_reference at(size_type logicalIndex) const
+    {
+        if(logicalIndex >= size())
+        {
+            throw std::out_of_range("Index is out of range.");
+        }
+
+        auto index(m_tailIndex + logicalIndex);
+        if(m_capacity <= index)
+        {
+            index -= m_capacity;
+        }
         return m_data[index];
     }
 
@@ -430,9 +513,9 @@ public:
         {
             return m_headIndex + m_capacity - m_tailIndex;
         }
-
         return m_headIndex - m_tailIndex;
     }
+
     size_type max_size() const noexcept
     {
         const auto maxSize = std::numeric_limits<std::size_t>::max();
@@ -491,8 +574,32 @@ public:
         {
             reserve(m_capacity* 1.5);
         }
-        decrement(m_tailIndex);
-        m_allocator.construct(&m_data[m_tailIndex], val);
+
+        // Decrement temporary index incase constructol throws to retain invariants (elements of the buffer are always initialized).
+        auto newIndex = m_tailIndex;
+        decrement(newIndex);
+        m_allocator.construct(&m_data[newIndex], val);
+        m_tailIndex = newIndex;
+    }
+
+    /// @brief Inserts an element to the front of the buffer.
+    /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
+    /// @param val Rvalue reference to the element to insert.
+    /// @note Allocates memory before the insertion if the buffer would be full after the operation.
+    /// @pre T needs to satisfy MoveConstoructible
+    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
+    void push_front(value_type&& val)
+    {
+        if(m_capacity - 1 == size())
+        {
+            reserve(m_capacity* 1.5);
+        }
+
+        // Decrement temporary index incase constructor throws to retain invariants (elements of the buffer are always initialized).
+        auto newIndex = m_tailIndex;
+        decrement(newIndex);
+        m_allocator.construct(&m_data[newIndex], std::forward(val));
+        m_tailIndex = newIndex;
     }
 
     /// @brief Inserts an element in the back of the buffer. If buffer is full, allocates more memory.
@@ -500,6 +607,8 @@ public:
     /// @param val Value of type T to be inserted in to the buffer. Needs to be CopyConstructible.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
     /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @pre T is EmplaceConstructible.
+    /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
     void push_back(value_type val)
     {
         // Empty buffer case.

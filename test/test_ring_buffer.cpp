@@ -572,7 +572,8 @@ TYPED_TEST(RingBufferTest, insertInitializerList)
     const auto pos = 3;
     const auto posIt = t_buffer.begin() + pos;
     const auto refBuffer(t_buffer);
-    std::initializer_list<TypeParam> initList {static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>())};
+    std::initializer_list<TypeParam> initList {static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()),static_cast<TypeParam>(getValue<TypeParam>()),
+                                                static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>())};
 
     t_buffer.insert(posIt, initList);
 
@@ -604,6 +605,7 @@ TYPED_TEST(RingBufferTest, erase)
     }
 }
 
+// Tests a special case of erase(). Erasing at end iterator (past the last element) basically does nothing.
 TYPED_TEST(RingBufferTest, eraseLast)
 {
     const auto offset = 1;
@@ -613,7 +615,9 @@ TYPED_TEST(RingBufferTest, eraseLast)
     const auto newLastValue = *refIt;
 
     const auto erasedIt = t_buffer.erase(endIt);
+
     ASSERT_EQ(erasedIt, refIt);
+    ASSERT_EQ(erasedIt, t_buffer.end());
     ASSERT_EQ(newLastValue, *erasedIt);
 
     for(auto i = 0; i < t_buffer.size(); i++)
@@ -649,6 +653,82 @@ TYPED_TEST(RingBufferTest, clear)
 {
     t_buffer.clear();
     ASSERT_EQ(t_buffer.size(), 0);
+
+    // Just try some operations to make sure they don't throw exceptions.
+    t_buffer.push_back(getValue<TypeParam>());
+    t_buffer[0];
+}
+
+// Tests requirement: SequenceContainer, assign(i, j) where i and j are a valid range.
+TYPED_TEST(RingBufferTest, assignRange)
+{
+    RingBuffer<TypeParam> sourceBuffer(CreateBuffer<TypeParam>());
+    const auto rangeSize = 4;
+    const auto beginOffset = 1;
+    const auto rangeBeginIt = sourceBuffer.begin() + beginOffset;
+    const auto rangeEndIt = rangeBeginIt + rangeSize;
+
+    t_buffer.assign(rangeBeginIt, rangeEndIt);
+
+    for(auto i = 0; i < rangeSize; i++)
+    {
+        ASSERT_EQ(t_buffer[i], sourceBuffer[i + beginOffset]);
+    }
+
+    t_buffer.assign(sourceBuffer.begin(), sourceBuffer.end());
+
+    for(auto i = 0; i < sourceBuffer.size(); i++)
+    {
+        ASSERT_EQ(t_buffer[i], sourceBuffer[i]);
+    }
+}
+
+// Tests requirement: SequenceContainer, assign(initializerList)
+TYPED_TEST(RingBufferTest, assignInitList)
+{
+    std::initializer_list<TypeParam> initList {static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>())};
+
+    t_buffer.assign(initList);
+
+    for(auto i = 0; i < initList.size(); i++)
+    {
+        ASSERT_EQ(t_buffer[i], *(initList.begin() + i));
+    }
+    ASSERT_EQ(t_buffer.size(), initList.size());
+}
+
+TYPED_TEST(RingBufferTest, assignSizeVal)
+{
+    const auto value = getValue<TypeParam>();
+    const auto size = 4;
+
+    const auto refBuffer(t_buffer);
+
+    t_buffer.assign(size, value);
+
+    for(auto i = 0; i < t_buffer.size(); i++)
+    {
+        ASSERT_EQ(t_buffer[i], value);
+    }
+    ASSERT_EQ(t_buffer.size(), size);
+}
+
+TYPED_TEST(RingBufferTest, at)
+{
+    for(auto i = 0; i < t_buffer.size(); i++)
+    {
+        ASSERT_EQ(t_buffer[i], t_buffer.at(i));
+    }
+
+    const auto const_buffer(t_buffer);
+    for(auto i = 0; i < t_buffer.size(); i++)
+    {
+        ASSERT_EQ(const_buffer[i], const_buffer.at(i));
+    }
+
+    // Test OB access.
+    EXPECT_THROW(t_buffer.at(6), std::out_of_range);
+    EXPECT_THROW(const_buffer.at(6), std::out_of_range);
 }
 
 }
