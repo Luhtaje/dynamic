@@ -731,4 +731,24 @@ TYPED_TEST(RingBufferTest, at)
     EXPECT_THROW(const_buffer.at(6), std::out_of_range);
 }
 
+TYPED_TEST(RingBufferTest, popBack)
+{
+    const auto refBuffer(t_buffer);
+    t_buffer.pop_back();
+    for(auto i = 0; i < t_buffer.size(); i++)
+    {
+        ASSERT_EQ(t_buffer[i], refBuffer[i]);
+    }
+}
+
+TYPED_TEST(RingBufferTest, pushBack)
+{
+
+}
+
+TYPED_TEST(RingBufferTest, pushBackRV)
+{
+    
+}
+
 }

@@ -604,14 +604,14 @@ public:
 
     /// @brief Inserts an element in the back of the buffer. If buffer is full, allocates more memory.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
-    /// @param val Value of type T to be inserted in to the buffer. Needs to be CopyConstructible.
+    /// @param val Value of type T to be appended.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
-    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @exception If any exception is thrown, this function retains invariants. Basic exception guarantee.
     /// @pre T is EmplaceConstructible.
     /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
     void push_back(value_type val)
     {
-        // Empty buffer case.
+
         if(m_capacity - 1 == size())
         {
             reserve(m_capacity * 1.5);
@@ -620,6 +620,26 @@ public:
         m_allocator.construct(&m_data[m_headIndex], val);
         increment(m_headIndex);
     }
+
+    /// @brief Inserts an element in the back of the buffer. If buffer is full, allocates more memory.
+    /// @param val Rvalue reference to the value to be appended.
+    /// @note Allocates memory before the insertion if the buffer would be full after the operation.
+    /// @exception If any exception is thrown, this function retains invariants. Basic exception guarantee.
+    /// @pre T is EmplaceConstructible.
+    /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
+    void push_back(value_type&& val)
+    {
+
+        if(m_capacity - 1 == size())
+        {
+            reserve(m_capacity * 1.5);
+        }
+    
+        m_allocator.construct(&m_data[m_headIndex], std::forward(val));
+        increment(m_headIndex);
+    }
+
+
 
     /// @brief Remove the first element in the buffer.
     void pop_front() noexcept
@@ -631,8 +651,10 @@ public:
     // Erase an element from the logical back of the buffer.
     void pop_back() noexcept
     {
+
         decrement(m_headIndex);
-        m_allocator.destroy(&m_data[m_headIndex-1]);
+        m_allocator.destroy(&m_data[m_headIndex]);
+
     }
 
 //===========================================================
