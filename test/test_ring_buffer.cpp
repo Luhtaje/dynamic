@@ -402,7 +402,7 @@ TYPED_TEST(RingBufferTest, Data)
     ASSERT_EQ(copy, t_buffer);
 }
 
-TYPED_TEST(RingBufferTest, Push_back)
+TYPED_TEST(RingBufferTest, pushBack)
 {
     // Push few times to make buffer allocate more memory.
     const auto someVal = getValue<TypeParam>();
@@ -430,7 +430,33 @@ TYPED_TEST(RingBufferTest, Push_back)
     EXPECT_EQ(t_buffer.back(), someVal6);
 }
 
-TYPED_TEST(RingBufferTest, Push_front)
+TYPED_TEST(RingBufferTest, pushBackRV)
+{
+    auto refBuffer = CreateBuffer<TypeParam>();
+
+    // Push rval ref to buffer, check against refValue.
+    for(auto i = 0; i < TEST_BUFFER_SIZE ; i++)
+    {
+        const auto moveValue = getValue<TypeParam>();
+        const auto refValue = moveValue;
+        refBuffer.push_back(std::move(moveValue));
+        ASSERT_EQ(refBuffer.back(), refValue);
+    }
+}
+
+// Right now this test is pointless. It basicall tests decrement works. How to test if pop has actually removed an element?
+TYPED_TEST(RingBufferTest, popBack)
+{
+    const auto refBuffer(t_buffer);
+    t_buffer.pop_back();
+    for(auto i = 0; i < t_buffer.size(); i++)
+    {
+        ASSERT_EQ(t_buffer[i], refBuffer[i]);
+    }
+ }
+
+
+TYPED_TEST(RingBufferTest, pushFront)
 {
     // Push few times to make buffer allocate more memory.
     const auto someVal = getValue<TypeParam>();
@@ -456,6 +482,20 @@ TYPED_TEST(RingBufferTest, Push_front)
     const auto someVal6 = getValue<TypeParam>();
     t_buffer.push_front(someVal6);
     EXPECT_EQ(t_buffer.front(), someVal6);
+}
+
+TYPED_TEST(RingBufferTest, pushFrontRV)
+{
+    auto refBuffer = CreateBuffer<TypeParam>();
+
+    // Push rval ref to buffer, check against refValue.
+    for(auto i = 0; i < TEST_BUFFER_SIZE ; i++)
+    {
+        const auto moveValue = getValue<TypeParam>();
+        const auto refValue = moveValue;
+        refBuffer.push_front(std::move(moveValue));
+        ASSERT_EQ(refBuffer.front(), refValue);
+    }
 }
 
 TYPED_TEST(RingBufferTest, Front)
@@ -729,26 +769,6 @@ TYPED_TEST(RingBufferTest, at)
     // Test OB access.
     EXPECT_THROW(t_buffer.at(6), std::out_of_range);
     EXPECT_THROW(const_buffer.at(6), std::out_of_range);
-}
-
-TYPED_TEST(RingBufferTest, popBack)
-{
-    const auto refBuffer(t_buffer);
-    t_buffer.pop_back();
-    for(auto i = 0; i < t_buffer.size(); i++)
-    {
-        ASSERT_EQ(t_buffer[i], refBuffer[i]);
-    }
-}
-
-TYPED_TEST(RingBufferTest, pushBack)
-{
-
-}
-
-TYPED_TEST(RingBufferTest, pushBackRV)
-{
-    
 }
 
 }

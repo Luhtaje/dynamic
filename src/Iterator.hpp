@@ -23,7 +23,6 @@ public:
     using reference = const value_type&;
 
 public:
-
     _rBuf_const_iterator(): m_container(nullptr), m_logicalIndex(0) {}
 
     /// @brief Constructor.

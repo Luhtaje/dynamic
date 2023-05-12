@@ -27,7 +27,7 @@ public:
     using size_type = std::size_t;
 
     /// @brief Default constructor.
-    /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
+    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @note Allocates memory for 2 elements. The buffer works on a principle that it never gets full.
     RingBuffer() : m_headIndex(0), m_tailIndex(0), m_capacity(2)
     {
@@ -36,6 +36,7 @@ public:
 
     /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any elements.
     /// @param capacity Capacity of the buffer.
+    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     RingBuffer(size_type capacity) : m_headIndex(0), m_tailIndex(0), m_capacity(capacity)
     {
         m_data = m_allocator.allocate(m_capacity);
@@ -44,6 +45,7 @@ public:
     /// @brief Custom constructor. Constructs the buffer and initializes all of its elements to a given value.
     /// @param size Amount of elements to be initialized in the buffer.
     /// @param val Value which the elements are initialized to.
+    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     RingBuffer(size_type size, T val) : m_headIndex(0), m_tailIndex(0), m_capacity(size + 2)
     {
         m_data = m_allocator.allocate(m_capacity);
@@ -55,7 +57,7 @@ public:
 
     /// @brief Custom constructor. Construct the buffer from range [begin,end).
     /// @param begin Iterator to first element of range.
-    /// @param end Iterator past-the-last element of range.
+    /// @param end Iterator pointing to past-the-last element of range.
     /// @note Behavior is undefined if elements in range are not initialized.
     RingBuffer(const_iterator beginIt, const_iterator endIt)
     {
@@ -101,10 +103,11 @@ public:
         m_tailIndex = std::exchange(other.m_tailIndex, 0);
     }
 
+    /// Destructor.
     ~RingBuffer()
     {
         // Calls destructor for each element in the buffer.
-        if(size()) for_each(begin(),end(),[](T elem) { elem.~T(); });
+        if(size()) for_each(begin(),end(),[this](T& elem) { m_allocator.destroy(&elem); });
 
         // After destruction deallocate the memory.
         m_allocator.deallocate(m_data, m_capacity);
@@ -114,10 +117,11 @@ public:
     /// @param pos Iterator where the the element should be inserted. 
     /// @param value Value to insert.
     /// @return Iterator that points to the inserted element.
-    /// @exception Can throw std::bad_alloc, or 
+    /// @throw Can throw std::bad_alloc if allocation is required but not enough free memory available.
+    /// @exception 
     iterator insert(const_iterator pos, const value_type& value)
     {
-        while(m_capacity - 1 == size())
+        while(m_capacity - 1 <= size() + 1)
         {
             reserve(m_capacity * 1.5);
         }
@@ -132,17 +136,18 @@ public:
     /// @param pos Iterator where the the element should be inserted
     /// @param value Value to insert.
     /// @return Iterator that pos to the inserted element.
-    /// @exception Can throw std::bad_alloc, or something from element construction. 
+    /// @throw Can throw std::bad_alloc, or something from element construction. 
+    /// @exception 
     iterator insert(const_iterator pos, value_type&& value)
     {
-        while(m_capacity - 1 == size())
+        while(m_capacity - 1 <= size() + 1)
         {
             reserve(m_capacity * 1.5);
         }
 
         shift(pos, 1);
+        m_allocator.construct(&(*pos), std::forward<value_type>(value));
 
-        m_allocator.construct(&(*pos), std::forward<const value_type>(value));
         return iterator(this, pos.getIndex());
     }
 
@@ -150,7 +155,7 @@ public:
     /// @param pos Iterator where the the element should be inserted
     /// @param value Value to insert. T must meet the requirements of CopyInsertable.
     /// @return Iterator that pos to the inserted element.
-    /// @exception Can throw std::bad_alloc, or something from element construction. Allocation failure is critical, construction not as much. TODO improve exception safety.
+    /// @throw Can throw std::bad_alloc, or something from element construction.
     iterator insert(iterator pos, const size_type amount, const value_type& value)
     {
         while(m_capacity - 1 <= size() + amount)
@@ -219,6 +224,28 @@ public:
         return destIt;
     }
 
+    template<class... Args>
+    iterator emplace(const_iterator pos, Args&&... args)
+    {
+        // Shift requires that enough memory is allocated, allocate enough for size + the emplaced element.
+        while(m_capacity - 1 <= size() + 1)
+        {
+            reserve(m_capacity * 1.5);
+        }
+
+        size_t index = pos.getIndex();
+
+        // If pos is not end iterator.
+        if( index < size())
+        {
+            shift(pos, 1);
+        }
+
+        m_allocator.construct(&(*pos), std::forward<Args>(args)...):
+        increment(m_headIndex);
+        return pos;
+    }
+
     /// @brief Erase an element at a given position.
     /// @param pos Pointer to the element to be erased.
     /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.
@@ -280,7 +307,7 @@ public:
     }
 
     /// @brief Replaces the elements in the buffer with copy of [sourceBegin, sourceEnd)
-    /// @pre T is EmplaceConstructible and [sourceBegin, sourceEnd) are not in the buffer.
+    /// @pre T is CopyConstructible and [sourceBegin, sourceEnd) are not in the buffer.
     /// @post All existing pointers, references and iterators are to be considered invalid.
     void assign(const_iterator sourceBegin, const_iterator sourceEnd)
     {
@@ -317,7 +344,7 @@ public:
     }
 
     /// @brief Copy assignment operator.
-    /// @param copy A temporary RingBuffer created by a copy constructor.
+    /// @param other Ringbuffer to be copied.
     /// @return Returns reference to the left hand side RungBuffer after swap.
     /// @note Strong exception guarantee. 
     RingBuffer& operator=(const RingBuffer& other)
@@ -340,7 +367,7 @@ public:
     /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
     /// @param logicalIndex Index of the element.
     /// @return Returns a reference to the element.
-    /// @note Does not check bounds, and behaviour for accessing index larger than size() - 1 is undefined.
+    /// @note Behaviour for accessing index larger than size() - 1 is undefined.
     reference operator[](const size_type logicalIndex)
     {
         // If sum of tailIndex (physical first element) and logical index(logical element) is larger than vector capacity, 
@@ -358,7 +385,7 @@ public:
     /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
     /// @param logicalIndex Index of the element.
     /// @return Returns a const reference the the element.
-    /// @note Does not check bounds, and behaviour for accessing index larger than size() - 1 is undefined.
+    /// @note Behaviour for accessing index larger than size() - 1 is undefined.
     const_reference operator[](const size_type logicalIndex) const
     {
         auto index(m_tailIndex + logicalIndex);
@@ -609,7 +636,7 @@ public:
     /// @exception If any exception is thrown, this function retains invariants. Basic exception guarantee.
     /// @pre T is EmplaceConstructible.
     /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
-    void push_back(value_type val)
+    void push_back(const value_type& val)
     {
 
         if(m_capacity - 1 == size())
@@ -629,17 +656,14 @@ public:
     /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
     void push_back(value_type&& val)
     {
-
         if(m_capacity - 1 == size())
         {
             reserve(m_capacity * 1.5);
         }
     
-        m_allocator.construct(&m_data[m_headIndex], std::forward(val));
+        m_allocator.construct(&m_data[m_headIndex], std::forward<value_type>(val));
         increment(m_headIndex);
     }
-
-
 
     /// @brief Remove the first element in the buffer.
     void pop_front() noexcept
@@ -758,6 +782,7 @@ private:
     /// @param sourceEnd Iterator to past-the-end element of of source data.
     /// @param destBegin Iterator to beginning of destination range.
     /// @note Copies all elements in range [sourceBegin, sourceEnd), from sourceBegin to  sourceEnd - 1. The behaviour is undefined destBegin overlaps the range [sourceBegin, sourceEnd).
+    /// @pre T is CopyConstructible.
     /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
     void copy(const_iterator sourceBegin, const_iterator sourceEnd, iterator destBegin)
     {
@@ -771,9 +796,9 @@ private:
 
     /// @brief Shifts a range of elements forward or backwards with the copy and swap idiom. Deduces shifts direction based on distance to each border from the given iterator.
     /// @param shiftPoint Iterator to the shift point. The shift point is an element, which is the first index that will be empty after shift. "Where to spawn empty elements".
-    /// @param offset Size of shift. How many steps each element will be shifted, eg, "How many empty elements".
+    /// @param offset Size of shift. How many steps each element will be shifted, eg, "How many empty elements" are inserted.
     /// @exception Might throw exceptions from memory allocation and element constructors. If exceptions are thrown, nothing happens (Strong exception safety guarantee).
-    /// @note Undefined behaviour if buffer does not have enough memory allocated for the shift.
+    /// @pre The buffer must have enough allocated memory for size() + offset. Otherwise the behaviour is undefined.
     void shift(const_iterator shiftPoint, difference_type offset)
     {
         const auto endIt = end();
