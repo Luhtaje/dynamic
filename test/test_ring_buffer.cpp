@@ -225,6 +225,7 @@ TYPED_TEST(RingBufferTest, copy)
 #endif /*TEST_INTERNALS*/
 
 //==================mainframe ===================//
+// Tests requirement: DefaultConstructible expression T u, T u{}, T(), T{} ; Container expression C();
 TYPED_TEST(RingBufferTest, DefaultConstruction)
 {
     RingBuffer<TypeParam> defaultInitialized;
@@ -232,6 +233,12 @@ TYPED_TEST(RingBufferTest, DefaultConstruction)
 
     RingBuffer<TypeParam> defaultValueInitialized{};
     EXPECT_TRUE(defaultValueInitialized.empty());
+
+    auto emptyInitialized = RingBuffer<TypeParam>();
+    EXPECT_TRUE(emptyInitialized.empty());
+
+    auto emptyAggregateInitialized = RingBuffer<TypeParam>{};
+    EXPECT_TRUE(emptyAggregateInitialized.empty());
 
     EXPECT_TRUE(std::is_default_constructible<RingBuffer<TypeParam>>::value);
 }
@@ -503,7 +510,7 @@ TYPED_TEST(RingBufferTest, Front)
     EXPECT_EQ(t_buffer.front(), *t_buffer.begin());
 }
 
-// Tests requiremet: SequenceContainer, Insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
+// Tests requirement: SequenceContainer, Insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
 TYPED_TEST(RingBufferTest, Insert)
 {
     const auto beginIt = t_buffer.begin();
@@ -531,11 +538,12 @@ TYPED_TEST(RingBufferTest, InsertRV)
     // Test that returned iterator points to correct element and that the value is correct
     const auto value = getValue<TypeParam>();
     auto pointIt = t_buffer.insert(it + 1, std::move(value));
+
     ASSERT_EQ(*pointIt, value);
     ASSERT_EQ(t_buffer[1], value);
 }
 
-// Tests requirement: SequeanceContainer, insert() exprssion a.insert(p, n, t) where p is position iterator, n is a size_type and t is a value of value type a::value_type.
+// Tests requirement: SequenceContainer, insert() exprssion a.insert(p, n, t) where p is position iterator, n is a size_type and t is a value of value type a::value_type.
 TYPED_TEST(RingBufferTest, InsertSizeVal)
 {
     const auto amount = 3;
@@ -567,7 +575,7 @@ TYPED_TEST(RingBufferTest, InsertSizeVal)
     }
 }
 
-// Tests requirement: SequeanceContainer, insert() exprssion a.insert(p, i, j) where p is position iterator and [i, j) is a valid range.
+// Tests requirement: SequenceContainer, insert() exprssion a.insert(p, i, j) where p is position iterator and [i, j) is a valid range.
 TYPED_TEST(RingBufferTest, insertRange)
 {
     const auto beginOffset = 2;

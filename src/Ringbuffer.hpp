@@ -1,5 +1,5 @@
-#ifndef MAIN_HPP
-#define MAIN_HPP
+#ifndef DYNAMIC_RINGBUFFER_HPP
+#define DYNAMIC_RINGBUFFER_HPP
 
 #include <memory>
 #include <algorithm>
@@ -146,7 +146,7 @@ public:
         }
 
         shift(pos, 1);
-        m_allocator.construct(&(*pos), std::forward<value_type>(value));
+        m_allocator.construct(&(*pos), std::move(value));
 
         return iterator(this, pos.getIndex());
     }
@@ -522,7 +522,7 @@ public:
         // Pummel the original buffer with destructor calls.
         if(size())
         {
-            for_each(begin(),end(),[](T elem) { elem.~T(); });
+            for_each(begin(),end(),[this](T& elem) { m_allocator.destroy(&elem); });
         }
 
         // Set up index values on original buffer to match rotated ones.
@@ -781,14 +781,14 @@ private:
     /// @param sourceBegin Iterator to begin of source data.
     /// @param sourceEnd Iterator to past-the-end element of of source data.
     /// @param destBegin Iterator to beginning of destination range.
-    /// @note Copies all elements in range [sourceBegin, sourceEnd), from sourceBegin to  sourceEnd - 1. The behaviour is undefined destBegin overlaps the range [sourceBegin, sourceEnd).
+    /// @note Copies all elements in range [sourceBegin, sourceEnd), from sourceBegin to  sourceEnd - 1. The behaviour is undefined if destBegin overlaps the range [sourceBegin, sourceEnd). Custom copy is required to copy elements into uninitialized memory.
     /// @pre T is CopyConstructible.
     /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
     void copy(const_iterator sourceBegin, const_iterator sourceEnd, iterator destBegin)
     {
         size_t size = sourceEnd - sourceBegin;
 
-        for(ptrdiff_t i = 0; i != size ; i++)
+        for(size_t i = 0; i != size ; i++)
         {
             m_allocator.construct(&destBegin[i], sourceBegin[i]);
         }
@@ -812,7 +812,7 @@ private:
         const auto fromEnd = abs(shiftPoint - endIt);
         const auto fromBegin = abs(shiftPoint - beginIt);
 
-        // Shift the elements in the direction based on distance from borders.
+        // Shift the elements in the direction based on (smaller) distance from borders.
         if(fromBegin >= fromEnd)
         {
             increment(temp.m_headIndex, offset);
@@ -886,4 +886,4 @@ inline bool operator!=(const RingBuffer<T,Alloc>& lhs, const RingBuffer<T,Alloc>
     return !(lhs == rhs);
 }
 
-#endif /*MAIN_HPP*/
+#endif /*DYNAMIC_RINGBUFFER_HPP*/

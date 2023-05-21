@@ -181,7 +181,7 @@ public:
     /// @return True if iterators point to same element in same container. Does not compare c-qualification.
     bool operator==(const _rBuf_const_iterator& other) const
     {
-        const auto pointsToSame = (m_logicalIndex % m_container->capacity() == other.m_logicalIndex % other.m_container->capacity());
+        const auto pointsToSame = (m_logicalIndex == other.m_logicalIndex);
         return pointsToSame && m_container == other.m_container;
     }
 
