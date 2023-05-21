@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "Ringbuffer.hpp"
+#include "ring_buffer.hpp"
 #include <utility>
 #include <string>
 #include <ctime>
@@ -23,40 +23,40 @@ const static size_t TEST_INT_VALUE = 9;
 //=================
 
 template<class T>
-RingBuffer<T> CreateBuffer();
+ring_buffer<T> CreateBuffer();
 
 template <>
-RingBuffer<int> CreateBuffer<int>()
+ring_buffer<int> CreateBuffer<int>()
 {
-    return RingBuffer<int>{1,2,3,4,5,6};
+    return ring_buffer<int>{1,2,3,4,5,6};
 }
 
 template <>
-RingBuffer<std::string> CreateBuffer<std::string>()
+ring_buffer<std::string> CreateBuffer<std::string>()
 {
-    return RingBuffer<std::string>{"abc", "def", "ghj", "cjk", "okm", "tyu"};
+    return ring_buffer<std::string>{"abc", "def", "ghj", "cjk", "okm", "tyu"};
 }
 
 template <>
-RingBuffer<char> CreateBuffer<char>()
+ring_buffer<char> CreateBuffer<char>()
 {
-    return RingBuffer<char>{'a','b','c','d','e','f'};
+    return ring_buffer<char>{'a','b','c','d','e','f'};
 }
 
 //====================
 // By size
 //====================
 template<class T>
-RingBuffer<T> CreateBuffer(int size)
+ring_buffer<T> CreateBuffer(int size)
 {
-    return RingBuffer<T>(size);
+    return ring_buffer<T>(size);
 }
 
 template <>
-RingBuffer<char> CreateBuffer<char>(int size)
+ring_buffer<char> CreateBuffer<char>(int size)
 {
     srand(time(0));
-    auto buf = RingBuffer<char>();
+    auto buf = ring_buffer<char>();
     for(int i = 0 ; i < size; i++)
     {
         buf.push_back(char(rand() % 26));
@@ -65,10 +65,10 @@ RingBuffer<char> CreateBuffer<char>(int size)
 }
 
 template <>
-RingBuffer<int> CreateBuffer<int>(int size)
+ring_buffer<int> CreateBuffer<int>(int size)
 {
     srand(time(0));
-    auto buf = RingBuffer<int>();
+    auto buf = ring_buffer<int>();
     for(int i = 0 ; i < size; i++)
     {
         buf.push_back(rand() % 26);
@@ -77,10 +77,10 @@ RingBuffer<int> CreateBuffer<int>(int size)
 }
 
 template <>
-RingBuffer<std::string> CreateBuffer<std::string>(int size)
+ring_buffer<std::string> CreateBuffer<std::string>(int size)
 {
     srand(time(0));
-    auto buf = RingBuffer<std::string>();
+    auto buf = ring_buffer<std::string>();
     for(int i = 0 ; i < size; i++)
     {
         std::string someString("");
@@ -134,7 +134,7 @@ template<typename T>
 class RingBufferTest : public testing::Test
 {
 public:
-    RingBuffer<T> t_buffer;
+    ring_buffer<T> t_buffer;
 protected:
     RingBufferTest() : t_buffer(CreateBuffer<T>()) {}
 };
@@ -208,7 +208,7 @@ TYPED_TEST(RingBufferTest, shiftEnd)
 
 TYPED_TEST(RingBufferTest, copy)
 {
-    RingBuffer<TypeParam> copy(t_buffer.capacity());
+    ring_buffer<TypeParam> copy(t_buffer.capacity());
     copy.m_headIndex = t_buffer.m_headIndex;
     copy.m_tailIndex = t_buffer.m_tailIndex;
     const auto begin = t_buffer.begin();
@@ -228,57 +228,57 @@ TYPED_TEST(RingBufferTest, copy)
 // Tests requirement: DefaultConstructible expression T u, T u{}, T(), T{} ; Container expression C();
 TYPED_TEST(RingBufferTest, DefaultConstruction)
 {
-    RingBuffer<TypeParam> defaultInitialized;
+    ring_buffer<TypeParam> defaultInitialized;
     EXPECT_TRUE(defaultInitialized.empty());
 
-    RingBuffer<TypeParam> defaultValueInitialized{};
+    ring_buffer<TypeParam> defaultValueInitialized{};
     EXPECT_TRUE(defaultValueInitialized.empty());
 
-    auto emptyInitialized = RingBuffer<TypeParam>();
+    auto emptyInitialized = ring_buffer<TypeParam>();
     EXPECT_TRUE(emptyInitialized.empty());
 
-    auto emptyAggregateInitialized = RingBuffer<TypeParam>{};
+    auto emptyAggregateInitialized = ring_buffer<TypeParam>{};
     EXPECT_TRUE(emptyAggregateInitialized.empty());
 
-    EXPECT_TRUE(std::is_default_constructible<RingBuffer<TypeParam>>::value);
+    EXPECT_TRUE(std::is_default_constructible<ring_buffer<TypeParam>>::value);
 }
 
 TYPED_TEST(RingBufferTest, CopyConstruction)
 {
-    RingBuffer<TypeParam> copy(t_buffer);
+    ring_buffer<TypeParam> copy(t_buffer);
     ASSERT_EQ(copy, t_buffer);
-    ASSERT_TRUE(std::is_copy_constructible<RingBuffer<TypeParam>>::value);
+    ASSERT_TRUE(std::is_copy_constructible<ring_buffer<TypeParam>>::value);
 
 }
 
 TYPED_TEST(RingBufferTest, CopyAssignment)
 {
-    RingBuffer<TypeParam> control = t_buffer;
+    ring_buffer<TypeParam> control = t_buffer;
     ASSERT_EQ(control, t_buffer);
-    ASSERT_TRUE(std::is_copy_assignable<RingBuffer<TypeParam>>::value);
+    ASSERT_TRUE(std::is_copy_assignable<ring_buffer<TypeParam>>::value);
 }
 
 TYPED_TEST(RingBufferTest, RangeConstruction)
 {
-    RingBuffer<TypeParam> rangeConstructed(t_buffer.begin(), t_buffer.end());
+    ring_buffer<TypeParam> rangeConstructed(t_buffer.begin(), t_buffer.end());
     EXPECT_EQ(rangeConstructed, t_buffer);
 
-    const auto ranged = RingBuffer<TypeParam>(t_buffer.begin(), t_buffer.end());
+    const auto ranged = ring_buffer<TypeParam>(t_buffer.begin(), t_buffer.end());
     EXPECT_EQ(ranged, t_buffer);
 }
 
 
 TYPED_TEST(RingBufferTest, MoveConstruction)
 {
-    RingBuffer<TypeParam> copy(t_buffer);
+    ring_buffer<TypeParam> copy(t_buffer);
     EXPECT_EQ(t_buffer.empty(), false);
 
-    RingBuffer<TypeParam> moved(std::move(t_buffer));
+    ring_buffer<TypeParam> moved(std::move(t_buffer));
 
     EXPECT_EQ(moved, copy);
     EXPECT_EQ(t_buffer.size(), 0);
 
-    ASSERT_TRUE(std::is_move_constructible<RingBuffer<TypeParam>>::value);
+    ASSERT_TRUE(std::is_move_constructible<ring_buffer<TypeParam>>::value);
 }
 
 TYPED_TEST(RingBufferTest, MoveAssign)
@@ -289,14 +289,14 @@ TYPED_TEST(RingBufferTest, MoveAssign)
     ASSERT_EQ(copy, moved);
     EXPECT_EQ(t_buffer.size(), 0);
 
-    ASSERT_TRUE(std::is_move_assignable<RingBuffer<TypeParam>>::value);
+    ASSERT_TRUE(std::is_move_assignable<ring_buffer<TypeParam>>::value);
 }
 
 TYPED_TEST(RingBufferTest, SizeValConstruction)
 {
     const auto value = getValue<TypeParam>();
-    RingBuffer<TypeParam> sizeVal (TEST_BUFFER_SIZE, value);
-    RingBuffer<TypeParam>::iterator it = sizeVal.begin();
+    ring_buffer<TypeParam> sizeVal (TEST_BUFFER_SIZE, value);
+    ring_buffer<TypeParam>::iterator it = sizeVal.begin();
 
     EXPECT_EQ(sizeVal.size(), TEST_BUFFER_SIZE);
     ++it;
@@ -310,7 +310,7 @@ TYPED_TEST(RingBufferTest, InitListConstruction)
     const auto firstElem = getValue<TypeParam>();
     const auto secondElem = getValue<TypeParam>();
     const auto ThirdElem = getValue<TypeParam>();
-    RingBuffer<TypeParam> buf{firstElem, secondElem, ThirdElem};
+    ring_buffer<TypeParam> buf{firstElem, secondElem, ThirdElem};
 
     EXPECT_EQ(buf.size(), 3);
     EXPECT_EQ(buf[0], firstElem);
@@ -320,7 +320,7 @@ TYPED_TEST(RingBufferTest, InitListConstruction)
 
 TYPED_TEST(RingBufferTest, EqualityComparable)
 {
-    RingBuffer<TypeParam> copy(t_buffer);
+    ring_buffer<TypeParam> copy(t_buffer);
     EXPECT_TRUE(copy == t_buffer);
 
     copy.pop_back();
@@ -361,7 +361,7 @@ TYPED_TEST(RingBufferTest, Size)
 {
     EXPECT_EQ(t_buffer.size(), std::distance(t_buffer.cbegin(), t_buffer.cend()));
 
-    RingBuffer<TypeParam> emptyBuf(0);
+    ring_buffer<TypeParam> emptyBuf(0);
     EXPECT_EQ(emptyBuf.size(), 0);
 }
 
@@ -373,9 +373,9 @@ TYPED_TEST(RingBufferTest, MaxSize)
 
 TYPED_TEST(RingBufferTest, Empty)
 {
-    RingBuffer<TypeParam> control;
-    RingBuffer<TypeParam>::iterator begin = control.begin();
-    RingBuffer<TypeParam>::iterator end = control.end();
+    ring_buffer<TypeParam> control;
+    ring_buffer<TypeParam>::iterator begin = control.begin();
+    ring_buffer<TypeParam>::iterator end = control.end();
     
     EXPECT_EQ(control.end(), control.begin());
     EXPECT_EQ(begin, end);
@@ -387,7 +387,7 @@ TYPED_TEST(RingBufferTest, Empty)
 
 TYPED_TEST(RingBufferTest, Data)
 {
-    RingBuffer<TypeParam> myBuf;
+    ring_buffer<TypeParam> myBuf;
     myBuf.reserve(5);
     ASSERT_TRUE((myBuf.size() == 0 && myBuf.capacity() > 0));
     ASSERT_TRUE(myBuf.data() != nullptr);
@@ -583,7 +583,7 @@ TYPED_TEST(RingBufferTest, insertRange)
     const auto amount = endOffset - beginOffset;
     const auto pos = 3;
 
-    RingBuffer<TypeParam> rangeSource = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+    ring_buffer<TypeParam> rangeSource = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
     const auto refBuffer(t_buffer);
 
     const auto rangeBeginIt = rangeSource.begin() + beginOffset;
@@ -710,7 +710,7 @@ TYPED_TEST(RingBufferTest, clear)
 // Tests requirement: SequenceContainer, assign(i, j) where i and j are a valid range.
 TYPED_TEST(RingBufferTest, assignRange)
 {
-    RingBuffer<TypeParam> sourceBuffer(CreateBuffer<TypeParam>());
+    ring_buffer<TypeParam> sourceBuffer(CreateBuffer<TypeParam>());
     const auto rangeSize = 4;
     const auto beginOffset = 1;
     const auto rangeBeginIt = sourceBuffer.begin() + beginOffset;
