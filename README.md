@@ -20,7 +20,25 @@ The project is structured as follows:
 
 ## Building and Testing
 
-The project is configured to create a GoogleTest executable that tests the functionality of the buffer and its iterators. The project can be built using VScode IDE or Cmake build system.
+The project is configured to create a GoogleTest executable that tests the functionality of the buffer and its iterators. The project can be built using Cmake.
+
+The googletest submodule needs to be updated before building the project. To do this either clone and update directly:
+```bash
+git clone --recurse-submodules <repository-url>
+```
+or in the root directory of the project before building
+```
+git submodule init
+git submodule update
+```
+Then build the project:
+```bash
+mkdir build
+cd build
+cmake ..
+```
+This will create a Visual Studio project. Set the project "googletests" as startup project and hit run to run the tests.
+
 
 ## Documentation
 
