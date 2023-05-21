@@ -25,7 +25,3 @@ The project is configured to create a GoogleTest executable that tests the funct
 ## Documentation
 
 Doxygen is used to generate project documentation. You can find the output in the `docs/` directory, in both HTML and Latex formats.
-
----
-
-This project is developed as a part of an engineering thesis for Metropolia University of Applied Sciences and is in collaboration with Rightware Oy.
