@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 3.24)
 set(This source)
 
 set(Headers
-    Ringbuffer.hpp    
+    ring_buffer.hpp    
     Iterator.hpp
 )
 
 set(Sources
-    Ringbuffer.cpp
+    ring_buffer.cpp
 )
 
 add_library(${This} STATIC ${Sources} ${Headers})

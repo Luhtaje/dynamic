@@ -9,7 +9,7 @@ class _rBuf_iterator;
 //============================================================================
 
 /// @brief Custom iterator class.
-/// @tparam _rBuf Ringbuffer class type.
+/// @tparam _rBuf ring_buffer class type.
 template<class _rBuf>
 class _rBuf_const_iterator
 {
@@ -58,7 +58,7 @@ public:
 
     /// @brief Postfix increment
     /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
-    /// See Iterator::operator* and RingBuffer::operator[].
+    /// See Iterator::operator* and ring_buffer::operator[].
     _rBuf_const_iterator& operator++()
     {
         m_logicalIndex++;
@@ -69,7 +69,7 @@ public:
     /// @brief Postfix increment
     /// @param  int empty parameter to guide overload resolution.
     /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
-    /// See Iterator::operator* and RingBuffer::operator[].
+    /// See Iterator::operator* and ring_buffer::operator[].
     _rBuf_const_iterator operator++(int)
     {
         auto temp (*this);
@@ -274,8 +274,8 @@ public:
     _rBuf_iterator(): m_container(nullptr), m_logicalIndex(0) {}
 
     /// @brief Constructor.
-    /// @param container Pointer to the RingBuffer element which owns this iterator.
-    /// @param index Index pointing to the logical element of the RingBuffer.
+    /// @param container Pointer to the ring_buffer element which owns this iterator.
+    /// @param index Index pointing to the logical element of the ring_buffer.
     explicit _rBuf_iterator(_rBuf* container, difference_type index): m_container(container), m_logicalIndex(index) {}
 
     /// @brief Dereference operator
@@ -296,7 +296,7 @@ public:
 
     /// @brief Prefix increment
     /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
-    /// See Iterator::operator* and RingBuffer::operator[].
+    /// See Iterator::operator* and ring_buffer::operator[].
     _rBuf_iterator& operator++()
     {
         ++m_logicalIndex;
@@ -306,7 +306,7 @@ public:
     /// @brief Postfix increment
     /// @param  int empty parameter to guide overload resolution.
     /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
-    ///  See Iterator::operator* and RingBuffer::operator[].
+    ///  See Iterator::operator* and ring_buffer::operator[].
     _rBuf_iterator operator++(int)
     {
         auto temp (*this);

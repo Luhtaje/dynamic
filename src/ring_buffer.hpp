@@ -10,7 +10,7 @@
 /// @tparam T Type of the elements. Must meet the requirement EmplaceCostructible.
 /// @tparam Allocator Allocator used for (de)allocation and (de)construction. Defaults to std::allocator<T>
 template<typename T, typename Allocator = std::allocator<T>> 
-class RingBuffer
+class ring_buffer
 {
 
 public:
@@ -20,8 +20,8 @@ public:
     using const_reference= const T&;
     using pointer = typename T*;
     using const_pointer= typename const T*;
-    using const_iterator = _rBuf_const_iterator<RingBuffer<T>>;
-    using iterator = _rBuf_iterator<RingBuffer<T>>;
+    using const_iterator = _rBuf_const_iterator<ring_buffer<T>>;
+    using iterator = _rBuf_iterator<ring_buffer<T>>;
 
     using difference_type = ptrdiff_t;
     using size_type = std::size_t;
@@ -29,7 +29,7 @@ public:
     /// @brief Default constructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @note Allocates memory for 2 elements. The buffer works on a principle that it never gets full.
-    RingBuffer() : m_headIndex(0), m_tailIndex(0), m_capacity(2)
+    ring_buffer() : m_headIndex(0), m_tailIndex(0), m_capacity(2)
     {
         m_data = m_allocator.allocate(m_capacity);
     }
@@ -37,7 +37,7 @@ public:
     /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any elements.
     /// @param capacity Capacity of the buffer.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
-    RingBuffer(size_type capacity) : m_headIndex(0), m_tailIndex(0), m_capacity(capacity)
+    ring_buffer(size_type capacity) : m_headIndex(0), m_tailIndex(0), m_capacity(capacity)
     {
         m_data = m_allocator.allocate(m_capacity);
     }
@@ -46,7 +46,7 @@ public:
     /// @param size Amount of elements to be initialized in the buffer.
     /// @param val Value which the elements are initialized to.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
-    RingBuffer(size_type size, T val) : m_headIndex(0), m_tailIndex(0), m_capacity(size + 2)
+    ring_buffer(size_type size, T val) : m_headIndex(0), m_tailIndex(0), m_capacity(size + 2)
     {
         m_data = m_allocator.allocate(m_capacity);
         for(int i = 0 ; i < size ;  i++)
@@ -59,7 +59,7 @@ public:
     /// @param begin Iterator to first element of range.
     /// @param end Iterator pointing to past-the-last element of range.
     /// @note Behavior is undefined if elements in range are not initialized.
-    RingBuffer(const_iterator beginIt, const_iterator endIt)
+    ring_buffer(const_iterator beginIt, const_iterator endIt)
     {
         const auto size = endIt - beginIt;
         m_capacity = size + 2;
@@ -73,7 +73,7 @@ public:
     /// @brief Initializer list contructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
-    explicit RingBuffer(std::initializer_list<T> init): m_headIndex(0), m_tailIndex(0), m_capacity(init.size() + 2)
+    explicit ring_buffer(std::initializer_list<T> init): m_headIndex(0), m_tailIndex(0), m_capacity(init.size() + 2)
     {
         m_data = m_allocator.allocate(m_capacity);
         for(const auto& element : init)
@@ -85,7 +85,7 @@ public:
     /// @brief Copy constructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation.
     /// @param rhs Reference to a RingBuffer to create a copy from.
-    RingBuffer(const RingBuffer& rhs) : m_capacity(rhs.m_capacity), m_headIndex(rhs.m_headIndex), m_tailIndex(rhs.m_tailIndex)
+    ring_buffer(const ring_buffer& rhs) : m_capacity(rhs.m_capacity), m_headIndex(rhs.m_headIndex), m_tailIndex(rhs.m_tailIndex)
     {
         m_data = m_allocator.allocate(m_capacity);
         
@@ -95,7 +95,7 @@ public:
 
     /// @brief Move constructor.
     /// @param other Rvalue reference to other buffer.
-    RingBuffer(RingBuffer&& other) noexcept
+    ring_buffer(ring_buffer&& other) noexcept
     {
         m_data = std::exchange(other.m_data, nullptr);
         m_capacity = std::exchange(other.m_capacity, 0);
@@ -104,7 +104,7 @@ public:
     }
 
     /// Destructor.
-    ~RingBuffer()
+    ~ring_buffer()
     {
         // Calls destructor for each element in the buffer.
         if(size()) for_each(begin(),end(),[this](T& elem) { m_allocator.destroy(&elem); });
@@ -347,9 +347,9 @@ public:
     /// @param other Ringbuffer to be copied.
     /// @return Returns reference to the left hand side RungBuffer after swap.
     /// @note Strong exception guarantee. 
-    RingBuffer& operator=(const RingBuffer& other)
+    ring_buffer& operator=(const ring_buffer& other)
     {
-        RingBuffer copy(other);
+        ring_buffer copy(other);
         copy.swap(*this);
         return *this;
     }
@@ -357,9 +357,9 @@ public:
     /// @brief Move assignment operator.
     /// @param other Rvalue ref to other buffer.
     /// @return Reference to the buffer.
-    RingBuffer& operator=(RingBuffer&& other) noexcept
+    ring_buffer& operator=(ring_buffer&& other) noexcept
     {
-        RingBuffer copy(std::move(other));
+        ring_buffer copy(std::move(other));
         copy.swap(*this);
         return *this;
     }
@@ -438,8 +438,8 @@ public:
     }
 
     /// @brief Member swap implementation. Swaps RingBuffers member to member.
-    /// @param other Reference to a RingBuffer to swap with.
-    void swap(RingBuffer& other) noexcept
+    /// @param other Reference to a ring_buffer to swap with.
+    void swap(ring_buffer& other) noexcept
     {
         using std::swap;
         swap(m_data, other.m_data);
@@ -452,7 +452,7 @@ public:
     /// @brief Friend swap.
     /// @param a Swap candidate.
     /// @param b Swap candidate.
-    friend void swap(RingBuffer& a, RingBuffer& b) noexcept
+    friend void swap(ring_buffer& a, ring_buffer& b) noexcept
     {
         a.swap(b);
     }
@@ -514,7 +514,7 @@ public:
         // element to the beginning of the allocated area. Inefficient but linear in complexity related to the length of the buffer, and consecutive calls to data() does not invalidate previous pointer.
 
         // Create a temporary buffer and copy existing buffers elements to the start of the temporary memory.
-        auto temp = RingBuffer<T>(capacity());
+        auto temp = ring_buffer<T>(capacity());
         copy(cbegin(), cend(), temp.begin());
         // Set the head index. Whole point of this copy is to slide the buffer to the start, so tail is correctly at 0 after constructing the temporary buffer.
         temp.m_headIndex = size();
@@ -572,7 +572,7 @@ public:
         if(newCapacity <= m_capacity) return;
 
         // Temporary buffer to take hits if exceptions occur.
-        auto temp =  RingBuffer<T>(newCapacity);
+        auto temp =  ring_buffer<T>(newCapacity);
         temp.m_headIndex = m_headIndex;
         temp.m_tailIndex = m_tailIndex;
 
@@ -804,7 +804,7 @@ private:
         const auto endIt = end();
         const auto beginIt = begin();
 
-        RingBuffer<T> temp(m_capacity);
+        ring_buffer<T> temp(m_capacity);
         temp.m_tailIndex = m_tailIndex;
         temp.m_headIndex = m_headIndex;
 
@@ -817,7 +817,7 @@ private:
         {
             increment(temp.m_headIndex, offset);
             // Iterator to first element after the "cut off" caused by shifting.
-            auto destCutOff = RingBuffer<T>::iterator(&temp, shiftPoint.getIndex() + offset);
+            auto destCutOff = ring_buffer<T>::iterator(&temp, shiftPoint.getIndex() + offset);
             copy(shiftPoint, endIt, destCutOff);
 
             copy(beginIt, shiftPoint, temp.begin());
@@ -825,7 +825,7 @@ private:
         else
         {
             // Iterator to first element after the "cut off" caused by shifting.
-            auto destCutOff = RingBuffer<T>::iterator(&temp, shiftPoint.getIndex());
+            auto destCutOff = ring_buffer<T>::iterator(&temp, shiftPoint.getIndex());
             copy(beginIt, shiftPoint, temp.begin() - offset);
 
             copy(shiftPoint, endIt, destCutOff);
@@ -856,7 +856,7 @@ private:
 /// @param rhs right hand side operand
 /// @return returns true if the buffers elements compare equal.
 template<typename T , typename Alloc>
-inline bool operator==(const RingBuffer<T,Alloc>& lhs, const RingBuffer<T,Alloc>& rhs)
+inline bool operator==(const ring_buffer<T,Alloc>& lhs, const ring_buffer<T,Alloc>& rhs)
 {
     if(lhs.size() != rhs.size())
     {
@@ -881,7 +881,7 @@ inline bool operator==(const RingBuffer<T,Alloc>& lhs, const RingBuffer<T,Alloc>
 /// @param rhs Right hand side operand.
 /// @return returns True if any of the elements are not equal.
 template<typename T,typename Alloc>
-inline bool operator!=(const RingBuffer<T,Alloc>& lhs, const RingBuffer<T,Alloc>& rhs)
+inline bool operator!=(const ring_buffer<T,Alloc>& lhs, const ring_buffer<T,Alloc>& rhs)
 {
     return !(lhs == rhs);
 }
