@@ -44,20 +44,20 @@ ring_buffer<char> CreateBuffer<char>()
 }
 
 //====================
-// By size
+// Random content.
 //====================
 template<class T>
-ring_buffer<T> CreateBuffer(int size)
+ring_buffer<T> CreateBuffer(int /*size*/)
 {
-    return ring_buffer<T>(size);
+    return ring_buffer<T>(TEST_BUFFER_SIZE);
 }
 
 template <>
-ring_buffer<char> CreateBuffer<char>(int size)
+ring_buffer<char> CreateBuffer<char>(int /*size*/)
 {
     srand(time(0));
     auto buf = ring_buffer<char>();
-    for(int i = 0 ; i < size; i++)
+    for(int i = 0 ; i < TEST_BUFFER_SIZE; i++)
     {
         buf.push_back(char(rand() % 26));
     }
@@ -65,11 +65,11 @@ ring_buffer<char> CreateBuffer<char>(int size)
 }
 
 template <>
-ring_buffer<int> CreateBuffer<int>(int size)
+ring_buffer<int> CreateBuffer<int>(int /*size*/)
 {
     srand(time(0));
     auto buf = ring_buffer<int>();
-    for(int i = 0 ; i < size; i++)
+    for(int i = 0 ; i < TEST_BUFFER_SIZE; i++)
     {
         buf.push_back(rand() % 26);
     }
@@ -77,11 +77,11 @@ ring_buffer<int> CreateBuffer<int>(int size)
 }
 
 template <>
-ring_buffer<std::string> CreateBuffer<std::string>(int size)
+ring_buffer<std::string> CreateBuffer<std::string>(int /*size*/)
 {
     srand(time(0));
     auto buf = ring_buffer<std::string>();
-    for(int i = 0 ; i < size; i++)
+    for(int i = 0 ; i < TEST_BUFFER_SIZE; i++)
     {
         std::string someString("");
         for(int j = 0 ; j < 3 ; j++)
@@ -94,9 +94,9 @@ ring_buffer<std::string> CreateBuffer<std::string>(int size)
     return buf;
 }
 
-//===================
-// Random value generators
-//===================
+//===================================
+// Individual random value generators
+//===================================
 
 template <typename T>
 T getValue();
@@ -171,8 +171,8 @@ TYPED_TEST(RingBufferTest, shiftBegin)
 
     // Shift at begin by one, expect elements to be shifted by one.
     t_buffer.shift(beginIt,1);
-    EXPECT_EQ(t_buffer[1], firstVal);
-    EXPECT_EQ(t_buffer[2], secondVal);
+    ASSERT_EQ(t_buffer[1], firstVal);
+    ASSERT_EQ(t_buffer[2], secondVal);
     t_buffer.m_allocator.construct(&(*beginIt), getValue<TypeParam>());
 }
 
@@ -185,9 +185,9 @@ TYPED_TEST(RingBufferTest, shiftMiddle)
 
     // Shift at begin by one, expect elements to be shifted by one.
     t_buffer.shift(middleIt, 1);
-    EXPECT_EQ(*(middleIt + 1), currentVal);
-    EXPECT_EQ(*(middleIt - 1), prevVal);
-    EXPECT_EQ(*(middleIt + 2), nextVal);
+    ASSERT_EQ(*(middleIt + 1), currentVal);
+    ASSERT_EQ(*(middleIt - 1), prevVal);
+    ASSERT_EQ(*(middleIt + 2), nextVal);
 
     t_buffer.m_allocator.construct(&(*middleIt), getValue<TypeParam>());
 }
@@ -200,8 +200,8 @@ TYPED_TEST(RingBufferTest, shiftEnd)
 
     t_buffer.shift(endIt, 1);
 
-    EXPECT_EQ(*(endIt - 1), lastVal);
-    EXPECT_EQ(*(endIt - 2), secondToLastVal);
+    ASSERT_EQ(*(endIt - 1), lastVal);
+    ASSERT_EQ(*(endIt - 2), secondToLastVal);
 
     t_buffer.m_allocator.construct(&(*endIt), getValue<TypeParam>());
 }
@@ -225,25 +225,26 @@ TYPED_TEST(RingBufferTest, copy)
 #endif /*TEST_INTERNALS*/
 
 //==================mainframe ===================//
-// Tests requirement: DefaultConstructible expression T u, T u{}, T(), T{} ; Container expression C();
+// Tests requirement: Container requirement DefaultConstructible expression C u, C u{}, C(), C{}
 TYPED_TEST(RingBufferTest, DefaultConstruction)
 {
     ring_buffer<TypeParam> defaultInitialized;
-    EXPECT_TRUE(defaultInitialized.empty());
+    ASSERT_TRUE(defaultInitialized.empty());
 
     ring_buffer<TypeParam> defaultValueInitialized{};
-    EXPECT_TRUE(defaultValueInitialized.empty());
+    ASSERT_TRUE(defaultValueInitialized.empty());
 
     auto emptyInitialized = ring_buffer<TypeParam>();
-    EXPECT_TRUE(emptyInitialized.empty());
+    ASSERT_TRUE(emptyInitialized.empty());
 
     auto emptyAggregateInitialized = ring_buffer<TypeParam>{};
-    EXPECT_TRUE(emptyAggregateInitialized.empty());
+    ASSERT_TRUE(emptyAggregateInitialized.empty());
 
-    EXPECT_TRUE(std::is_default_constructible<ring_buffer<TypeParam>>::value);
+    ASSERT_TRUE(std::is_default_constructible<ring_buffer<TypeParam>>::value);
 }
 
-TYPED_TEST(RingBufferTest, CopyConstruction)
+// Tests requirement: Container requirement CopyConstructible, expression C(a)
+TYPED_TEST(RingBufferTest, copyConstruction)
 {
     ring_buffer<TypeParam> copy(t_buffer);
     ASSERT_EQ(copy, t_buffer);
@@ -251,89 +252,122 @@ TYPED_TEST(RingBufferTest, CopyConstruction)
 
 }
 
-TYPED_TEST(RingBufferTest, CopyAssignment)
+// Tests requirement: Container expression a = b
+TYPED_TEST(RingBufferTest, copyAssignment)
 {
     ring_buffer<TypeParam> control = t_buffer;
     ASSERT_EQ(control, t_buffer);
     ASSERT_TRUE(std::is_copy_assignable<ring_buffer<TypeParam>>::value);
 }
 
-TYPED_TEST(RingBufferTest, RangeConstruction)
-{
-    ring_buffer<TypeParam> rangeConstructed(t_buffer.begin(), t_buffer.end());
-    EXPECT_EQ(rangeConstructed, t_buffer);
-
-    const auto ranged = ring_buffer<TypeParam>(t_buffer.begin(), t_buffer.end());
-    EXPECT_EQ(ranged, t_buffer);
-}
-
-
-TYPED_TEST(RingBufferTest, MoveConstruction)
+// Tests requirement: Container expression C(rv)
+TYPED_TEST(RingBufferTest, moveConstruction)
 {
     ring_buffer<TypeParam> copy(t_buffer);
-    EXPECT_EQ(t_buffer.empty(), false);
+    ASSERT_EQ(t_buffer.empty(), false);
 
     ring_buffer<TypeParam> moved(std::move(t_buffer));
 
-    EXPECT_EQ(moved, copy);
-    EXPECT_EQ(t_buffer.size(), 0);
+    ASSERT_EQ(moved, copy);
+    ASSERT_EQ(t_buffer.size(), 0);
 
     ASSERT_TRUE(std::is_move_constructible<ring_buffer<TypeParam>>::value);
 }
 
-TYPED_TEST(RingBufferTest, MoveAssign)
+// Tests requirement: Container expression a = rv
+TYPED_TEST(RingBufferTest, moveAssign)
 {
     const auto copy(t_buffer);
     const auto moved = std::move(t_buffer);
 
     ASSERT_EQ(copy, moved);
-    EXPECT_EQ(t_buffer.size(), 0);
+    ASSERT_EQ(t_buffer.size(), 0);
 
     ASSERT_TRUE(std::is_move_assignable<ring_buffer<TypeParam>>::value);
 }
 
-TYPED_TEST(RingBufferTest, SizeValConstruction)
+// Tests requirement: SequenceContainer expression X a(n, t), X (n, t)
+TYPED_TEST(RingBufferTest, sizeValConstruction)
 {
     const auto value = getValue<TypeParam>();
-    ring_buffer<TypeParam> sizeVal (TEST_BUFFER_SIZE, value);
-    ring_buffer<TypeParam>::iterator it = sizeVal.begin();
+    ring_buffer<TypeParam> sizeVal(TEST_BUFFER_SIZE, value);
 
-    EXPECT_EQ(sizeVal.size(), TEST_BUFFER_SIZE);
-    ++it;
-    EXPECT_EQ(*it, value);
-    EXPECT_EQ(*it, sizeVal[TEST_BUFFER_SIZE-1]);
+    ASSERT_EQ(sizeVal.size(), TEST_BUFFER_SIZE);
+
+    for (auto elem : sizeVal)
+    {
+        ASSERT_EQ(elem, value);
+    }
+
+    const auto sizeRval = ring_buffer<TypeParam>(TEST_BUFFER_SIZE, value);
+
+    ASSERT_EQ(sizeVal, sizeRval);
 }
 
+// Tests requirement: SequenceContainer expression X a(i, j), X (i,j)
+TYPED_TEST(RingBufferTest, rangeConstruction)
+{
+    ring_buffer<TypeParam> rangeConstructed(t_buffer.begin(), t_buffer.end());
+    ASSERT_EQ(rangeConstructed, t_buffer);
 
-TYPED_TEST(RingBufferTest, InitListConstruction)
+    const auto ranged = ring_buffer<TypeParam>(t_buffer.begin(), t_buffer.end());
+    ASSERT_EQ(ranged, t_buffer);
+}
+
+// Tests requirement: SequenceContainer expression X(il)
+TYPED_TEST(RingBufferTest, initListConstruction)
 {
     const auto firstElem = getValue<TypeParam>();
     const auto secondElem = getValue<TypeParam>();
     const auto ThirdElem = getValue<TypeParam>();
     ring_buffer<TypeParam> buf{firstElem, secondElem, ThirdElem};
 
-    EXPECT_EQ(buf.size(), 3);
-    EXPECT_EQ(buf[0], firstElem);
-    EXPECT_EQ(buf[1], secondElem);
-    EXPECT_EQ(buf[2], ThirdElem);
+    ASSERT_EQ(buf.size(), 3);
+    ASSERT_EQ(buf[0], firstElem);
+    ASSERT_EQ(buf[1], secondElem);
+    ASSERT_EQ(buf[2], ThirdElem);
 }
 
-TYPED_TEST(RingBufferTest, EqualityComparable)
+// Tests requirement: SequenceContainer expression a = il
+TYPED_TEST(RingBufferTest, assignInitListOperator)
+{
+    std::initializer_list<TypeParam> initList{ static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()) };
+
+    t_buffer = initList;
+
+    for (auto i = 0; i < initList.size(); i++)
+    {
+        ASSERT_EQ(t_buffer[i], *(initList.begin() + i));
+    }
+    ASSERT_EQ(t_buffer.size(), initList.size());
+}
+
+// Tests requirement: SequenceContainer expression a.emplace(p, args) where p is position iterator.
+TYPED_TEST(RingBufferTest, emplace)
+{
+    auto it = t_buffer.begin();
+    ++it;
+
+    //t_buffer.emplace(it,59);
+}
+
+// Tests requirement: ?
+TYPED_TEST(RingBufferTest, equalityComparable)
 {
     ring_buffer<TypeParam> copy(t_buffer);
-    EXPECT_TRUE(copy == t_buffer);
+    ASSERT_TRUE(copy == t_buffer);
 
     copy.pop_back();
-    EXPECT_TRUE(copy != t_buffer);
+    ASSERT_TRUE(copy != t_buffer);
 
     t_buffer.pop_back();
-    EXPECT_TRUE(copy == t_buffer);
+    ASSERT_TRUE(copy == t_buffer);
 
     const auto randomBuffer(CreateBuffer<TypeParam>(TEST_BUFFER_SIZE));
-    EXPECT_TRUE(randomBuffer != t_buffer);
+    ASSERT_TRUE(randomBuffer != t_buffer);
 }
 
-TYPED_TEST(RingBufferTest, AccessOperator)
+TYPED_TEST(RingBufferTest, accessOperator)
 {
     const auto frontVal = getValue<TypeParam>();
     t_buffer.push_front(frontVal);
@@ -344,48 +378,48 @@ TYPED_TEST(RingBufferTest, AccessOperator)
     ASSERT_EQ(backVal, t_buffer[t_buffer.size() -1]);
 }
 
-TYPED_TEST(RingBufferTest, Swap)
+TYPED_TEST(RingBufferTest, swap)
 {
     using std::swap;
     auto control = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
     auto experiment1(control);
-    EXPECT_EQ(control, experiment1);
+    ASSERT_EQ(control, experiment1);
 
     swap(experiment1, t_buffer);
 
-    EXPECT_EQ(control, t_buffer);
-    EXPECT_NE(control, experiment1);
+    ASSERT_EQ(control, t_buffer);
+    ASSERT_NE(control, experiment1);
 }
 
-TYPED_TEST(RingBufferTest, Size)
+TYPED_TEST(RingBufferTest, size)
 {
-    EXPECT_EQ(t_buffer.size(), std::distance(t_buffer.cbegin(), t_buffer.cend()));
+    ASSERT_EQ(t_buffer.size(), std::distance(t_buffer.cbegin(), t_buffer.cend()));
 
     ring_buffer<TypeParam> emptyBuf(0);
-    EXPECT_EQ(emptyBuf.size(), 0);
+    ASSERT_EQ(emptyBuf.size(), 0);
 }
 
 TYPED_TEST(RingBufferTest, MaxSize)
 {
     // Yeah.
-    EXPECT_NE(t_buffer.max_size(), 1);
+    ASSERT_NE(t_buffer.max_size(), 1);
 }
 
-TYPED_TEST(RingBufferTest, Empty)
+TYPED_TEST(RingBufferTest, empty)
 {
     ring_buffer<TypeParam> control;
     ring_buffer<TypeParam>::iterator begin = control.begin();
     ring_buffer<TypeParam>::iterator end = control.end();
     
-    EXPECT_EQ(control.end(), control.begin());
-    EXPECT_EQ(begin, end);
+    ASSERT_EQ(control.end(), control.begin());
+    ASSERT_EQ(begin, end);
 
-    EXPECT_TRUE(control.empty());
+    ASSERT_TRUE(control.empty());
     ASSERT_FALSE(t_buffer.empty());
 
 }
 
-TYPED_TEST(RingBufferTest, Data)
+TYPED_TEST(RingBufferTest, data)
 {
     ring_buffer<TypeParam> myBuf;
     myBuf.reserve(5);
@@ -414,27 +448,27 @@ TYPED_TEST(RingBufferTest, pushBack)
     // Push few times to make buffer allocate more memory.
     const auto someVal = getValue<TypeParam>();
     t_buffer.push_back(someVal);
-    EXPECT_EQ(t_buffer.back(), someVal);
+    ASSERT_EQ(t_buffer.back(), someVal);
 
     const auto someVal2 = getValue<TypeParam>();
     t_buffer.push_back(someVal2);
-    EXPECT_EQ(t_buffer.back(), someVal2);
+    ASSERT_EQ(t_buffer.back(), someVal2);
 
     const auto someVal3 = getValue<TypeParam>();
     t_buffer.push_back(someVal3);
-    EXPECT_EQ(t_buffer.back(), someVal3);
+    ASSERT_EQ(t_buffer.back(), someVal3);
 
     const auto someVal4 = getValue<TypeParam>();
     t_buffer.push_back(someVal4);
-    EXPECT_EQ(t_buffer.back(),someVal4);
+    ASSERT_EQ(t_buffer.back(),someVal4);
 
     const auto someVal5 = getValue<TypeParam>();
     t_buffer.push_back(someVal5);
-    EXPECT_EQ(t_buffer.back(), someVal5);
+    ASSERT_EQ(t_buffer.back(), someVal5);
 
     const auto someVal6 = getValue<TypeParam>();
     t_buffer.push_back(someVal6);
-    EXPECT_EQ(t_buffer.back(), someVal6);
+    ASSERT_EQ(t_buffer.back(), someVal6);
 }
 
 TYPED_TEST(RingBufferTest, pushBackRV)
@@ -442,7 +476,7 @@ TYPED_TEST(RingBufferTest, pushBackRV)
     auto refBuffer = CreateBuffer<TypeParam>();
 
     // Push rval ref to buffer, check against refValue.
-    for(auto i = 0; i < TEST_BUFFER_SIZE ; i++)
+    for(size_t i = 0; i < TEST_BUFFER_SIZE ; i++)
     {
         const auto moveValue = getValue<TypeParam>();
         const auto refValue = moveValue;
@@ -456,7 +490,7 @@ TYPED_TEST(RingBufferTest, popBack)
 {
     const auto refBuffer(t_buffer);
     t_buffer.pop_back();
-    for(auto i = 0; i < t_buffer.size(); i++)
+    for(size_t i = 0; i < t_buffer.size(); i++)
     {
         ASSERT_EQ(t_buffer[i], refBuffer[i]);
     }
@@ -468,27 +502,27 @@ TYPED_TEST(RingBufferTest, pushFront)
     // Push few times to make buffer allocate more memory.
     const auto someVal = getValue<TypeParam>();
     t_buffer.push_front(someVal);
-    EXPECT_EQ(t_buffer.front(), someVal);
+    ASSERT_EQ(t_buffer.front(), someVal);
 
     const auto someVal2 = getValue<TypeParam>();
     t_buffer.push_front(someVal2);
-    EXPECT_EQ(t_buffer.front(), someVal2);
+    ASSERT_EQ(t_buffer.front(), someVal2);
 
     const auto someVal3 = getValue<TypeParam>();
     t_buffer.push_front(someVal3);
-    EXPECT_EQ(t_buffer.front(), someVal3);
+    ASSERT_EQ(t_buffer.front(), someVal3);
 
     const auto someVal4 = getValue<TypeParam>();
     t_buffer.push_front(someVal4);
-    EXPECT_EQ(t_buffer.front(), someVal4);
+    ASSERT_EQ(t_buffer.front(), someVal4);
 
     const auto someVal5 = getValue<TypeParam>();
     t_buffer.push_front(someVal5);
-    EXPECT_EQ(t_buffer.front(), someVal5);
+    ASSERT_EQ(t_buffer.front(), someVal5);
 
     const auto someVal6 = getValue<TypeParam>();
     t_buffer.push_front(someVal6);
-    EXPECT_EQ(t_buffer.front(), someVal6);
+    ASSERT_EQ(t_buffer.front(), someVal6);
 }
 
 TYPED_TEST(RingBufferTest, pushFrontRV)
@@ -496,7 +530,7 @@ TYPED_TEST(RingBufferTest, pushFrontRV)
     auto refBuffer = CreateBuffer<TypeParam>();
 
     // Push rval ref to buffer, check against refValue.
-    for(auto i = 0; i < TEST_BUFFER_SIZE ; i++)
+    for(size_t i = 0; i < TEST_BUFFER_SIZE ; i++)
     {
         const auto moveValue = getValue<TypeParam>();
         const auto refValue = moveValue;
@@ -505,13 +539,13 @@ TYPED_TEST(RingBufferTest, pushFrontRV)
     }
 }
 
-TYPED_TEST(RingBufferTest, Front)
+TYPED_TEST(RingBufferTest, front)
 {
-    EXPECT_EQ(t_buffer.front(), *t_buffer.begin());
+    ASSERT_EQ(t_buffer.front(), *t_buffer.begin());
 }
 
 // Tests requirement: SequenceContainer, Insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
-TYPED_TEST(RingBufferTest, Insert)
+TYPED_TEST(RingBufferTest, insert)
 {
     const auto beginIt = t_buffer.begin();
     const auto size = t_buffer.size();
@@ -530,7 +564,7 @@ TYPED_TEST(RingBufferTest, Insert)
 }
 
 // Tests requiremet: SequenceContainer, Insert() expression a.insert(a, rv) where a is a postion iterator and rv is an rvalue.
-TYPED_TEST(RingBufferTest, InsertRV)
+TYPED_TEST(RingBufferTest, insertRV)
 {
     const auto it = t_buffer.begin();
     const auto size = t_buffer.size();
@@ -544,7 +578,7 @@ TYPED_TEST(RingBufferTest, InsertRV)
 }
 
 // Tests requirement: SequenceContainer, insert() exprssion a.insert(p, n, t) where p is position iterator, n is a size_type and t is a value of value type a::value_type.
-TYPED_TEST(RingBufferTest, InsertSizeVal)
+TYPED_TEST(RingBufferTest, insertSizeVal)
 {
     const auto amount = 3;
     const auto insertPosIndex = 2;
@@ -556,13 +590,13 @@ TYPED_TEST(RingBufferTest, InsertSizeVal)
     t_buffer.insert(insertPosIt, amount, value);
 
     // Check inserted elements are correct
-    for(auto i = 0; i < amount; i++)
+    for(size_t i = 0; i < amount; i++)
     {
         ASSERT_EQ(t_buffer[i + insertPosIndex], value);
     }
 
     // Check buffer outside inserted elements remains untouched.
-    for(auto i = 0; i < refBuffer.size(); i++)
+    for(size_t i = 0; i < refBuffer.size(); i++)
     {
         if(i < insertPosIndex)
         {
@@ -593,7 +627,7 @@ TYPED_TEST(RingBufferTest, insertRange)
     const auto returnIt = t_buffer.insert(posIt, rangeBeginIt, rangeEndIt);
 
     // Verify buffer state.
-    for(auto i = 0; i < refBuffer.size(); i ++)
+    for(size_t i = 0; i < refBuffer.size(); i ++)
     {
         // Check beginning of buffer is unchanged
         if(i < pos)
@@ -608,7 +642,7 @@ TYPED_TEST(RingBufferTest, insertRange)
         // Check range is inserted correctly.
     }
 
-    for(auto i = 0; i < amount ; i++)
+    for(size_t i = 0; i < amount ; i++)
     {
         ASSERT_EQ(returnIt[i], posIt[i]);
         ASSERT_EQ(rangeSource[beginOffset + i], t_buffer[pos + i]);
@@ -625,7 +659,7 @@ TYPED_TEST(RingBufferTest, insertInitializerList)
 
     t_buffer.insert(posIt, initList);
 
-    for(auto i = 0; i < t_buffer.size(); i++)
+    for(size_t i = 0; i < t_buffer.size(); i++)
     {
         if(i < pos || (pos + initList.size()) < i)
         {
@@ -668,7 +702,7 @@ TYPED_TEST(RingBufferTest, eraseLast)
     ASSERT_EQ(erasedIt, t_buffer.end());
     ASSERT_EQ(newLastValue, *erasedIt);
 
-    for(auto i = 0; i < t_buffer.size(); i++)
+    for(size_t i = 0; i < t_buffer.size(); i++)
     {
         ASSERT_EQ(refBuffer[i], t_buffer[i]);
     }
@@ -686,7 +720,7 @@ TYPED_TEST(RingBufferTest, eraseRange)
     const auto erasedIt = t_buffer.erase(beginIt, endIt);
     ASSERT_EQ(refValue, *erasedIt);
 
-    for(auto i = 0; i < beginIndex; i++)
+    for(size_t i = 0; i < beginIndex; i++)
     {
         ASSERT_EQ(refBuffer[i], t_buffer[i]);
     }
@@ -707,30 +741,6 @@ TYPED_TEST(RingBufferTest, clear)
     t_buffer[0];
 }
 
-// Tests requirement: SequenceContainer, assign(i, j) where i and j are a valid range.
-TYPED_TEST(RingBufferTest, assignRange)
-{
-    ring_buffer<TypeParam> sourceBuffer(CreateBuffer<TypeParam>());
-    const auto rangeSize = 4;
-    const auto beginOffset = 1;
-    const auto rangeBeginIt = sourceBuffer.begin() + beginOffset;
-    const auto rangeEndIt = rangeBeginIt + rangeSize;
-
-    t_buffer.assign(rangeBeginIt, rangeEndIt);
-
-    for(auto i = 0; i < rangeSize; i++)
-    {
-        ASSERT_EQ(t_buffer[i], sourceBuffer[i + beginOffset]);
-    }
-
-    t_buffer.assign(sourceBuffer.begin(), sourceBuffer.end());
-
-    for(auto i = 0; i < sourceBuffer.size(); i++)
-    {
-        ASSERT_EQ(t_buffer[i], sourceBuffer[i]);
-    }
-}
-
 // Tests requirement: SequenceContainer, assign(initializerList)
 TYPED_TEST(RingBufferTest, assignInitList)
 {
@@ -738,7 +748,7 @@ TYPED_TEST(RingBufferTest, assignInitList)
 
     t_buffer.assign(initList);
 
-    for(auto i = 0; i < initList.size(); i++)
+    for(size_t i = 0; i < initList.size(); i++)
     {
         ASSERT_EQ(t_buffer[i], *(initList.begin() + i));
     }
@@ -754,29 +764,54 @@ TYPED_TEST(RingBufferTest, assignSizeVal)
 
     t_buffer.assign(size, value);
 
-    for(auto i = 0; i < t_buffer.size(); i++)
+    for(size_t i = 0; i < t_buffer.size(); i++)
     {
         ASSERT_EQ(t_buffer[i], value);
     }
     ASSERT_EQ(t_buffer.size(), size);
 }
 
+// Tests requirement: SequenceContainer assign(i, j) where i and j are a valid range.
+TYPED_TEST(RingBufferTest, assignRange)
+{
+    ring_buffer<TypeParam> sourceBuffer(CreateBuffer<TypeParam>());
+    const auto rangeSize = 4;
+    const auto beginOffset = 1;
+    const auto rangeBeginIt = sourceBuffer.begin() + beginOffset;
+    const auto rangeEndIt = rangeBeginIt + rangeSize;
+
+    t_buffer.assign(rangeBeginIt, rangeEndIt);
+
+    for (size_t i = 0; i < rangeSize; i++)
+    {
+        ASSERT_EQ(t_buffer[i], sourceBuffer[i + beginOffset]);
+    }
+
+    t_buffer.assign(sourceBuffer.begin(), sourceBuffer.end());
+
+    for (size_t i = 0; i < sourceBuffer.size(); i++)
+    {
+        ASSERT_EQ(t_buffer[i], sourceBuffer[i]);
+    }
+}
+
+
 TYPED_TEST(RingBufferTest, at)
 {
-    for(auto i = 0; i < t_buffer.size(); i++)
+    for(size_t i = 0; i < t_buffer.size(); i++)
     {
         ASSERT_EQ(t_buffer[i], t_buffer.at(i));
     }
 
     const auto const_buffer(t_buffer);
-    for(auto i = 0; i < t_buffer.size(); i++)
+    for(size_t i = 0; i < t_buffer.size(); i++)
     {
         ASSERT_EQ(const_buffer[i], const_buffer.at(i));
     }
 
     // Test OB access.
-    EXPECT_THROW(t_buffer.at(6), std::out_of_range);
-    EXPECT_THROW(const_buffer.at(6), std::out_of_range);
+    ASSERT_THROW(t_buffer.at(6), std::out_of_range);
+    ASSERT_THROW(const_buffer.at(6), std::out_of_range);
 }
 
 }

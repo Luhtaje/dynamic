@@ -28,28 +28,48 @@ public:
 
     /// @brief Default constructor.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
-    /// @note Allocates memory for 2 elements. The buffer works on a principle that it never gets full.
+    /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @note Allocates memory for 2 elements but buffer is initialized to 0 size.
+    /// @details Constant complexity.
     ring_buffer() : m_headIndex(0), m_tailIndex(0), m_capacity(2)
+    {
+        m_data = m_allocator.allocate(m_capacity);
+    }
+
+    /// @brief Constructs the container with a custom allocator.
+    /// @param alloc Custom allocator for the buffer.
+    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
+    /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @note Allocates memory for 2 elements but buffer is initialized to 0 size.
+    /// @details Constant complexity.
+    explicit ring_buffer(const allocator_type& alloc) : m_headIndex(0), m_tailIndex(0), m_capacity(2), m_allocator(alloc)
     {
         m_data = m_allocator.allocate(m_capacity);
     }
 
     /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any elements.
     /// @param capacity Capacity of the buffer.
-    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
-    ring_buffer(size_type capacity) : m_headIndex(0), m_tailIndex(0), m_capacity(capacity)
+    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
+    /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @details Linear complexity in relation to count.
+    explicit ring_buffer(size_type count, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
     {
         m_data = m_allocator.allocate(m_capacity);
+        for (size_t i = 0; i < count; i++)
+        {
+            m_allocator.construct(m_data + i);
+            increment(m_headIndex);
+        }
     }
 
     /// @brief Custom constructor. Constructs the buffer and initializes all of its elements to a given value.
     /// @param size Amount of elements to be initialized in the buffer.
     /// @param val Value which the elements are initialized to.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
-    ring_buffer(size_type size, T val) : m_headIndex(0), m_tailIndex(0), m_capacity(size + 2)
+    ring_buffer(size_type count, const reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
     {
         m_data = m_allocator.allocate(m_capacity);
-        for(int i = 0 ; i < size ;  i++)
+        for(size_t i = 0 ; i < count ;  i++)
         {
             push_back(val);
         }
@@ -107,7 +127,7 @@ public:
     ~ring_buffer()
     {
         // Calls destructor for each element in the buffer.
-        if(size()) for_each(begin(),end(),[this](T& elem) { m_allocator.destroy(&elem); });
+        for_each(begin(),end(),[this](T& elem) { m_allocator.destroy(&elem); });
 
         // After destruction deallocate the memory.
         m_allocator.deallocate(m_data, m_capacity);
@@ -241,9 +261,9 @@ public:
             shift(pos, 1);
         }
 
-        m_allocator.construct(&(*pos), std::forward<Args>(args)...):
+        m_allocator.construct(&(*pos), std::forward<Args>(args)...);
         increment(m_headIndex);
-        return pos;
+        return iterator(this, pos.getIndex());
     }
 
     /// @brief Erase an element at a given position.
@@ -260,7 +280,7 @@ public:
         // Destroy element and move remaining elements to fill the void.
         m_allocator.destroy(&pos);
         decrement(m_headIndex);
-        for(auto i = 0; i + posIndex + 1 < endIndex; i++)
+        for(size_t i = 0; i + posIndex + 1 < endIndex; i++)
         {
             // Move elements back one by one.
             it[i] = std::move(it[i + 1]);
@@ -285,7 +305,7 @@ public:
         iterator it(this, first.getIndex());
 
         // Destroy elements
-        for(auto i = 0; i <= rangeSize; i++)
+        for(size_t i = 0; i <= rangeSize; i++)
         {
             it = erase(first);
         }
@@ -293,8 +313,8 @@ public:
         return it;
     }
 
-    /// @brief Destroys all elements in a buffer.
-    /// @note All references, pointers and iterators are invalidated. Leaves capacity unchanged.
+    /// @brief Destroys all elements in a buffer. Does not modify capacity.
+    /// @post All existing references, pointers and iterators are to be considered invalid.
     void clear()
     {
         for(m_tailIndex; m_tailIndex < m_headIndex ; m_tailIndex++)
@@ -308,7 +328,7 @@ public:
 
     /// @brief Replaces the elements in the buffer with copy of [sourceBegin, sourceEnd)
     /// @pre T is CopyConstructible and [sourceBegin, sourceEnd) are not in the buffer.
-    /// @post All existing pointers, references and iterators are to be considered invalid.
+    /// @post All existing references, pointers and iterators are to be considered invalid.
     void assign(const_iterator sourceBegin, const_iterator sourceEnd)
     {
         clear();
@@ -320,12 +340,13 @@ public:
 
     /// @brief Replaces the elements in the buffer.
     /// @param list Initializer list containing the elements to replace the existing ones.
-    /// @pre T is EmplaceConstructible.
+    /// @pre T is CopyInsertable.
+    /// @post All existing references, pointers and iterators are to be considered invalid.
     /// @note Leaves capacity of the buffer unchanged.
     void assign(std::initializer_list<T> list)
     {
         clear();
-        for(auto i = 0; i < list.size(); i++)
+        for(size_t i = 0; i < list.size(); i++)
         {
             push_back(*(list.begin() + i));
         }
@@ -361,6 +382,18 @@ public:
     {
         ring_buffer copy(std::move(other));
         copy.swap(*this);
+        return *this;
+    }
+
+    /// @brief Initializer list assign operator.
+    /// @param init Initializer list to assign to the buffer.
+    /// @return Returns a reference to the buffer.
+    /// @pre T is CopyInsertable.
+    /// @post All existing iterators and pointers have undefined behaviour after the operation. 
+    /// @note Internally calls assign(), which destroys all elements before Copy Inserting from initializer list.
+    ring_buffer& operator=(std::initializer_list<T> init)
+    {
+        assign(init);
         return *this;
     }
 
@@ -540,12 +573,13 @@ public:
         {
             return m_headIndex + m_capacity - m_tailIndex;
         }
+
         return m_headIndex - m_tailIndex;
     }
 
     size_type max_size() const noexcept
     {
-        const auto maxSize = std::numeric_limits<std::size_t>::max();
+        constexpr auto maxSize = std::numeric_limits<std::size_t>::max();
         return maxSize / sizeof(T);
     }
 
@@ -733,11 +767,11 @@ private:
     void increment(size_t& index) noexcept
     {   
         ++index;
-        // Reaching equal is past the last element, then wraps around.
-        // if(index >= m_capacity)
-        // {
-        //     index = 0;
-        // }
+        //Reaching equal is past the last element, then wraps around.
+        if(index >= m_capacity)
+        {
+            index = 0;
+        }
     }
 
     /// @brief Increments an index multiple times.

@@ -10,7 +10,7 @@ ring_buffer<int> itControl {6,4,2,1,3,5};
 //================Iterators=================//
 
 
-//Tests requirement: LegacyForwardIterator / DefaultConstructible
+//Tests requirement: LegacyForwardIterator requirement DefaultConstructible
 TEST(Iterators, DefaultConstructible)
 {
     // After making iterator internals private, need to figure out something else for test.
@@ -33,7 +33,7 @@ TEST(Iterators, DefaultConstructible)
     EXPECT_EQ(std::is_default_constructible<ring_buffer<int>::const_iterator>::value, true);
 }
 
-// Tests requirement: LegacyInputIterator / EqualityComparable
+// Tests requirement: LegacyInputIterator requirement EqualityComparable
 TEST(Iterators, EqualityComparable)
 {
     const auto begin(itControl.begin());
@@ -98,11 +98,11 @@ TEST(Iterators, Destructible)
 // Tests requirement: CopyAssignable / MoveAssignable
 TEST(Iterators, MoveAssignable)
 {
-    const auto beginIt = itControl.begin();
+    auto beginIt = itControl.begin();
     ring_buffer<int>::iterator moveAssigned;
     moveAssigned = std::move(beginIt);
 
-    const auto cbeginIt = itControl.cbegin();
+    auto cbeginIt = itControl.cbegin();
     ring_buffer<int>::const_iterator cmoveAssigned;
     cmoveAssigned = std::move(cbeginIt);
 
@@ -131,7 +131,7 @@ TEST(Iterators, CopyAssignable)
 // Tests requirement: CopyConstructible / MoveConstucrible
 TEST(Iterators, MoveConstructible)
 {
-    const auto it = itControl.begin();
+    auto it = itControl.begin();
     const auto movedIt(std::move(it));
 
     const auto cit = itControl.cbegin();
