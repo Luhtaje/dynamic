@@ -31,9 +31,8 @@ public:
     /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
     /// @note Allocates memory for 2 elements but buffer is initialized to 0 size.
     /// @details Constant complexity.
-    ring_buffer() : m_headIndex(0), m_tailIndex(0), m_capacity(2)
+    ring_buffer() : ring_buffer(0)
     {
-        m_data = m_allocator.allocate(m_capacity);
     }
 
     /// @brief Constructs the container with a custom allocator.
@@ -42,9 +41,22 @@ public:
     /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
     /// @note Allocates memory for 2 elements but buffer is initialized to 0 size.
     /// @details Constant complexity.
-    explicit ring_buffer(const allocator_type& alloc) : m_headIndex(0), m_tailIndex(0), m_capacity(2), m_allocator(alloc)
+    explicit ring_buffer(const allocator_type& alloc) : ring_buffer(0, alloc)
+    {
+    }
+
+    /// @brief Constructs the buffer to a size with given values and optionally a custom allocator.
+    /// @param size Amount of elements to be initialized in the buffer.
+    /// @param val Reference to a value which the elements are initialized to.
+    /// @param alloc Custom allocator.
+    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
+    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
     {
         m_data = m_allocator.allocate(m_capacity);
+        for (size_t i = 0; i < count; i++)
+        {
+            push_back(val);
+        }
     }
 
     /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any elements.
@@ -62,44 +74,33 @@ public:
         }
     }
 
-    /// @brief Custom constructor. Constructs the buffer and initializes all of its elements to a given value.
-    /// @param size Amount of elements to be initialized in the buffer.
-    /// @param val Value which the elements are initialized to.
-    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
-    ring_buffer(size_type count, const reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
+    /// @brief Construct the buffer from range [begin,end).
+    /// @param beginIt Iterator to first element of range.
+    /// @param endIt Iterator pointing to past-the-last element of range.
+    /// @exception Might throw std::bad_alloc if there is not enough memory available for allocation.
+    /// @details Linear complexity in relation to the size of the range.
+    /// @note Behavior is undefined if elements in range are not valid.
+    template<typename InputIt>
+    ring_buffer(InputIt beginIt, InputIt endIt)
     {
-        m_data = m_allocator.allocate(m_capacity);
-        for(size_t i = 0 ; i < count ;  i++)
-        {
-            push_back(val);
-        }
-    }
-
-    /// @brief Custom constructor. Construct the buffer from range [begin,end).
-    /// @param begin Iterator to first element of range.
-    /// @param end Iterator pointing to past-the-last element of range.
-    /// @note Behavior is undefined if elements in range are not initialized.
-    ring_buffer(const_iterator beginIt, const_iterator endIt)
-    {
-        const auto size = endIt - beginIt;
+        const auto size = std::distance<InputIt>(beginIt , endIt);
         m_capacity = size + 2;
-        m_data = m_allocator.allocate(m_capacity);
         m_headIndex = size;
         m_tailIndex = 0;
+        m_data = m_allocator.allocate(m_capacity);
 
-        copy(beginIt, endIt, begin());
+        for (size_t i = 0; i < size; i++)
+        {
+            m_allocator.construct(m_data + i, *(beginIt + i));
+        }
     }
 
     /// @brief Initializer list contructor.
+    /// @param init Initializer list to initialize the buffer from.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
-    explicit ring_buffer(std::initializer_list<T> init): m_headIndex(0), m_tailIndex(0), m_capacity(init.size() + 2)
+    explicit ring_buffer(std::initializer_list<T> init): ring_buffer(init.begin(),init.end())
     {
-        m_data = m_allocator.allocate(m_capacity);
-        for(const auto& element : init)
-        {
-            push_back(element);
-        }
     }
 
     /// @brief Copy constructor.
@@ -146,10 +147,7 @@ public:
             reserve(m_capacity * 1.5);
         }
 
-        shift(pos, 1);
-        m_allocator.construct(&(*pos), value); 
-
-        return iterator(this, pos.getIndex());
+        return insertBase(pos, 1, value);
     }
 
     /// @brief Inserts an element to the buffer.
@@ -165,10 +163,7 @@ public:
             reserve(m_capacity * 1.5);
         }
 
-        shift(pos, 1);
-        m_allocator.construct(&(*pos), std::move(value));
-
-        return iterator(this, pos.getIndex());
+        return insertBase(pos, 1, std::move(value));
     }
 
     /// @brief Inserts an element to the buffer.
@@ -176,20 +171,14 @@ public:
     /// @param value Value to insert. T must meet the requirements of CopyInsertable.
     /// @return Iterator that pos to the inserted element.
     /// @throw Can throw std::bad_alloc, or something from element construction.
-    iterator insert(iterator pos, const size_type amount, const value_type& value)
+    iterator insert(const_iterator pos, const size_type amount, const value_type& value)
     {
         while(m_capacity - 1 <= size() + amount)
         {
             reserve(m_capacity * 1.5);
         }
 
-        shift(pos, amount);
-        for(int i = 0; i < amount; i++)
-        {
-            m_allocator.construct(&pos[i], value);
-        }
-
-        return pos;
+        return insertBase(pos, amount, value);
     }
 
     /// @brief Inserts a range of elements into the buffer to a specific position.
@@ -203,22 +192,7 @@ public:
     /// @exception Can throw std::bad_alloc, TODO and is this strong or basic or weak guarantee? shift should not throw but... it could?
     iterator insert(const_iterator pos, const_iterator sourceBegin, const_iterator sourceEnd)
     {
-        const auto amount = sourceEnd - sourceBegin;
-        while(m_capacity - 1 <= size() + amount)
-        {
-            reserve(m_capacity * 1.5);
-        }
-
-        shift(pos, amount);
-        for(int i = 0; i < amount; i++)
-        {
-            m_allocator.construct(&pos[i], *(sourceBegin + i));
-        }
-
-        auto destIt = iterator(this, pos.getIndex());
-        copy(sourceBegin, sourceEnd, destIt);
-
-        return destIt;
+        return insertRangeBase(pos,sourceBegin, sourceEnd);
     }
 
     /// @brief Inserts initializer list to buffer.
@@ -228,20 +202,7 @@ public:
     /// @return Returns Iterator to the first element inserted, or the element pointed by pos if the initializer list was empty.
     iterator insert(const_iterator pos, std::initializer_list<T> list)
     {
-        const auto amount = list.size();
-        while(m_capacity - 1 <= size() + amount)
-        {
-            reserve(m_capacity * 1.5);
-        }
-
-        auto destIt = iterator(this, pos.getIndex());
-
-        for(auto i= 0; i < amount; i++)
-        {
-            m_allocator.construct(&destIt[i], *(list.begin() + i));
-        }
-
-        return destIt;
+        return insertRangeBase(pos, list.begin(), list.end());
     }
 
     template<class... Args>
@@ -618,7 +579,7 @@ public:
         }
 
         // Copy to temp memory.
-        copy(cbegin(), cend(), temp.begin());
+        temp.assign(cbegin(), cend());
 
         // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
         this->swap(temp);
@@ -668,7 +629,7 @@ public:
     /// @param val Value of type T to be appended.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
     /// @exception If any exception is thrown, this function retains invariants. Basic exception guarantee.
-    /// @pre T is EmplaceConstructible.
+    /// @pre T is CopyInsertable.
     /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
     void push_back(const value_type& val)
     {
@@ -762,6 +723,48 @@ public:
 // Ugly testing solution, to enable tests for private methods enable "TEST_INTERNALS" from ring_buffer_tests and comment out the private identifier.
 private:
 
+    template<typename T>
+    iterator insertBase(const_iterator pos, const size_type amount, T&& value)
+    {
+        // check amount and reserve for that.
+        while (m_capacity - 1 <= size() + 1)
+        {
+            reserve(m_capacity * 1.5);
+        }
+
+        for (size_type i = 0; i < amount; i++)
+        {
+            // Construct element at the end.
+            m_allocator.construct(&(*end()), std::forward<T>(value));
+            increment(m_headIndex);
+        }
+
+        iterator cUnqualifiedIt(this, pos.getIndex());
+        // Rotate elements from the back into pos.
+        std::rotate(cUnqualifiedIt, end() - amount, end());
+
+        return cUnqualifiedIt;
+    }
+
+    template<typename InputIt>
+    iterator insertRangeBase(const_iterator pos, InputIt rangeBegin, InputIt rangeEnd)
+    {
+        const auto amount = std::distance<InputIt>(rangeBegin, rangeEnd);
+        // check amount and reserve for that.
+        reserve(m_capacity * 1.5);
+        
+        for (; rangeBegin != rangeEnd; rangeBegin++)
+        {
+            m_allocator.construct(&*end(), *rangeBegin);
+            increment(m_headIndex);
+        }
+
+        iterator it(this, pos.getIndex());
+        std::rotate(it, end() - amount, end());
+
+        return it;
+    }
+
     /// @brief Increment an index.
     /// @param index The index to increment.
     void increment(size_t& index) noexcept
@@ -828,48 +831,7 @@ private:
         }
     }
 
-    /// @brief Shifts a range of elements forward or backwards with the copy and swap idiom. Deduces shifts direction based on distance to each border from the given iterator.
-    /// @param shiftPoint Iterator to the shift point. The shift point is an element, which is the first index that will be empty after shift. "Where to spawn empty elements".
-    /// @param offset Size of shift. How many steps each element will be shifted, eg, "How many empty elements" are inserted.
-    /// @exception Might throw exceptions from memory allocation and element constructors. If exceptions are thrown, nothing happens (Strong exception safety guarantee).
-    /// @pre The buffer must have enough allocated memory for size() + offset. Otherwise the behaviour is undefined.
-    void shift(const_iterator shiftPoint, difference_type offset)
-    {
-        const auto endIt = end();
-        const auto beginIt = begin();
-
-        ring_buffer<T> temp(m_capacity);
-        temp.m_tailIndex = m_tailIndex;
-        temp.m_headIndex = m_headIndex;
-
-        // Distance to the shift-point iterator from each end.
-        const auto fromEnd = abs(shiftPoint - endIt);
-        const auto fromBegin = abs(shiftPoint - beginIt);
-
-        // Shift the elements in the direction based on (smaller) distance from borders.
-        if(fromBegin >= fromEnd)
-        {
-            increment(temp.m_headIndex, offset);
-            // Iterator to first element after the "cut off" caused by shifting.
-            auto destCutOff = ring_buffer<T>::iterator(&temp, shiftPoint.getIndex() + offset);
-            copy(shiftPoint, endIt, destCutOff);
-
-            copy(beginIt, shiftPoint, temp.begin());
-        }
-        else
-        {
-            // Iterator to first element after the "cut off" caused by shifting.
-            auto destCutOff = ring_buffer<T>::iterator(&temp, shiftPoint.getIndex());
-            copy(beginIt, shiftPoint, temp.begin() - offset);
-
-            copy(shiftPoint, endIt, destCutOff);
-            // Decrementing the tail pointer changes what element the sourceBegin pointer deferences to so it has to be done last.
-            decrement(temp.m_tailIndex, offset);
-
-        }
-
-        this->swap(temp);
-    }
+ 
 
 //==========================================
 // Members 

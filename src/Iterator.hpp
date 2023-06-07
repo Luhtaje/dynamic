@@ -236,6 +236,7 @@ public:
         return (*m_container)[m_logicalIndex];
     }
 
+    /// @brief Returns the logical index of the element the iterator is pointing to.
     difference_type getIndex() noexcept
     {
         return m_logicalIndex;

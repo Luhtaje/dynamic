@@ -252,14 +252,6 @@ TYPED_TEST(RingBufferTest, copyConstruction)
 
 }
 
-// Tests requirement: Container expression a = b
-TYPED_TEST(RingBufferTest, copyAssignment)
-{
-    ring_buffer<TypeParam> control = t_buffer;
-    ASSERT_EQ(control, t_buffer);
-    ASSERT_TRUE(std::is_copy_assignable<ring_buffer<TypeParam>>::value);
-}
-
 // Tests requirement: Container expression C(rv)
 TYPED_TEST(RingBufferTest, moveConstruction)
 {
@@ -272,6 +264,14 @@ TYPED_TEST(RingBufferTest, moveConstruction)
     ASSERT_EQ(t_buffer.size(), 0);
 
     ASSERT_TRUE(std::is_move_constructible<ring_buffer<TypeParam>>::value);
+}
+
+// Tests requirement: Container expression a = b
+TYPED_TEST(RingBufferTest, copyAssignment)
+{
+    ring_buffer<TypeParam> control = t_buffer;
+    ASSERT_EQ(control, t_buffer);
+    ASSERT_TRUE(std::is_copy_assignable<ring_buffer<TypeParam>>::value);
 }
 
 // Tests requirement: Container expression a = rv
@@ -298,6 +298,7 @@ TYPED_TEST(RingBufferTest, sizeValConstruction)
     {
         ASSERT_EQ(elem, value);
     }
+    ASSERT_EQ(sizeVal.size(), TEST_BUFFER_SIZE);
 
     const auto sizeRval = ring_buffer<TypeParam>(TEST_BUFFER_SIZE, value);
 
@@ -307,10 +308,12 @@ TYPED_TEST(RingBufferTest, sizeValConstruction)
 // Tests requirement: SequenceContainer expression X a(i, j), X (i,j)
 TYPED_TEST(RingBufferTest, rangeConstruction)
 {
-    ring_buffer<TypeParam> rangeConstructed(t_buffer.begin(), t_buffer.end());
+
+    std::vector<TypeParam> testVector(t_buffer.begin(), t_buffer.end());
+    ring_buffer<TypeParam> rangeConstructed(testVector.begin(), testVector.end());
     ASSERT_EQ(rangeConstructed, t_buffer);
 
-    const auto ranged = ring_buffer<TypeParam>(t_buffer.begin(), t_buffer.end());
+    const auto ranged = ring_buffer<TypeParam>(testVector.begin(), testVector.end());
     ASSERT_EQ(ranged, t_buffer);
 }
 
@@ -639,7 +642,6 @@ TYPED_TEST(RingBufferTest, insertRange)
         {
             ASSERT_EQ(t_buffer[i + amount], refBuffer[i]);
         }
-        // Check range is inserted correctly.
     }
 
     for(size_t i = 0; i < amount ; i++)
@@ -659,16 +661,24 @@ TYPED_TEST(RingBufferTest, insertInitializerList)
 
     t_buffer.insert(posIt, initList);
 
-    for(size_t i = 0; i < t_buffer.size(); i++)
-    {
-        if(i < pos || (pos + initList.size()) < i)
+    //Check the elements outside inserted range is correct.
+    for(size_t i = 0; i < refBuffer.size(); i++)
+    {   // Before inserted elements.
+        if(i < pos)
         {
             ASSERT_EQ(refBuffer[i], t_buffer[i]);
         }
+        // After inserted elements.
         else
         {
-            ASSERT_EQ(*(initList.begin() + (i - pos)), t_buffer[i]);
+            ASSERT_EQ(refBuffer[i], t_buffer[i + initList.size()]);
         }
+    }
+
+    // Check the inserted elements are correct.
+    for (size_t i = 0; i < initList.size(); i++)
+    {
+        ASSERT_EQ(*(initList.begin() + i), t_buffer[pos + i]);
     }
 }
 
