@@ -439,6 +439,7 @@ TYPED_TEST(RingBufferTest, data)
     ASSERT_EQ(&t_buffer.front(), secondAddress);
 
     auto copy(t_buffer);
+
     // Sorts the buffer.
     t_buffer.data();
     ASSERT_EQ(copy, t_buffer);

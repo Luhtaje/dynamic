@@ -31,7 +31,7 @@ public:
     /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
     /// @note Allocates memory for 2 elements but buffer is initialized to 0 size.
     /// @details Constant complexity.
-    ring_buffer() : ring_buffer(0)
+    ring_buffer() : ring_buffer(0, allocator_type())
     {
     }
 
@@ -49,7 +49,9 @@ public:
     /// @param size Amount of elements to be initialized in the buffer.
     /// @param val Reference to a value which the elements are initialized to.
     /// @param alloc Custom allocator.
+    /// @note Allocates memory for count + 2 elements.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
+    /// @details Linear complexity in relation to amount of constructed elements.
     ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
     {
         m_data = m_allocator.allocate(m_capacity);
@@ -62,7 +64,7 @@ public:
     /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any elements.
     /// @param capacity Capacity of the buffer.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
-    /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @exception If an exception is thrown bad_alloc is thrown trong exception guarantee.
     /// @details Linear complexity in relation to count.
     explicit ring_buffer(size_type count, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
     {
@@ -99,7 +101,8 @@ public:
     /// @param init Initializer list to initialize the buffer from.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
-    explicit ring_buffer(std::initializer_list<T> init): ring_buffer(init.begin(),init.end())
+    /// @details Linear complexity in relation to initializer list size.
+    explicit ring_buffer(std::initializer_list<T> init) : ring_buffer(init.begin(),init.end())
     {
     }
 
@@ -109,9 +112,12 @@ public:
     ring_buffer(const ring_buffer& rhs) : m_capacity(rhs.m_capacity), m_headIndex(rhs.m_headIndex), m_tailIndex(rhs.m_tailIndex)
     {
         m_data = m_allocator.allocate(m_capacity);
-        
-        // Copies the buffer by calling copyconstructor on each element.
-        copy(rhs.cbegin(), rhs.cend(), begin());
+        for (size_t i = 0; i < rhs.size(); i++)
+        {
+            m_allocator.construct(&*begin() + i);
+        }
+
+        std::copy(rhs.cbegin(), rhs.cend(), begin());
     }
 
     /// @brief Move constructor.
@@ -504,25 +510,15 @@ public:
             return m_data;
         }
 
-        // This function rotates the buffer by doing a double copy: copies the buffer to temporary location and then back to original but matching the first
-        // element to the beginning of the allocated area. Inefficient but linear in complexity related to the length of the buffer, and consecutive calls to data() does not invalidate previous pointer.
-
         // Create a temporary buffer and copy existing buffers elements to the start of the temporary memory.
         auto temp = ring_buffer<T>(capacity());
-        copy(cbegin(), cend(), temp.begin());
+
+        std::copy(cbegin(), cend(), temp.begin());
+
         // Set the head index. Whole point of this copy is to slide the buffer to the start, so tail is correctly at 0 after constructing the temporary buffer.
         temp.m_headIndex = size();
-
-        // Pummel the original buffer with destructor calls.
-        if(size())
-        {
-            for_each(begin(),end(),[this](T& elem) { m_allocator.destroy(&elem); });
-        }
-
-        // Set up index values on original buffer to match rotated ones.
-        m_headIndex = temp.m_headIndex;
-        m_tailIndex = 0;
-        copy(temp.cbegin(), temp.cend(), begin());
+        
+        swap(temp);
         return m_data;
     }
 
@@ -633,7 +629,6 @@ public:
     /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
     void push_back(const value_type& val)
     {
-
         if(m_capacity - 1 == size())
         {
             reserve(m_capacity * 1.5);
