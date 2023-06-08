@@ -52,7 +52,7 @@ public:
     /// @return pointer.
     pointer operator->() const
     {
-        //TODO: check value initialization and bounds.
+        //TODO: check value initialization and bounds. Shhhh......
         return &(*m_container)[m_logicalIndex];
     }
 

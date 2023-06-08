@@ -282,9 +282,10 @@ public:
 
     /// @brief Destroys all elements in a buffer. Does not modify capacity.
     /// @post All existing references, pointers and iterators are to be considered invalid.
-    void clear()
+    /// @details Linear complexity in relation to size of the buffer.
+    void clear() noexcept
     {
-        for(m_tailIndex; m_tailIndex < m_headIndex ; m_tailIndex++)
+        for(; m_tailIndex < m_headIndex ; m_tailIndex++)
         {
             m_allocator.destroy(&m_data[m_tailIndex]);
         }
@@ -293,9 +294,12 @@ public:
         m_tailIndex = 0;
     }
 
+
+
     /// @brief Replaces the elements in the buffer with copy of [sourceBegin, sourceEnd)
     /// @pre T is CopyConstructible and [sourceBegin, sourceEnd) are not in the buffer.
     /// @post All existing references, pointers and iterators are to be considered invalid.
+    /// @note Undefined behaviour if either source iterator is an iterator to *this.
     void assign(const_iterator sourceBegin, const_iterator sourceEnd)
     {
         clear();
@@ -313,9 +317,11 @@ public:
     void assign(std::initializer_list<T> list)
     {
         clear();
-        for(size_t i = 0; i < list.size(); i++)
+        auto begin = list.begin();
+        const auto end = list.end();
+        for (; begin != end; begin++)
         {
-            push_back(*(list.begin() + i));
+            push_back(*begin);
         }
     }
 
@@ -556,62 +562,58 @@ public:
 
     /// @brief Allocates more memory and copies the existing buffer to the new memory location.
     /// @throw Throws std::bad_alloc if there is not enough memory for allocation. Throws std::bad_array_new_lenght if std::numeric_limits<std::size_t>::max() / sizeof(T) < newsize.
-    /// @param newCapacity Amount of memory to allocate. if newCapacity is less than or equal to m_capacity, function does nothing.
+    /// @param newCapacity Amount of memory to allocate. If newCapacity is less than or equal to m_capacity, function does nothing.
     /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @details Linear complexity in relation to size of the buffer.
     void reserve(size_type newCapacity)
     {
         if(newCapacity <= m_capacity) return;
 
-        // Temporary buffer to take hits if exceptions occur.
+        // Temporary buffer for "initialize and swap" idiom to provide excepion guarantee.
         auto temp =  ring_buffer<T>(newCapacity);
         temp.m_headIndex = m_headIndex;
         temp.m_tailIndex = m_tailIndex;
 
-        // If buffer is wrapped, move the tail. 
+        // If the head index has wrapped around the capacity border, move the tail. 
         if(m_headIndex < m_tailIndex)
         {
-            // Moves the tail so that the distance from the end border of allocated memory stays the same.
+            // Moves the tail forward by the difference of capacity so that the distance from the end border of allocated memory to the tail index stays the same.
+            // This ensures that the elements in the buffer stay continuous, instead of being broken off by the newly allocated memory.
             temp.m_tailIndex += newCapacity - m_capacity;
         }
 
-        // Copy to temp memory.
-        temp.assign(cbegin(), cend());
+        // Linear complexity operation to copyconstruct all elements.
+        temp.assign(begin(), end());
 
         // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
         this->swap(temp);
     }
 
-    /// @brief Inserts an element to the front of the buffer.
+    /// @brief Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Element to insert.  Needs to be CopyConstructible.
-    /// @note Allocates memory before the insertion if the buffer would be full after the operation.
-    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @note If allocation happens, all iterators, pointers and references should be treated as invalidated.
+    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
     void push_front(value_type val)
     {
-        if(m_capacity - 1 == size())
-        {
-            reserve(m_capacity* 1.5);
-        }
+        validateCapacity(1);
 
-        // Decrement temporary index incase constructol throws to retain invariants (elements of the buffer are always initialized).
+        // Decrement temporary index in case constructor throws to retain invariants (elements of the buffer are always initialized).
         auto newIndex = m_tailIndex;
         decrement(newIndex);
         m_allocator.construct(&m_data[newIndex], val);
         m_tailIndex = newIndex;
     }
 
-    /// @brief Inserts an element to the front of the buffer.
+    /// @brief Inserts an element in the back of the buffer by move if move constructor is provided by value_type. If buffer would get full after the operation, allocates more memory.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Rvalue reference to the element to insert.
-    /// @note Allocates memory before the insertion if the buffer would be full after the operation.
-    /// @pre T needs to satisfy MoveConstoructible
-    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @note If allocation happens, all iterators, pointers and references should be treated as invalidated.
+    /// @pre T needs to satisfy MoveConstructible or CopyCostructible.
+    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
     void push_front(value_type&& val)
     {
-        if(m_capacity - 1 == size())
-        {
-            reserve(m_capacity* 1.5);
-        }
+        validateCapacity(1);
 
         // Decrement temporary index incase constructor throws to retain invariants (elements of the buffer are always initialized).
         auto newIndex = m_tailIndex;
@@ -620,36 +622,32 @@ public:
         m_tailIndex = newIndex;
     }
 
-    /// @brief Inserts an element in the back of the buffer. If buffer is full, allocates more memory.
+    /// @brief Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Value of type T to be appended.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
-    /// @exception If any exception is thrown, this function retains invariants. Basic exception guarantee.
-    /// @pre T is CopyInsertable.
+    /// @throw Can throw std::bad_alloc.
+    /// @exception If the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
+    /// @pre T needs to satisfy CopyInsertable.
     /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
     void push_back(const value_type& val)
     {
-        if(m_capacity - 1 == size())
-        {
-            reserve(m_capacity * 1.5);
-        }
+        validateCapacity(1);
 
         m_allocator.construct(&m_data[m_headIndex], val);
         increment(m_headIndex);
     }
 
-    /// @brief Inserts an element in the back of the buffer. If buffer is full, allocates more memory.
+    /// @brief Inserts an element in the back of the buffer by move if move constructor is provided for value_type. If buffer would get full after the operation, allocates more memory.
     /// @param val Rvalue reference to the value to be appended.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
-    /// @exception If any exception is thrown, this function retains invariants. Basic exception guarantee.
-    /// @pre T is EmplaceConstructible.
+    /// @throw Can throw std::bad_alloc.
+    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
+    /// @pre T needs to satisfy MoveConstructible or CopyConstructible.
     /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
     void push_back(value_type&& val)
     {
-        if(m_capacity - 1 == size())
-        {
-            reserve(m_capacity * 1.5);
-        }
+        validateCapacity(1);
     
         m_allocator.construct(&m_data[m_headIndex], std::forward<value_type>(val));
         increment(m_headIndex);
@@ -677,6 +675,7 @@ public:
 
     /// @brief Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer.
     /// @return Reference to the first element.
+    /// @details Constant complexity.
     reference front() noexcept
     {
         return m_data[m_tailIndex];
@@ -684,48 +683,66 @@ public:
 
     /// @brief Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer.
     /// @return const-Reference to the first element.
+    /// @details Constant complexity.
     const_reference front() const noexcept
     {
         return m_data[m_tailIndex];
     }
 
-    ///@brief Returns a reference to the last element in the buffer. Behaviour is undefined for empty buffer.
-    ///@return Reference to the last element in the buffer.
+    /// @brief Returns a reference to the last element in the buffer. Behaviour is undefined for empty buffer.
+    /// @return Reference to the last element in the buffer.
+    /// @details Constant complexity.
     reference back() noexcept
     {
         // Since head points to next-to-last element, it needs to be decremented once to get the correct element. 
         // If the index is at the beginning border of the allocated memory area it needs to be wrapped around. 
         if (m_headIndex == 0)
         {
-            return m_data[size() - 1];
+            return m_data[m_capacity - 1];
         }
         return m_data[m_headIndex-1];
     }
 
     /// @brief Returns a const-reference to the last element in the buffer. Behaviour is undefined for empty buffer.
     /// @return const-reference to the last element in the buffer.
+    /// @details Constant complexity.
     const_reference back() const noexcept
     {
         // Since head points to next-to-last element, it needs to be decremented once to get the correct element. 
         // If the index is at the beginning border of the allocated memory area it needs to be wrapped around. 
         if (m_headIndex == 0)
         {
-            return *m_data[size() - 1];
+            return m_data[m_capacity - 1];
         }
-        return *m_data[m_headIndex-1];
+        return m_data[m_headIndex-1];
     }
 
-// Ugly testing solution, to enable tests for private methods enable "TEST_INTERNALS" from ring_buffer_tests and comment out the private identifier.
 private:
+
+    /// @brief Reserves more memory if needed for an increase in size. If more memory is needed, allocates capacity * 1.5 or if that is not enough (capacity * 1.5 + increase).
+    /// @param increase Expected increase in size of the buffer, based on which memory is allocated.
+    /// @details Linear complexity in relation to buffer size if more memory needs to be allocated, otherwise constant complexity.
+    /// @exception May throw std::bad_alloc. If any exception is thrown this function does nothing. Strong exception guarantee.
+    /// @note This function should be called before increasing the size of the buffer.
+    void validateCapacity(size_t increase)
+    {
+        if (m_capacity <= size() + increase)
+        {
+            if (m_capacity / 2 + m_capacity < size() + increase)
+            {
+                reserve(m_capacity + increase + m_capacity / 2 );
+            }
+            else
+            {
+                reserve(m_capacity / 2 + m_capacity);
+            }
+        }
+    }
 
     template<typename T>
     iterator insertBase(const_iterator pos, const size_type amount, T&& value)
     {
-        // check amount and reserve for that.
-        while (m_capacity - 1 <= size() + 1)
-        {
-            reserve(m_capacity * 1.5);
-        }
+        validateCapacity(amount);
 
         for (size_type i = 0; i < amount; i++)
         {
@@ -734,19 +751,19 @@ private:
             increment(m_headIndex);
         }
 
-        iterator cUnqualifiedIt(this, pos.getIndex());
-        // Rotate elements from the back into pos.
-        std::rotate(cUnqualifiedIt, end() - amount, end());
+        iterator it(this, pos.getIndex());
 
-        return cUnqualifiedIt;
+        // Rotate elements from the back into pos.
+        std::rotate(it, end() - amount, end());
+
+        return it;
     }
 
     template<typename InputIt>
     iterator insertRangeBase(const_iterator pos, InputIt rangeBegin, InputIt rangeEnd)
     {
         const auto amount = std::distance<InputIt>(rangeBegin, rangeEnd);
-        // check amount and reserve for that.
-        reserve(m_capacity * 1.5);
+        validateCapacity(amount);
         
         for (; rangeBegin != rangeEnd; rangeBegin++)
         {
@@ -808,25 +825,6 @@ private:
             times--;
         }
     }
-
-    /// @brief Copies elements by calling allocators construct().
-    /// @param sourceBegin Iterator to begin of source data.
-    /// @param sourceEnd Iterator to past-the-end element of of source data.
-    /// @param destBegin Iterator to beginning of destination range.
-    /// @note Copies all elements in range [sourceBegin, sourceEnd), from sourceBegin to  sourceEnd - 1. The behaviour is undefined if destBegin overlaps the range [sourceBegin, sourceEnd). Custom copy is required to copy elements into uninitialized memory.
-    /// @pre T is CopyConstructible.
-    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
-    void copy(const_iterator sourceBegin, const_iterator sourceEnd, iterator destBegin)
-    {
-        size_t size = sourceEnd - sourceBegin;
-
-        for(size_t i = 0; i != size ; i++)
-        {
-            m_allocator.construct(&destBegin[i], sourceBegin[i]);
-        }
-    }
-
- 
 
 //==========================================
 // Members 

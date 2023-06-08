@@ -57,7 +57,7 @@ ring_buffer<char> CreateBuffer<char>(int /*size*/)
 {
     srand(time(0));
     auto buf = ring_buffer<char>();
-    for(int i = 0 ; i < TEST_BUFFER_SIZE; i++)
+    for(size_t i = 0 ; i < TEST_BUFFER_SIZE; i++)
     {
         buf.push_back(char(rand() % 26));
     }
@@ -69,7 +69,7 @@ ring_buffer<int> CreateBuffer<int>(int /*size*/)
 {
     srand(time(0));
     auto buf = ring_buffer<int>();
-    for(int i = 0 ; i < TEST_BUFFER_SIZE; i++)
+    for(size_t i = 0 ; i < TEST_BUFFER_SIZE; i++)
     {
         buf.push_back(rand() % 26);
     }
@@ -81,10 +81,10 @@ ring_buffer<std::string> CreateBuffer<std::string>(int /*size*/)
 {
     srand(time(0));
     auto buf = ring_buffer<std::string>();
-    for(int i = 0 ; i < TEST_BUFFER_SIZE; i++)
+    for(size_t i = 0 ; i < TEST_BUFFER_SIZE; i++)
     {
         std::string someString("");
-        for(int j = 0 ; j < 3 ; j++)
+        for(size_t j = 0 ; j < 3 ; j++)
         {
             someString.push_back(char(rand() % 100));
         }
@@ -616,16 +616,14 @@ TYPED_TEST(RingBufferTest, insertSizeVal)
 // Tests requirement: SequenceContainer, insert() exprssion a.insert(p, i, j) where p is position iterator and [i, j) is a valid range.
 TYPED_TEST(RingBufferTest, insertRange)
 {
-    const auto beginOffset = 2;
-    const auto endOffset = 5;
-    const auto amount = endOffset - beginOffset;
-    const auto pos = 3;
-
+    const auto pos = 1;
+    const auto amount = 2;
+    const auto beginOffset = 1;
     ring_buffer<TypeParam> rangeSource = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
     const auto refBuffer(t_buffer);
 
     const auto rangeBeginIt = rangeSource.begin() + beginOffset;
-    const auto rangeEndIt = rangeSource.begin() + endOffset;
+    const auto rangeEndIt = rangeBeginIt + amount;
     const auto posIt = t_buffer.begin() + pos;
 
     const auto returnIt = t_buffer.insert(posIt, rangeBeginIt, rangeEndIt);
