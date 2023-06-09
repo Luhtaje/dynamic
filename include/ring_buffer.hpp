@@ -533,6 +533,77 @@ public:
     using const_iterator = _rBuf_const_iterator<ring_buffer<T>>;
 
 
+    template <typename T, std::size_t N, typename Allocator = std::allocator<T>>
+    class rBuf_construction_token
+    {
+    public:
+        rBuf_construction_token() : rBuf_construction_token(0, Allocator())
+        {
+        }
+
+        rBuf_construction_token(const Allocator& alloc) : rBuf_construction_token(0, alloc)
+        {
+        }
+
+        rBuf_construction_token(size_t /*count*/, Allocator alloc = Allocator()) : t_tailIndex(0), t_headIndex(count), t_capacity(count + 2)
+        {
+            for (size_t i = 0; i < N; i++)
+            {
+                t_allocator.construct(t_data.data() + i);
+            }
+        }
+
+        rBuf_construction_token(size_t /*count*/, const T& value, Allocator& alloc = Allocator())
+        {
+            for (size_t i = 0; i < N; i++)
+            {
+                t_allocator.construct(t_data.data() + i, value);
+            }
+        }
+
+        rBuf_construction_token(std::initializer_list<T> init) : rBuf_construction_token(init.begin(), init.end())
+        {
+        }
+
+
+        template<typename InputIt>
+        rBuf_construction_token(InputIt begin, InputIt end)
+        {
+            for (size_t i = 0; i < N; i++)
+            {
+                t_allocator.construct(t_data.data() + i, *(begin + i));
+            }
+        }
+
+        size_t t_headIndex;
+        size_t t_tailIndex;
+        size_t t_capacity;
+        Allocator t_allocator;
+        std::array<T, N> t_data;
+    };
+
+    static ring_buffer::rBuf_construction_token preconstruct(size_t count, allocator_type& alloc = allocator_type())
+    {
+        return rBuf_construction_token<T, count>(alloc);
+    }
+
+    static ring_buffer::rBuf_construction_token preconstruct(size_t count, value_type& value, allocator_type& alloc = allocator_type())
+    {
+        return rBuf_construction_token<T, count>(value, alloc);
+    }
+
+
+    ring_buffer operator=(rBuf_construction_token&& token) noexcept
+    {
+        for (size_t i = 0; i < token.m_headIndex; i++)
+        {
+
+        }
+        m_capacity = std::exchange(token.m_capacity, 0);
+        m_headIndex = std::exchange(token.m_headIndex, 0);
+        m_tailIndex = std::exchange(token.m_tailIndex, 0);
+    }
+
     /// @brief Default constructor. Constructs to 0 size and 2 capacity.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @post this->empty() == true.
