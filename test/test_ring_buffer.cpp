@@ -823,4 +823,11 @@ TYPED_TEST(RingBufferTest, at)
     ASSERT_THROW(const_buffer.at(6), std::out_of_range);
 }
 
+TYPED_TEST(RingBufferTest, shrink_to_fit)
+{
+    t_buffer.reserve(100);
+    t_buffer.shrink_to_fit();
+    ASSERT_EQ(t_buffer.size() + 2, t_buffer.capacity());
+}
+
 }

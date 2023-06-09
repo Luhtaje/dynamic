@@ -532,7 +532,7 @@ public:
     using iterator = _rBuf_iterator<ring_buffer<T>>;
     using const_iterator = _rBuf_const_iterator<ring_buffer<T>>;
 
-    /// @brief Default constructor.
+    /// @brief Default constructor. Constructs to 0 size and 2 capacity.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
     /// @note Allocates memory for 2 elements but buffer is initialized to 0 size.
@@ -654,10 +654,7 @@ public:
     /// @exception 
     iterator insert(const_iterator pos, const value_type& value)
     {
-        while(m_capacity - 1 <= size() + 1)
-        {
-            reserve(m_capacity * 1.5);
-        }
+        validateCapacity(1);
 
         return insertBase(pos, 1, value);
     }
@@ -670,10 +667,7 @@ public:
     /// @exception 
     iterator insert(const_iterator pos, value_type&& value)
     {
-        while(m_capacity - 1 <= size() + 1)
-        {
-            reserve(m_capacity * 1.5);
-        }
+        validateCapacity(1);
 
         return insertBase(pos, 1, std::move(value));
     }
@@ -685,10 +679,7 @@ public:
     /// @throw Can throw std::bad_alloc, or something from element construction.
     iterator insert(const_iterator pos, const size_type amount, const value_type& value)
     {
-        while(m_capacity - 1 <= size() + amount)
-        {
-            reserve(m_capacity * 1.5);
-        }
+        validateCapacity(1);
 
         return insertBase(pos, amount, value);
     }
@@ -1131,6 +1122,29 @@ public:
         decrement(m_headIndex);
         m_allocator.destroy(&m_data[m_headIndex]);
 
+    }
+
+    /// @brief Releases unused allocated memory.
+    /// @pre T must satisfy MoveConstructible or CopyConstructible.
+    /// @post m_capacity == size() + 2.
+    /// @exception If any exception is thrown this function has no effect (Strong exception guarantee).
+    /// @details Linear complexity in relation to size of the buffer.
+    void shrink_to_fit()
+    {
+        if (m_capacity <= size() + 2)
+        { 
+            return;
+        }
+
+        ring_buffer<value_type, allocator_type> targetBuffer(size());
+
+        for (auto beginIt = begin(); beginIt != end(); beginIt++)
+        {
+            targetBuffer.push_back(std::move(*beginIt));
+        }
+        targetBuffer.m_headIndex = size();
+
+        this->swap(targetBuffer);
     }
 
 //===========================================================
