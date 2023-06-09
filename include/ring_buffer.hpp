@@ -1015,33 +1015,43 @@ public:
         return m_tailIndex == m_headIndex;
     }
 
-    /// @brief Allocates more memory and copies the existing buffer to the new memory location.
+    /// @brief Allocates memory and copies the existing buffer to the new memory location. Can be used to increase or decrease capacity.
     /// @throw Throws std::bad_alloc if there is not enough memory for allocation. Throws std::bad_array_new_lenght if std::numeric_limits<std::size_t>::max() / sizeof(T) < newsize.
     /// @param newCapacity Amount of memory to allocate. If newCapacity is less than or equal to m_capacity, function does nothing.
-    /// @exception If any exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @param enableShrink True to enable reserve to reduce the capacity, to a minimum of size() +2.
+    /// @throw Can throw std::bad_alloc. 
+    /// @exception If T's move (or copy if T has no move) constructor throws, behaviour is undefined. Otherwise Stong Exception Guarantee.
+    /// @notes All references and pointers are invalidated (iterators stay valid).
     /// @details Linear complexity in relation to size of the buffer.
-    void reserve(size_type newCapacity)
+    void reserve(size_type newCapacity, bool enableShrink = false)
     {
-        if(newCapacity <= m_capacity) return;
-
-        // Temporary buffer for "initialize and swap" idiom to provide excepion guarantee.
-        auto temp =  ring_buffer<T>(newCapacity);
-        temp.m_headIndex = m_headIndex;
-        temp.m_tailIndex = m_tailIndex;
-
-        // If the head index has wrapped around the capacity border, move the tail. 
-        if(m_headIndex < m_tailIndex)
+        if (!enableShrink)
         {
-            // Moves the tail forward by the difference of capacity so that the distance from the end border of allocated memory to the tail index stays the same.
-            // This ensures that the elements in the buffer stay continuous, instead of being broken off by the newly allocated memory.
-            temp.m_tailIndex += newCapacity - m_capacity;
+            if (newCapacity <= m_capacity) return;
+        }
+        else
+        {
+            if (newCapacity < size() + 2) return;
         }
 
-        // Linear complexity operation to copyconstruct all elements.
-        temp.assign(begin(), end());
+        // Data pointer for "do stuff and swap" idiom to provide strong excepion guarantee.
+        auto tempData = m_allocator.allocate(newCapacity);
+
+        for (size_t i = 0; i < size(); i++)
+        {
+            m_allocator.construct(tempData + i, std::move(this->operator[](i)));
+            m_allocator.destroy(&this->operator[](i));
+        }
+
+        m_allocator.deallocate(m_data, size());
+
+        // If memory was allocated, the buffer matches beginning of physical memory.
+        m_headIndex = size();
+        m_tailIndex = 0;
+        m_capacity = newCapacity;
 
         // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
-        this->swap(temp);
+        std::swap(tempData, m_data);
     }
 
     /// @brief Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.
@@ -1096,10 +1106,11 @@ public:
     /// @brief Inserts an element in the back of the buffer by move if move constructor is provided for value_type. If buffer would get full after the operation, allocates more memory.
     /// @param val Rvalue reference to the value to be appended.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
-    /// @throw Can throw std::bad_alloc.
-    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
+    /// @throw Can throw std::bad_alloc if more memory is allocated.
+    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception (std::bad_alloc) this function has no effect (Strong Exception Guarantee).
     /// @pre T needs to satisfy MoveConstructible or CopyConstructible.
     /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
+    /// @details Constant complexity.
     void push_back(value_type&& val)
     {
         validateCapacity(1);
@@ -1109,13 +1120,17 @@ public:
     }
 
     /// @brief Remove the first element in the buffer.
+    /// @pre Buffers size > 0, otherwise behaviour is undefined.
+    /// @details Constant complexity.
     void pop_front() noexcept
     {
         m_allocator.destroy(&m_data[m_tailIndex]);
         increment(m_tailIndex);
     }
 
-    // Erase an element from the logical back of the buffer.
+    /// @brief Erase an element from the logical back of the buffer.
+    /// @pre Buffers size > 0, otherwise behaviour is undefined.
+    /// @details Constant complexity.
     void pop_back() noexcept
     {
 
@@ -1124,10 +1139,12 @@ public:
 
     }
 
-    /// @brief Releases unused allocated memory.
+    /// @brief Releases unused allocated memory. 
     /// @pre T must satisfy MoveConstructible or CopyConstructible.
     /// @post m_capacity == size() + 2.
-    /// @exception If any exception is thrown this function has no effect (Strong exception guarantee).
+    /// @note Reduces capacity by allocating a smaller memory area and moving the elements. 
+    /// @throw Might throw std::bad_alloc if memory allocation fails.
+    /// @exception If T's move (or copy) constructor can and does throw, behaviour is undefined. If any other exception is thrown (bad_alloc) this function has no effect (Strong exception guarantee).
     /// @details Linear complexity in relation to size of the buffer.
     void shrink_to_fit()
     {
@@ -1136,15 +1153,7 @@ public:
             return;
         }
 
-        ring_buffer<value_type, allocator_type> targetBuffer(size());
-
-        for (auto beginIt = begin(); beginIt != end(); beginIt++)
-        {
-            targetBuffer.push_back(std::move(*beginIt));
-        }
-        targetBuffer.m_headIndex = size();
-
-        this->swap(targetBuffer);
+        reserve(size() + 2, true);
     }
 
 //===========================================================
@@ -1248,7 +1257,7 @@ private:
     {
         if (m_capacity <= size() + increase)
         {
-            if (m_capacity / 2 + m_capacity < size() + increase)
+            if (m_capacity / 2 + m_capacity <= size() + increase)
             {
                 reserve(m_capacity + increase + m_capacity / 2 );
             }
