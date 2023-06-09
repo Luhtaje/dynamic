@@ -286,6 +286,22 @@ TYPED_TEST(RingBufferTest, moveAssign)
     ASSERT_TRUE(std::is_move_assignable<ring_buffer<TypeParam>>::value);
 }
 
+// Tests requirement: Container expression a == b, a != b.
+TYPED_TEST(RingBufferTest, equalityComparable)
+{
+    ring_buffer<TypeParam> copy(t_buffer);
+    ASSERT_TRUE(copy == t_buffer);
+
+    copy.pop_back();
+    ASSERT_TRUE(copy != t_buffer);
+
+    t_buffer.pop_back();
+    ASSERT_TRUE(copy == t_buffer);
+
+    const auto randomBuffer(CreateBuffer<TypeParam>(TEST_BUFFER_SIZE));
+    ASSERT_TRUE(randomBuffer != t_buffer);
+}
+
 // Tests requirement: SequenceContainer expression X a(n, t), X (n, t)
 TYPED_TEST(RingBufferTest, sizeValConstruction)
 {
@@ -298,7 +314,9 @@ TYPED_TEST(RingBufferTest, sizeValConstruction)
     {
         ASSERT_EQ(elem, value);
     }
+
     ASSERT_EQ(sizeVal.size(), TEST_BUFFER_SIZE);
+    ASSERT_EQ(std::distance(sizeVal.begin(), sizeVal.end()), TEST_BUFFER_SIZE);
 
     const auto sizeRval = ring_buffer<TypeParam>(TEST_BUFFER_SIZE, value);
 
@@ -352,22 +370,6 @@ TYPED_TEST(RingBufferTest, emplace)
     ++it;
 
     //t_buffer.emplace(it,59);
-}
-
-// Tests requirement: ?
-TYPED_TEST(RingBufferTest, equalityComparable)
-{
-    ring_buffer<TypeParam> copy(t_buffer);
-    ASSERT_TRUE(copy == t_buffer);
-
-    copy.pop_back();
-    ASSERT_TRUE(copy != t_buffer);
-
-    t_buffer.pop_back();
-    ASSERT_TRUE(copy == t_buffer);
-
-    const auto randomBuffer(CreateBuffer<TypeParam>(TEST_BUFFER_SIZE));
-    ASSERT_TRUE(randomBuffer != t_buffer);
 }
 
 TYPED_TEST(RingBufferTest, accessOperator)
@@ -823,6 +825,7 @@ TYPED_TEST(RingBufferTest, at)
     ASSERT_THROW(const_buffer.at(6), std::out_of_range);
 }
 
+// No requirement
 TYPED_TEST(RingBufferTest, shrink_to_fit)
 {
     t_buffer.reserve(100);

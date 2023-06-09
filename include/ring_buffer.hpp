@@ -532,31 +532,35 @@ public:
     using iterator = _rBuf_iterator<ring_buffer<T>>;
     using const_iterator = _rBuf_const_iterator<ring_buffer<T>>;
 
+
     /// @brief Default constructor. Constructs to 0 size and 2 capacity.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
+    /// @post this->empty() == true.
     /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
-    /// @note Allocates memory for 2 elements but buffer is initialized to 0 size.
     /// @details Constant complexity.
     ring_buffer() : ring_buffer(0, allocator_type())
     {
     }
 
-    /// @brief Constructs the container with a custom allocator.
+    /// @brief Constructs the container with a custom allocator to 0 size and 2 capacity.
     /// @param alloc Custom allocator for the buffer.
+    /// @post this->empty() == true.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
-    /// @note Allocates memory for 2 elements but buffer is initialized to 0 size.
     /// @details Constant complexity.
     explicit ring_buffer(const allocator_type& alloc) : ring_buffer(0, alloc)
     {
     }
 
-    /// @brief Constructs the buffer to a size with given values and optionally a custom allocator.
+    /// @brief Constructs the buffer to a given size with given values and optionally a custom allocator.
     /// @param size Amount of elements to be initialized in the buffer.
     /// @param val Reference to a value which the elements are initialized to.
     /// @param alloc Custom allocator.
+    /// @pre T needs to satisfy CopyInsertable.
+    /// @post std::distance(begin(), end()) == count.
     /// @note Allocates memory for count + 2 elements.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
+    /// @exception 
     /// @details Linear complexity in relation to amount of constructed elements.
     ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
     {
@@ -567,8 +571,9 @@ public:
         }
     }
 
-    /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any elements.
+    /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any elemen.
     /// @param capacity Capacity of the buffer.
+    /// @pre T must satisfy DefaultInsertable.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
     /// @exception If an exception is thrown bad_alloc is thrown trong exception guarantee.
     /// @details Linear complexity in relation to count.
@@ -585,6 +590,7 @@ public:
     /// @brief Construct the buffer from range [begin,end).
     /// @param beginIt Iterator to first element of range.
     /// @param endIt Iterator pointing to past-the-last element of range.
+    /// @pre T must satisfy CopyInsertable. InputIt must be dereferenceable to value_type and end must be reachable from begin by (possibly repeatedly) incrementing begin. Otherwise behaviour is undefined.
     /// @exception Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @details Linear complexity in relation to the size of the range.
     /// @note Behavior is undefined if elements in range are not valid.
@@ -605,6 +611,7 @@ public:
 
     /// @brief Initializer list contructor.
     /// @param init Initializer list to initialize the buffer from.
+    /// @pre T must satisfy CopyInsertable.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
     /// @details Linear complexity in relation to initializer list size.
@@ -613,21 +620,24 @@ public:
     }
 
     /// @brief Copy constructor.
-    /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation.
     /// @param rhs Reference to a RingBuffer to create a copy from.
+    /// @pre T must meet CopyInsertable.
+    /// @post this == ring_buffer(rhs).
+    /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation.
+    /// @details Linear complexity in relation to buffer size.
     ring_buffer(const ring_buffer& rhs) : m_capacity(rhs.m_capacity), m_headIndex(rhs.m_headIndex), m_tailIndex(rhs.m_tailIndex)
     {
         m_data = m_allocator.allocate(m_capacity);
+
         for (size_t i = 0; i < rhs.size(); i++)
         {
-            m_allocator.construct(&*begin() + i);
+            m_allocator.construct(&this->operator[](i), rhs[i]);
         }
-
-        std::copy(rhs.cbegin(), rhs.cend(), begin());
     }
 
     /// @brief Move constructor.
     /// @param other Rvalue reference to other buffer.
+    /// @details Constant complexity.
     ring_buffer(ring_buffer&& other) noexcept
     {
         m_data = std::exchange(other.m_data, nullptr);
@@ -809,7 +819,7 @@ public:
     /// @brief Replaces the elements in the buffer.
     /// @param list Initializer list containing the elements to replace the existing ones.
     /// @pre T is CopyInsertable.
-    /// @post All existing references, pointers and iterators are to be considered invalid.
+    /// @post All existing references, pointers and iterators are invalidated.
     /// @note Leaves capacity of the buffer unchanged.
     void assign(std::initializer_list<T> list)
     {
@@ -837,7 +847,9 @@ public:
     /// @brief Copy assignment operator.
     /// @param other Ringbuffer to be copied.
     /// @return Returns reference to the left hand side RungBuffer after swap.
-    /// @note Strong exception guarantee. 
+    /// @post *this == other.
+    /// @details Constant complexity.
+    /// @exception If any exception is thrown, this function has no effect (Strong Exception Guarantee).
     ring_buffer& operator=(const ring_buffer& other)
     {
         ring_buffer copy(other);
@@ -847,31 +859,37 @@ public:
 
     /// @brief Move assignment operator.
     /// @param other Rvalue ref to other buffer.
+    /// @pre T is MoveConstructible or CopyConstuctible.
+    /// @post If T is MoveConstructible, *this has values other had before the assignment. Otherwise *this == other.
     /// @return Reference to the buffer.
-    ring_buffer& operator=(ring_buffer&& other) noexcept
+    /// @exception If T is not MoveConstructible, and a throwing CopyConstructor which throws this function has no effect (Strong Exception Guarantee).
+    /// @details Constant complexity.
+    ring_buffer& operator=(ring_buffer&& other)
     {
         ring_buffer copy(std::move(other));
         copy.swap(*this);
         return *this;
     }
 
-    /// @brief Initializer list assign operator.
+    /// @brief Initializer list assign operator. 
     /// @param init Initializer list to assign to the buffer.
     /// @return Returns a reference to the buffer.
     /// @pre T is CopyInsertable.
-    /// @post All existing iterators and pointers have undefined behaviour after the operation. 
-    /// @note Internally calls assign(), which destroys all elements before Copy Inserting from initializer list.
+    /// @post All existing iterators are invalidated. 
+    /// @note Internally calls assign(), which destroys all elements before CopyInserting from initializer list.
+    /// @details Linear complexity in relation to amount of existing elements and size of initializer list.
     ring_buffer& operator=(std::initializer_list<T> init)
     {
         assign(init);
         return *this;
     }
 
-    /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
+    /// @brief Index operator.
     /// @param logicalIndex Index of the element.
+    /// @details Constant complexity.
+    /// @note The operator acts as interface that hides the physical memory layout from the user. Logical index neeeds to be added to internal tail index to get actual element address.
     /// @return Returns a reference to the element.
-    /// @note Behaviour for accessing index larger than size() - 1 is undefined.
-    reference operator[](const size_type logicalIndex)
+    reference operator[](const size_type logicalIndex) noexcept
     {
         // If sum of tailIndex (physical first element) and logical index(logical element) is larger than vector capacity, 
         // wrap index around to begin.
@@ -885,14 +903,16 @@ public:
         return m_data[index];
     }
 
-    /// @brief Index operator. The operator acts as interface that hides the physical layout from the user.
-    /// @param logicalIndex Index of the element.
-    /// @return Returns a const reference the the element.
-    /// @note Behaviour for accessing index larger than size() - 1 is undefined.
-    const_reference operator[](const size_type logicalIndex) const
+    /// @brief Index operator.
+    /// @param logicalIndex Index of the element used to access n:th element of the buffer.
+    /// @details Constant complexity
+    /// @note The operator acts as interface that hides the physical memory layout from the user. Logical index neeeds to be added to internal tail index to get actual element address.
+    /// @return Returns a const reference the the element ad logicalIndex.
+    const_reference operator[](const size_type logicalIndex) const noexcept
     {
         auto index(m_tailIndex + logicalIndex);
 
+        // Adjust real index if buffer has wrapped around the allocated physical memory (head is "lower" than tail)
         if(m_capacity <= index)
         {
             index -= m_capacity;
@@ -905,6 +925,8 @@ public:
     /// @param logicalIndex Index of the element.
     /// @return Returns a reference the the element at index.
     /// @throw Throws std::out_of_range if index is larger or equal to buffers size.
+    /// @exception If any exceptions is thrown this function has no effect (Strong exception guarantee).
+    /// @details Constant complexity.
     reference at(size_type logicalIndex)
     {
         if(logicalIndex >= size())
@@ -925,6 +947,8 @@ public:
     /// @param logicalIndex Index of the element.
     /// @return Returns a const reference the the element at index.
     /// @throw Throws std::out_of_range if index is larger or equal to buffers size.
+    /// @exception If any exceptions is thrown this function has no effect (Strong exception guarantee).
+    /// @details Constant complexity.
     const_reference at(size_type logicalIndex) const
     {
         if(logicalIndex >= size())
@@ -942,6 +966,7 @@ public:
 
     /// @brief Member swap implementation. Swaps RingBuffers member to member.
     /// @param other Reference to a ring_buffer to swap with.
+    /// @details Constant complexity.
     void swap(ring_buffer& other) noexcept
     {
         using std::swap;
@@ -955,6 +980,7 @@ public:
     /// @brief Friend swap.
     /// @param a Swap candidate.
     /// @param b Swap candidate.
+    /// @details Constant complexity.
     friend void swap(ring_buffer& a, ring_buffer& b) noexcept
     {
         a.swap(b);
@@ -962,8 +988,12 @@ public:
 
 	/// @brief Sorts ringbuffer so that logical tail matches the first element in physical memory.
     /// @return Returns a pointer to the first element.
-    /// @note Invalidates all existing pointers to buffer elements. Iterators are not invalidated. Expensive function because of allocation and multiple copies. No exception guarantee.
-    /// @throw Can throw exceptions from memory allocation and constructors when copying elements.
+    /// @pre T must meet MoveInsertable, or CopyInsertable.
+    /// @post &this[0] == m_data.
+    /// @throw Can throw std::bad_alloc.
+    /// @exception If T's Move (or copy) constructor is not noexcept and throws, behaviour is undefined. Otherwise if exceptions are thrown (std::bad_alloc) this function has no effect (Strong exception guarantee).
+    /// @note Invalidates all existing pointers and references.
+    /// @details Linear complexity in relation to buffer size.
     pointer data()
     {
         if(!size())
@@ -971,20 +1001,30 @@ public:
             return m_data;
         }
 
-        // Create a temporary buffer and copy existing buffers elements to the start of the temporary memory.
-        auto temp = ring_buffer<T>(capacity());
+        // Data pointer for "do stuff and swap" idiom to provide strong excepion guarantee.
+        auto tempData = m_allocator.allocate(m_capacity);
 
-        std::copy(cbegin(), cend(), temp.begin());
+        for (size_t i = 0; i < size(); i++)
+        {
+            m_allocator.construct(tempData + i, std::move(this->operator[](i)));
+            m_allocator.destroy(&this->operator[](i));
+        }
 
-        // Set the head index. Whole point of this copy is to slide the buffer to the start, so tail is correctly at 0 after constructing the temporary buffer.
-        temp.m_headIndex = size();
-        
-        swap(temp);
+        m_allocator.deallocate(m_data, size());
+
+        // If memory was allocated, the buffer matches beginning of physical memory.
+        m_headIndex = size();
+        m_tailIndex = 0;
+
+        // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
+        std::swap(tempData, m_data);
+
         return m_data;
     }
 
     /// @brief Gets the size of the container.
     /// @return Size of buffer.
+    /// @det
     size_type size() const noexcept
     {
         if(m_headIndex < m_tailIndex)
@@ -995,6 +1035,7 @@ public:
         return m_headIndex - m_tailIndex;
     }
 
+    /// TODO what is this, is this needed somewhere?
     size_type max_size() const noexcept
     {
         constexpr auto maxSize = std::numeric_limits<std::size_t>::max();
@@ -1003,6 +1044,7 @@ public:
 
     /// @brief Capacity getter.
     /// @return m_capacity Returns how many elements have been allocated for the buffers use. 
+    /// @details Constant complexity.
     size_type capacity() const noexcept
     {
         return m_capacity;
@@ -1010,6 +1052,7 @@ public:
 
     /// @brief Check if buffer is empty
     /// @return True if buffer is empty
+    /// @details Constant complexity.
     bool empty() const noexcept
     {
         return m_tailIndex == m_headIndex;
@@ -1057,8 +1100,9 @@ public:
     /// @brief Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Element to insert.  Needs to be CopyConstructible.
-    /// @note If allocation happens, all iterators, pointers and references should be treated as invalidated.
+    /// @note All iterators are invalidated. If allocation happens, all pointers and references are invalidated.
     /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
+    /// @details Constant complexity.
     void push_front(value_type val)
     {
         validateCapacity(1);
@@ -1073,9 +1117,10 @@ public:
     /// @brief Inserts an element in the back of the buffer by move if move constructor is provided by value_type. If buffer would get full after the operation, allocates more memory.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Rvalue reference to the element to insert.
-    /// @note If allocation happens, all iterators, pointers and references should be treated as invalidated.
-    /// @pre T needs to satisfy MoveConstructible or CopyCostructible.
+    /// @pre T needs to satisfy MoveInsertable or CopyInsertable.
+    /// @note All iterators are invalidated. If allocation happens, all pointers and references are invalidated.
     /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
+    /// @details Constant complexity.
     void push_front(value_type&& val)
     {
         validateCapacity(1);
@@ -1094,7 +1139,7 @@ public:
     /// @throw Can throw std::bad_alloc.
     /// @exception If the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
     /// @pre T needs to satisfy CopyInsertable.
-    /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
+    /// @post If more memory is allocated, all pointers and references are invalidated.
     void push_back(const value_type& val)
     {
         validateCapacity(1);
@@ -1108,8 +1153,8 @@ public:
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
     /// @throw Can throw std::bad_alloc if more memory is allocated.
     /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception (std::bad_alloc) this function has no effect (Strong Exception Guarantee).
-    /// @pre T needs to satisfy MoveConstructible or CopyConstructible.
-    /// @post If more memory is allocated due to the buffer getting full, all pointers and references are invalidated.
+    /// @pre T needs to satisfy MoveInsertable or CopyInsertable.
+    /// @post If more memory is allocated, all pointers and references are invalidated.
     /// @details Constant complexity.
     void push_back(value_type&& val)
     {
@@ -1121,6 +1166,7 @@ public:
 
     /// @brief Remove the first element in the buffer.
     /// @pre Buffers size > 0, otherwise behaviour is undefined.
+    /// @post All iterators, pointers and references are invalidated.
     /// @details Constant complexity.
     void pop_front() noexcept
     {
@@ -1130,6 +1176,7 @@ public:
 
     /// @brief Erase an element from the logical back of the buffer.
     /// @pre Buffers size > 0, otherwise behaviour is undefined.
+    /// @post All pointers and references are invalidated. Iterators persist except end() - 1 iterator is invalidated (it becomes new past-the-last iterator).
     /// @details Constant complexity.
     void pop_back() noexcept
     {
