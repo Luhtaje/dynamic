@@ -660,12 +660,12 @@ public:
     /// @param pos Iterator where the the element should be inserted. 
     /// @param value Value to insert.
     /// @return Iterator that points to the inserted element.
-    /// @throw Can throw std::bad_alloc if allocation is required but not enough free memory available.
-    /// @exception 
+    /// @note Internally calls insertBase.
+    /// @throw Might throw std::bad_alloc, or something from T's move/copy constructor.
+    /// @exception  If any exception is thrown, invariants are retained. (Basic Exception guarantee).
+    /// @details Linear Complexity in relation to amount of inserted elements.
     iterator insert(const_iterator pos, const value_type& value)
     {
-        validateCapacity(1);
-
         return insertBase(pos, 1, value);
     }
 
@@ -673,12 +673,12 @@ public:
     /// @param pos Iterator where the the element should be inserted
     /// @param value Value to insert.
     /// @return Iterator that pos to the inserted element.
-    /// @throw Can throw std::bad_alloc, or something from element construction. 
-    /// @exception 
+    /// @note Internally calls insertBase.
+    /// @throw Might throw std::bad_alloc, or something from T's move/copy constructor.
+    /// @exception  If any exception is thrown, invariants are retained. (Basic Exception guarantee).
+    /// @details Linear Complexity in relation to amount of inserted elements.
     iterator insert(const_iterator pos, value_type&& value)
     {
-        validateCapacity(1);
-
         return insertBase(pos, 1, std::move(value));
     }
 
@@ -686,11 +686,12 @@ public:
     /// @param pos Iterator where the the element should be inserted
     /// @param value Value to insert. T must meet the requirements of CopyInsertable.
     /// @return Iterator that pos to the inserted element.
-    /// @throw Can throw std::bad_alloc, or something from element construction.
+    /// @note Internally calls insertBase.
+    /// @throw Might throw std::bad_alloc, or something from T's move/copy constructor.
+    /// @exception  If any exception is thrown, invariants are retained. (Basic Exception guarantee).
+    /// @details Linear Complexity in relation to amount of inserted elements.
     iterator insert(const_iterator pos, const size_type amount, const value_type& value)
     {
-        validateCapacity(1);
-
         return insertBase(pos, amount, value);
     }
 
@@ -700,19 +701,23 @@ public:
     /// @param begin Iterator to first element of the range.
     /// @param sourceEnd Iterator past the last element of the range.
     /// @return Returns an iterator to an element in the buffer which is copy of the first element in the range.
-    /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.
-    /// @note Type of elements in the range need to be convertible to T. Elements of range must not be part of *this.
-    /// @exception Can throw std::bad_alloc, TODO and is this strong or basic or weak guarantee? shift should not throw but... it could?
+    /// @note Internally calls insertRangeBase.
+    /// @pre pos must be a valid dereferenceable iterator within the container.Iterators must point to elements that are implicitly convertible to value_type. Otherwise behavior is undefined.
+    /// @throw Can throw std::bad_alloc and something from value_types constructor. 
+    /// @exception If any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee)
     iterator insert(const_iterator pos, const_iterator sourceBegin, const_iterator sourceEnd)
     {
-        return insertRangeBase(pos,sourceBegin, sourceEnd);
+        return insertRangeBase(pos, sourceBegin, sourceEnd);
     }
 
-    /// @brief Inserts initializer list to buffer.
+    /// @brief Inserts initializer list into buffer to a specific position.
     /// @param pos Iterator where the list will be inserted.
     /// @param list Initiliazer list to insert.
     /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.
     /// @return Returns Iterator to the first element inserted, or the element pointed by pos if the initializer list was empty.
+    /// @note Internally calls insertRangeBase.
+    /// @throw Can throw std::bad_alloc and something from value_types constructor. 
+    /// @exception If any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee)
     iterator insert(const_iterator pos, std::initializer_list<T> list)
     {
         return insertRangeBase(pos, list.begin(), list.end());
@@ -1315,9 +1320,22 @@ private:
         }
     }
 
+    /// @brief Base function for inserting elements from value.
+    /// @tparam Value type of the buffer.
+    /// @param pos Iterator pointing to the element where after insert new element will exist.
+    /// @param amount Amount of elements to insert. If 0, function does nothing.
+    /// @param value Universal reference of the value to insert.
+    /// @return Returns iterator pointing to the first element inserted. If amount == 0, returns iterator to the element where insertion was supposed to happen.
+    /// @throw Might throw std::bad_alloc from allocating memory and rotate(), or something from T's move/copy constructor.
+    /// @exception  If any exception is thrown, invariants are retained. (Basic Exception guarantee).
+    /// @details Linear Complexity in relation to amount of inserted elements.
     template<typename T>
     iterator insertBase(const_iterator pos, const size_type amount, T&& value)
     {
+        iterator it(this, pos.getIndex());
+
+        if (!amount) return it;
+
         validateCapacity(amount);
 
         for (size_type i = 0; i < amount; i++)
@@ -1327,14 +1345,23 @@ private:
             increment(m_headIndex);
         }
 
-        iterator it(this, pos.getIndex());
-
         // Rotate elements from the back into pos.
         std::rotate(it, end() - amount, end());
 
         return it;
     }
 
+    /// @brief Base function for inserting elements from a range of [rangeBegin, rangeEnd).
+    /// @tparam InputIt type of the buffer.
+    /// @param pos Iterator pointing to the element where after insert new element will exist.
+    /// @param rangeBegin Iterator pointing to the first element of the range.
+    /// @param rangeEnd Iterator pointing past the last element to be inserted.
+    /// @return Returns iterator pointing to the first element inserted.
+    /// @pre T must meet CopyInsertable.
+    /// @post Each iterator in [rangeBegin, rangeEnd) is dereferenced once.
+    /// @throw Might throw std::bad_alloc from allocating memory and rotate(), or something from T's move/copy constructor.
+    /// @exception  If any exception is thrown, invariants are retained. (Basic Exception guarantee).
+    /// @details Linear Complexity in relation to amount of inserted elements.
     template<typename InputIt>
     iterator insertRangeBase(const_iterator pos, InputIt rangeBegin, InputIt rangeEnd)
     {

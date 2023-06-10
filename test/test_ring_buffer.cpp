@@ -365,7 +365,7 @@ TYPED_TEST(RingBufferTest, assignInitListOperator)
     ASSERT_EQ(t_buffer.size(), initList.size());
 }
 
-// Tests requirement: SequenceContainer expression a.emplace(p, args) where p is position iterator.
+// Tests requirement: SequenceContainer emplace() expression a.emplace(p, args) where p is position iterator.
 TEST(NonTypedTest, emplace)
 {
     ring_buffer<std::pair<int, std::string>> testBuffer;
@@ -385,6 +385,200 @@ TEST(NonTypedTest, emplace)
     ASSERT_EQ(*posIt, emplaced);
 }
 
+// Tests requirement: SequenceContainer, Insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
+TYPED_TEST(RingBufferTest, insert)
+{
+    const auto beginIt = t_buffer.begin();
+    const auto size = t_buffer.size();
+
+    // Test the returned iterator and inserted value.
+    const auto value = getValue<TypeParam>();
+    auto pointIt = t_buffer.insert(beginIt + 1, value);
+
+    ASSERT_EQ(*pointIt, value);
+    ASSERT_EQ(t_buffer[1], value);
+
+    // Tests the same things for the last element.
+    const auto pointIt2 = t_buffer.insert(beginIt + (size), value);
+    ASSERT_EQ(*pointIt2, value);
+    ASSERT_EQ(t_buffer[size], value);
+}
+
+// Tests requiremet: SequenceContainer, Insert() expression a.insert(a, rv) where a is a postion iterator and rv is an rvalue.
+TYPED_TEST(RingBufferTest, insertRV)
+{
+    const auto it = t_buffer.begin();
+    const auto size = t_buffer.size();
+
+    // Test that returned iterator points to correct element and that the value is correct
+    const auto value = getValue<TypeParam>();
+    auto pointIt = t_buffer.insert(it + 1, std::move(value));
+
+    ASSERT_EQ(*pointIt, value);
+    ASSERT_EQ(t_buffer[1], value);
+}
+
+// Tests requirement: SequenceContainer, insert() exprssion a.insert(p, n, t) where p is position iterator, n is a size_type and t is a value of value type a::value_type.
+TYPED_TEST(RingBufferTest, insertSizeVal)
+{
+    const auto amount = 3;
+    const auto insertPosIndex = 2;
+    const auto value = getValue<TypeParam>();
+    const auto insertPosIt = t_buffer.begin() + insertPosIndex;
+
+    const auto refBuffer(t_buffer);
+
+    t_buffer.insert(insertPosIt, amount, value);
+
+    // Check inserted elements are correct
+    for (size_t i = 0; i < amount; i++)
+    {
+        ASSERT_EQ(t_buffer[i + insertPosIndex], value);
+    }
+
+    // Check buffer outside inserted elements remains untouched.
+    for (size_t i = 0; i < refBuffer.size(); i++)
+    {
+        if (i < insertPosIndex)
+        {
+            ASSERT_EQ(t_buffer[i], refBuffer[i]);
+        }
+        else
+        {
+            ASSERT_EQ(t_buffer[i + amount], refBuffer[i]);
+        }
+    }
+}
+
+// Tests requirement: SequenceContainer, insert() exprssion a.insert(p, i, j) where p is position iterator and [i, j) is a valid range.
+TYPED_TEST(RingBufferTest, insertRange)
+{
+    const auto pos = 1;
+    const auto amount = 2;
+    const auto beginOffset = 1;
+    ring_buffer<TypeParam> rangeSource = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+    const auto refBuffer(t_buffer);
+
+    const auto rangeBeginIt = rangeSource.begin() + beginOffset;
+    const auto rangeEndIt = rangeBeginIt + amount;
+    const auto posIt = t_buffer.begin() + pos;
+
+    const auto returnIt = t_buffer.insert(posIt, rangeBeginIt, rangeEndIt);
+
+    // Verify buffer state.
+    for (size_t i = 0; i < refBuffer.size(); i++)
+    {
+        // Check beginning of buffer is unchanged
+        if (i < pos)
+        {
+            ASSERT_EQ(t_buffer[i], refBuffer[i]);
+        }
+        // Check remainder after range insertion is unchanged
+        else if ((amount + pos) < i)
+        {
+            ASSERT_EQ(t_buffer[i + amount], refBuffer[i]);
+        }
+    }
+
+    for (size_t i = 0; i < amount; i++)
+    {
+        ASSERT_EQ(returnIt[i], posIt[i]);
+        ASSERT_EQ(rangeSource[beginOffset + i], t_buffer[pos + i]);
+    }
+}
+
+// Tests requirement: SequenceContainer insert() expression insert(p, il) where il is std::initializer_list<T>
+TYPED_TEST(RingBufferTest, insertInitializerList)
+{
+    const auto pos = 3;
+    const auto posIt = t_buffer.begin() + pos;
+    const auto refBuffer(t_buffer);
+    std::initializer_list<TypeParam> initList{ static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()),static_cast<TypeParam>(getValue<TypeParam>()),
+                                                static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()) };
+
+    t_buffer.insert(posIt, initList);
+
+    //Check the elements outside inserted range is correct.
+    for (size_t i = 0; i < refBuffer.size(); i++)
+    {   // Before inserted elements.
+        if (i < pos)
+        {
+            ASSERT_EQ(refBuffer[i], t_buffer[i]);
+        }
+        // After inserted elements.
+        else
+        {
+            ASSERT_EQ(refBuffer[i], t_buffer[i + initList.size()]);
+        }
+    }
+
+    // Check the inserted elements are correct.
+    for (size_t i = 0; i < initList.size(); i++)
+    {
+        ASSERT_EQ(*(initList.begin() + i), t_buffer[pos + i]);
+    }
+}
+
+// Tests requirement: SequenceContainer, erase() expression erase(q) where q is a valid dereferenceable const iterator into a.
+TYPED_TEST(RingBufferTest, erase)
+{
+    const auto offset = 1;
+    const auto beginIt = t_buffer.cbegin() + offset;
+    const auto refBuffer(t_buffer);
+
+    const auto erasedIt = t_buffer.erase(beginIt);
+    ASSERT_EQ(erasedIt, beginIt);
+    for (auto i = offset; i < t_buffer.size() - offset; i++)
+    {
+        ASSERT_EQ(refBuffer[i + 1], t_buffer[i]);
+    }
+}
+
+// Tests a special case of erase(). Erasing at end iterator (past the last element) basically does nothing.
+TYPED_TEST(RingBufferTest, eraseLast)
+{
+    const auto offset = 1;
+    const auto endIt = t_buffer.cend();
+    const auto refIt = t_buffer.cend() - offset;
+    const auto refBuffer(t_buffer);
+    const auto newLastValue = *refIt;
+
+    const auto erasedIt = t_buffer.erase(endIt);
+
+    ASSERT_EQ(erasedIt, refIt);
+    ASSERT_EQ(erasedIt, t_buffer.end());
+    ASSERT_EQ(newLastValue, *erasedIt);
+
+    for (size_t i = 0; i < t_buffer.size(); i++)
+    {
+        ASSERT_EQ(refBuffer[i], t_buffer[i]);
+    }
+}
+
+// Tests requirement: SequenceContainer erase() expression erase(q1 , q2)
+TYPED_TEST(RingBufferTest, eraseRange)
+{
+    auto rangeBegin = t_buffer.begin() + 2;
+    auto rangeEnd = t_buffer.begin() + 4;
+    const auto diff = rangeEnd - rangeBegin;
+    auto refBuffer(t_buffer);
+    
+    auto erasedIt = t_buffer.erase(rangeBegin, rangeEnd);
+
+    // Before erased elements
+    for (auto it = t_buffer.begin(); it != rangeBegin; it++)
+    {
+        ASSERT_EQ(refBuffer[it.getIndex()], *it);
+    }
+
+    // After erased elements.
+    for (; erasedIt != t_buffer.end(); erasedIt++)
+    {
+        ASSERT_EQ(refBuffer[erasedIt.getIndex() + diff], *erasedIt);
+    }
+}
+
+// Tests requirement
 TYPED_TEST(RingBufferTest, accessOperator)
 {
     const auto frontVal = getValue<TypeParam>();
@@ -561,198 +755,6 @@ TYPED_TEST(RingBufferTest, pushFrontRV)
 TYPED_TEST(RingBufferTest, front)
 {
     ASSERT_EQ(t_buffer.front(), *t_buffer.begin());
-}
-
-// Tests requirement: SequenceContainer, Insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
-TYPED_TEST(RingBufferTest, insert)
-{
-    const auto beginIt = t_buffer.begin();
-    const auto size = t_buffer.size();
-
-    // Test the returned iterator and inserted value.
-    const auto value = getValue<TypeParam>();
-    auto pointIt = t_buffer.insert(beginIt + 1, value);
-    ASSERT_EQ(*pointIt, value);
-    ASSERT_EQ(t_buffer[1], value);
-
-    // Tests the same things for the last element.
-    const auto pointIt2 = t_buffer.insert(beginIt + (size), value);
-    ASSERT_EQ(*pointIt2, value);
-    ASSERT_EQ(t_buffer[size], value);
-
-}
-
-// Tests requiremet: SequenceContainer, Insert() expression a.insert(a, rv) where a is a postion iterator and rv is an rvalue.
-TYPED_TEST(RingBufferTest, insertRV)
-{
-    const auto it = t_buffer.begin();
-    const auto size = t_buffer.size();
-
-    // Test that returned iterator points to correct element and that the value is correct
-    const auto value = getValue<TypeParam>();
-    auto pointIt = t_buffer.insert(it + 1, std::move(value));
-
-    ASSERT_EQ(*pointIt, value);
-    ASSERT_EQ(t_buffer[1], value);
-}
-
-// Tests requirement: SequenceContainer, insert() exprssion a.insert(p, n, t) where p is position iterator, n is a size_type and t is a value of value type a::value_type.
-TYPED_TEST(RingBufferTest, insertSizeVal)
-{
-    const auto amount = 3;
-    const auto insertPosIndex = 2;
-    const auto value = getValue<TypeParam>();
-    const auto insertPosIt = t_buffer.begin() + insertPosIndex;
-
-    const auto refBuffer(t_buffer);
-
-    t_buffer.insert(insertPosIt, amount, value);
-
-    // Check inserted elements are correct
-    for(size_t i = 0; i < amount; i++)
-    {
-        ASSERT_EQ(t_buffer[i + insertPosIndex], value);
-    }
-
-    // Check buffer outside inserted elements remains untouched.
-    for(size_t i = 0; i < refBuffer.size(); i++)
-    {
-        if(i < insertPosIndex)
-        {
-            ASSERT_EQ(t_buffer[i], refBuffer[i]);
-        }
-        else
-        {
-            ASSERT_EQ(t_buffer[i + amount], refBuffer[i]);
-        }
-    }
-}
-
-// Tests requirement: SequenceContainer, insert() exprssion a.insert(p, i, j) where p is position iterator and [i, j) is a valid range.
-TYPED_TEST(RingBufferTest, insertRange)
-{
-    const auto pos = 1;
-    const auto amount = 2;
-    const auto beginOffset = 1;
-    ring_buffer<TypeParam> rangeSource = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
-    const auto refBuffer(t_buffer);
-
-    const auto rangeBeginIt = rangeSource.begin() + beginOffset;
-    const auto rangeEndIt = rangeBeginIt + amount;
-    const auto posIt = t_buffer.begin() + pos;
-
-    const auto returnIt = t_buffer.insert(posIt, rangeBeginIt, rangeEndIt);
-
-    // Verify buffer state.
-    for(size_t i = 0; i < refBuffer.size(); i ++)
-    {
-        // Check beginning of buffer is unchanged
-        if(i < pos)
-        {
-            ASSERT_EQ(t_buffer[i], refBuffer[i]);
-        }
-        // Check remainder after range insertion is unchanged
-        else if ((amount + pos) < i)
-        {
-            ASSERT_EQ(t_buffer[i + amount], refBuffer[i]);
-        }
-    }
-
-    for(size_t i = 0; i < amount ; i++)
-    {
-        ASSERT_EQ(returnIt[i], posIt[i]);
-        ASSERT_EQ(rangeSource[beginOffset + i], t_buffer[pos + i]);
-    }
-}
-
-TYPED_TEST(RingBufferTest, insertInitializerList)
-{
-    const auto pos = 3;
-    const auto posIt = t_buffer.begin() + pos;
-    const auto refBuffer(t_buffer);
-    std::initializer_list<TypeParam> initList {static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()),static_cast<TypeParam>(getValue<TypeParam>()),
-                                                static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>()), static_cast<TypeParam>(getValue<TypeParam>())};
-
-    t_buffer.insert(posIt, initList);
-
-    //Check the elements outside inserted range is correct.
-    for(size_t i = 0; i < refBuffer.size(); i++)
-    {   // Before inserted elements.
-        if(i < pos)
-        {
-            ASSERT_EQ(refBuffer[i], t_buffer[i]);
-        }
-        // After inserted elements.
-        else
-        {
-            ASSERT_EQ(refBuffer[i], t_buffer[i + initList.size()]);
-        }
-    }
-
-    // Check the inserted elements are correct.
-    for (size_t i = 0; i < initList.size(); i++)
-    {
-        ASSERT_EQ(*(initList.begin() + i), t_buffer[pos + i]);
-    }
-}
-
-// Tests requirement: SequenceContainer, erase() expression erase(q) where q is a valid dereferenceable const iterator into a.
-TYPED_TEST(RingBufferTest, erase)
-{
-    const auto offset = 1;
-    const auto beginIt = t_buffer.cbegin() + offset;
-    const auto refBuffer(t_buffer);
-
-    const auto erasedIt =  t_buffer.erase(beginIt);
-    ASSERT_EQ(erasedIt, beginIt);
-    for(auto i = offset; i < t_buffer.size() - offset; i++)
-    {
-        ASSERT_EQ(refBuffer[i + 1], t_buffer[i]);
-    }
-}
-
-// Tests a special case of erase(). Erasing at end iterator (past the last element) basically does nothing.
-TYPED_TEST(RingBufferTest, eraseLast)
-{
-    const auto offset = 1;
-    const auto endIt = t_buffer.cend();
-    const auto refIt = t_buffer.cend() - offset;
-    const auto refBuffer(t_buffer);
-    const auto newLastValue = *refIt;
-
-    const auto erasedIt = t_buffer.erase(endIt);
-
-    ASSERT_EQ(erasedIt, refIt);
-    ASSERT_EQ(erasedIt, t_buffer.end());
-    ASSERT_EQ(newLastValue, *erasedIt);
-
-    for(size_t i = 0; i < t_buffer.size(); i++)
-    {
-        ASSERT_EQ(refBuffer[i], t_buffer[i]);
-    }
-}
-
-TYPED_TEST(RingBufferTest, eraseRange)
-{
-    const auto beginIndex = 2;
-    const auto endIndex = 4;
-    const auto beginIt = t_buffer.begin() + beginIndex;
-    const auto endIt = t_buffer.begin() + endIndex;
-    const auto refBuffer(t_buffer);
-    const auto refValue = *endIt;
-
-    const auto erasedIt = t_buffer.erase(beginIt, endIt);
-    ASSERT_EQ(refValue, *erasedIt);
-
-    for(size_t i = 0; i < beginIndex; i++)
-    {
-        ASSERT_EQ(refBuffer[i], t_buffer[i]);
-    }
-
-    for(auto i = endIndex; i < t_buffer.size(); i++)
-    {
-        ASSERT_EQ(refBuffer[i], t_buffer[i]);
-    }
 }
 
 TYPED_TEST(RingBufferTest, clear)
