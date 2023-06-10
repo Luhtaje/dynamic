@@ -26,9 +26,9 @@ template<class T>
 ring_buffer<T> CreateBuffer();
 
 template <>
-ring_buffer<int> CreateBuffer<int>()
+ring_buffer<std::pair<int,std::string>> CreateBuffer<std::pair<int,std::string>>()
 {
-    return ring_buffer<int>{1,2,3,4,5,6};
+    return ring_buffer < std::pair<int, std::string>>{ {1, "Hello" }, { 2, "World" }, { 3, "I" }, { 4, "Love" }, { 5, "Mackerel"}, { 6, "wow" }};
 }
 
 template <>
@@ -65,13 +65,14 @@ ring_buffer<char> CreateBuffer<char>(int /*size*/)
 }
 
 template <>
-ring_buffer<int> CreateBuffer<int>(int /*size*/)
+ring_buffer<std::pair<int, std::string>> CreateBuffer<std::pair<int, std::string>>(int /*size*/)
 {
     srand(time(0));
-    auto buf = ring_buffer<int>();
+    auto buf = ring_buffer<std::pair<int,std::string>>();
     for(size_t i = 0 ; i < TEST_BUFFER_SIZE; i++)
     {
-        buf.push_back(rand() % 26);
+        std::pair<int, std::string> pair(rand() % 26, "hello world");
+        buf.push_back(pair);
     }
     return buf;
 }
@@ -102,10 +103,11 @@ template <typename T>
 T getValue();
 
 template <>
-int getValue<int>()
+std::pair<int, std::string> getValue<std::pair<int,std::string>>()
 {
     srand(time(0));
-    return rand() % 100;
+
+    return std::pair<int, std::string>(rand() % 100, "value");
 }
 
 template <>
@@ -139,7 +141,7 @@ protected:
     RingBufferTest() : t_buffer(CreateBuffer<T>()) {}
 };
 
-using Types = ::testing::Types<char, int, std::string>;
+using Types = ::testing::Types<char, std::pair<int,std::string>, std::string>;
 TYPED_TEST_SUITE(RingBufferTest, Types);
 
 //=======================================================================================================================================================================================
@@ -364,12 +366,23 @@ TYPED_TEST(RingBufferTest, assignInitListOperator)
 }
 
 // Tests requirement: SequenceContainer expression a.emplace(p, args) where p is position iterator.
-TYPED_TEST(RingBufferTest, emplace)
+TEST(NonTypedTest, emplace)
 {
-    auto it = t_buffer.begin();
-    ++it;
+    ring_buffer<std::pair<int, std::string>> testBuffer;
 
-    //t_buffer.emplace(it,59);
+    std::pair<int, std::string> first { 51, "hello" };
+    std::pair<int, std::string> second{ 53, "world" };
+
+    testBuffer.push_back(first);
+    testBuffer.push_back(second);
+
+
+    std::pair<int, std::string> emplaced{ 1, "I love Mackerel" };
+
+    auto posIt = testBuffer.begin() + 1;
+    testBuffer.emplace(posIt, emplaced.first, emplaced.second);
+
+    ASSERT_EQ(*posIt, emplaced);
 }
 
 TYPED_TEST(RingBufferTest, accessOperator)

@@ -4,7 +4,7 @@
 #include <memory>
 #include <algorithm>
 #include <limits>
-#include <vector>
+#include <utility>
 
 // Forward declaration of _rBuf_const_iterator.
 template<class _rBuf>
@@ -718,26 +718,26 @@ public:
         return insertRangeBase(pos, list.begin(), list.end());
     }
 
+    /// @brief Construct an element in place from arguments.
+    /// @param pos Iterator pointing to the element where the new element will be constructed.
+    /// @param args Argument pack containing arguments to construct value_type element.
+    /// @return Returns an iterator pointing to the element constructed from args.
+    /// @pre T must meet EmplaceConstructible.
+    /// @post returned iterator points at the element constructed from args.
+    /// @throw Can throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element. Additionally, rotate can throw bad_alloc and if T does not provide a noexcept move semantics.
+    /// @exception If any exception is thrown, invariants are preserved. (Basic exception guarantee).
+    /// @details Constant complexity.
     template<class... Args>
     iterator emplace(const_iterator pos, Args&&... args)
     {
-        // Shift requires that enough memory is allocated, allocate enough for size + the emplaced element.
-        while(m_capacity - 1 <= size() + 1)
-        {
-            reserve(m_capacity * 1.5);
-        }
+        validateCapacity(1);
 
-        size_t index = pos.getIndex();
-
-        // If pos is not end iterator.
-        if( index < size())
-        {
-            shift(pos, 1);
-        }
-
-        m_allocator.construct(&(*pos), std::forward<Args>(args)...);
+        iterator it(this, pos.getIndex());
+        m_allocator.construct(&*end(), std::forward<Args>(args)...);
         increment(m_headIndex);
-        return iterator(this, pos.getIndex());
+        std::rotate(it, end() - 1, end());
+
+        return it;
     }
 
     /// @brief Erase an element at a given position.
@@ -864,7 +864,7 @@ public:
     /// @return Reference to the buffer.
     /// @exception If T is not MoveConstructible, and a throwing CopyConstructor which throws this function has no effect (Strong Exception Guarantee).
     /// @details Constant complexity.
-    ring_buffer& operator=(ring_buffer&& other)
+    ring_buffer& operator=(ring_buffer&& other) noexcept
     {
         ring_buffer copy(std::move(other));
         copy.swap(*this);
@@ -1074,11 +1074,11 @@ public:
         }
         else
         {
-            if (newCapacity < size() + 2) return;
+            if (newCapacity < size() ) return;
         }
 
         // Data pointer for "do stuff and swap" idiom to provide strong excepion guarantee.
-        auto tempData = m_allocator.allocate(newCapacity);
+        auto tempData = m_allocator.allocate(newCapacity + 2);
 
         for (size_t i = 0; i < size(); i++)
         {
@@ -1086,12 +1086,12 @@ public:
             m_allocator.destroy(&this->operator[](i));
         }
 
-        m_allocator.deallocate(m_data, size());
+        m_allocator.deallocate(m_data, m_capacity);
 
         // If memory was allocated, the buffer matches beginning of physical memory.
         m_headIndex = size();
         m_tailIndex = 0;
-        m_capacity = newCapacity;
+        m_capacity = newCapacity +2;
 
         // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
         std::swap(tempData, m_data);
@@ -1200,7 +1200,7 @@ public:
             return;
         }
 
-        reserve(size() + 2, true);
+        reserve(size(), true);
     }
 
 //===========================================================
@@ -1323,7 +1323,7 @@ private:
         for (size_type i = 0; i < amount; i++)
         {
             // Construct element at the end.
-            m_allocator.construct(&(*end()), std::forward<T>(value));
+            m_allocator.construct(&*end(), std::forward<T>(value));
             increment(m_headIndex);
         }
 
