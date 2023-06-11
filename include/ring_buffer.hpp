@@ -12,7 +12,7 @@ class _rBuf_const_iterator;
 
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
-/// @tparam T Type of the elements. Must meet the requirement EmplaceCostructible.
+/// @tparam T Type of the elements.
 /// @tparam Allocator Allocator used for (de)allocation and (de)construction. Defaults to std::allocator<T>
 template<typename T, typename Allocator = std::allocator<T>> 
 class ring_buffer
@@ -536,7 +536,7 @@ public:
     /// @brief Default constructor. Constructs to 0 size and 2 capacity.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @post this->empty() == true.
-    /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Constant complexity.
     ring_buffer() : ring_buffer(0, allocator_type())
     {
@@ -546,7 +546,7 @@ public:
     /// @param alloc Custom allocator for the buffer.
     /// @post this->empty() == true.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
-    /// @exception If an exception is thrown, this function has no effect. Strong exception guarantee.
+    /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Constant complexity.
     explicit ring_buffer(const allocator_type& alloc) : ring_buffer(0, alloc)
     {
@@ -560,11 +560,13 @@ public:
     /// @post std::distance(begin(), end()) == count.
     /// @note Allocates memory for count + 2 elements.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
-    /// @exception 
+    /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to amount of constructed elements.
-    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
+    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
     {
-        m_data = m_allocator.allocate(m_capacity);
+        m_data = m_allocator.allocate(count + 2);
+        m_capacity = count + 2;
+
         for (size_t i = 0; i < count; i++)
         {
             push_back(val);
@@ -575,11 +577,13 @@ public:
     /// @param capacity Capacity of the buffer.
     /// @pre T must satisfy DefaultInsertable.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
-    /// @exception If an exception is thrown bad_alloc is thrown trong exception guarantee.
+    /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to count.
-    explicit ring_buffer(size_type count, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
+    explicit ring_buffer(size_type count, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
     {
-        m_data = m_allocator.allocate(m_capacity);
+        m_data = m_allocator.allocate(count + 2);
+        m_capacity = count + 2;
+
         for (size_t i = 0; i < count; i++)
         {
             m_allocator.construct(m_data + i);
@@ -590,22 +594,23 @@ public:
     /// @brief Construct the buffer from range [begin,end).
     /// @param beginIt Iterator to first element of range.
     /// @param endIt Iterator pointing to past-the-last element of range.
-    /// @pre T must satisfy CopyInsertable. InputIt must be dereferenceable to value_type and end must be reachable from begin by (possibly repeatedly) incrementing begin. Otherwise behaviour is undefined.
-    /// @exception Might throw std::bad_alloc if there is not enough memory available for allocation.
+    /// @pre T must satisfy CopyInsertable. InputIt must meet LegacyInputIterator. Otherwise behaviour is undefined.
+    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or something from T's constructor.
+    /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to the size of the range.
     /// @note Behavior is undefined if elements in range are not valid.
     template<typename InputIt>
-    ring_buffer(InputIt beginIt, InputIt endIt)
+    ring_buffer(InputIt beginIt, InputIt endIt) : m_tailIndex(0) , m_headIndex(0)
     {
         const auto size = std::distance<InputIt>(beginIt , endIt);
+
+        m_data = m_allocator.allocate(size + 2);
         m_capacity = size + 2;
-        m_headIndex = size;
-        m_tailIndex = 0;
-        m_data = m_allocator.allocate(m_capacity);
 
         for (size_t i = 0; i < size; i++)
         {
             m_allocator.construct(m_data + i, *(beginIt + i));
+            increment(m_headIndex);
         }
     }
 
@@ -625,13 +630,15 @@ public:
     /// @post this == ring_buffer(rhs).
     /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation.
     /// @details Linear complexity in relation to buffer size.
-    ring_buffer(const ring_buffer& rhs) : m_capacity(rhs.m_capacity), m_headIndex(rhs.m_headIndex), m_tailIndex(rhs.m_tailIndex)
+    ring_buffer(const ring_buffer& rhs) : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex)
     {
-        m_data = m_allocator.allocate(m_capacity);
+        m_data = m_allocator.allocate(rhs.capacity());
+        m_capacity = rhs.capacity();
 
         for (size_t i = 0; i < rhs.size(); i++)
         {
             m_allocator.construct(&this->operator[](i), rhs[i]);
+            increment(m_headIndex);
         }
     }
 
@@ -713,10 +720,10 @@ public:
     /// @brief Inserts initializer list into buffer to a specific position.
     /// @param pos Iterator where the list will be inserted.
     /// @param list Initiliazer list to insert.
-    /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.
+    /// @pre pos must be a valid dereferenceable iterator within the container. Otherwise behavior is undefined.
     /// @return Returns Iterator to the first element inserted, or the element pointed by pos if the initializer list was empty.
     /// @note Internally calls insertRangeBase.
-    /// @throw Can throw std::bad_alloc and something from value_types constructor. 
+    /// @throw Can throw std::bad_alloc and something from value_types constructor.
     /// @exception If any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee)
     iterator insert(const_iterator pos, std::initializer_list<T> list)
     {
@@ -926,7 +933,7 @@ public:
         return m_data[index];
     }
 
-    /// @brief Get a specific element of the buffer.
+    /// @brief Get a specific element of the buffer with bounds checking.
     /// @param logicalIndex Index of the element.
     /// @return Returns a reference the the element at index.
     /// @throw Throws std::out_of_range if index is larger or equal to buffers size.
@@ -1069,7 +1076,7 @@ public:
     /// @param enableShrink True to enable reserve to reduce the capacity, to a minimum of size() +2.
     /// @throw Can throw std::bad_alloc. 
     /// @exception If T's move (or copy if T has no move) constructor throws, behaviour is undefined. Otherwise Stong Exception Guarantee.
-    /// @notes All references and pointers are invalidated (iterators stay valid).
+    /// @notes All references and pointers are invalidated (iterators stay valid). If memory is allocated, the memory layout is rotated so that first element matches the beginning of physical memory.
     /// @details Linear complexity in relation to size of the buffer.
     void reserve(size_type newCapacity, bool enableShrink = false)
     {
@@ -1082,24 +1089,13 @@ public:
             if (newCapacity < size() ) return;
         }
 
-        // Data pointer for "do stuff and swap" idiom to provide strong excepion guarantee.
-        auto tempData = m_allocator.allocate(newCapacity + 2);
+        // Temp for "copy and swap" idiom to exception safe operation.
+        auto temp = ring_buffer<T, allocator_type>(newCapacity);
 
-        for (size_t i = 0; i < size(); i++)
-        {
-            m_allocator.construct(tempData + i, std::move(this->operator[](i)));
-            m_allocator.destroy(&this->operator[](i));
-        }
-
-        m_allocator.deallocate(m_data, m_capacity);
-
-        // If memory was allocated, the buffer matches beginning of physical memory.
-        m_headIndex = size();
-        m_tailIndex = 0;
-        m_capacity = newCapacity +2;
+        temp.assign(begin(), end());
 
         // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
-        std::swap(tempData, m_data);
+        this->swap(temp);
     }
 
     /// @brief Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.
@@ -1328,7 +1324,7 @@ private:
     /// @return Returns iterator pointing to the first element inserted. If amount == 0, returns iterator to the element where insertion was supposed to happen.
     /// @throw Might throw std::bad_alloc from allocating memory and rotate(), or something from T's move/copy constructor.
     /// @exception  If any exception is thrown, invariants are retained. (Basic Exception guarantee).
-    /// @details Linear Complexity in relation to amount of inserted elements.
+    /// @details Linear Complexity in relation to amount of inserted elements times (O(n*2) from construction and rotate).
     template<typename T>
     iterator insertBase(const_iterator pos, const size_type amount, T&& value)
     {
@@ -1361,7 +1357,7 @@ private:
     /// @post Each iterator in [rangeBegin, rangeEnd) is dereferenced once.
     /// @throw Might throw std::bad_alloc from allocating memory and rotate(), or something from T's move/copy constructor.
     /// @exception  If any exception is thrown, invariants are retained. (Basic Exception guarantee).
-    /// @details Linear Complexity in relation to amount of inserted elements.
+    /// @details Linear Complexity in relation to amount of inserted elements (O(n*2) from construction and rotate).
     template<typename InputIt>
     iterator insertRangeBase(const_iterator pos, InputIt rangeBegin, InputIt rangeEnd)
     {
@@ -1385,7 +1381,7 @@ private:
     void increment(size_t& index) noexcept
     {   
         ++index;
-        //Reaching equal is past the last element, then wraps around.
+        // Wrap index around at end of capacity.
         if(index >= m_capacity)
         {
             index = 0;
@@ -1412,7 +1408,8 @@ private:
         {
             index = m_capacity - 1;
         }
-        else{
+        else
+        {
             --index;
         }
     }

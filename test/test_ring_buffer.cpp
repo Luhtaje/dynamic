@@ -578,7 +578,7 @@ TYPED_TEST(RingBufferTest, eraseRange)
     }
 }
 
-// Tests requirement
+// Tests requirement 
 TYPED_TEST(RingBufferTest, accessOperator)
 {
     const auto frontVal = getValue<TypeParam>();
