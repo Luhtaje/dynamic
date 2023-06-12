@@ -37,7 +37,7 @@ public:
     /// @brief Custom iterator class.
     /// @tparam T Type of the element what iterator points to.
     template<class _rBuf>
-    class _rBuf_iterator
+    class _rBuf_iterator : public _rBuf_const_iterator<_rBuf>
     {
 
     public:
@@ -50,37 +50,34 @@ public:
 
     public:
 
-        /// @brief  Const iterator is friend to enable conversion.
-        friend class _rBuf_const_iterator<_rBuf>;
-
         /// @brief Default constructor
-        _rBuf_iterator() : m_container(nullptr), m_logicalIndex(0) {}
+        _rBuf_iterator() = default;
 
         /// @brief Constructor.
         /// @param container Pointer to the ring_buffer element which owns this iterator.
         /// @param index Index pointing to the logical element of the ring_buffer.
-        explicit _rBuf_iterator(_rBuf* container, difference_type index) : m_container(container), m_logicalIndex(index) {}
+        explicit _rBuf_iterator(_rBuf* container, size_type index) : _rBuf_const_iterator(container, index) {}
 
         /// @brief Dereference operator
         /// @return  Returns the object the iterator is currently pointing to.
-        reference operator*() const
+        reference operator*() const noexcept
         {
             //TODO: bounds checking and value-initialization.
-            return (*m_container)[m_logicalIndex];
+            return const_cast<reference>(_rBuf_const_iterator<_rBuf>::operator*());
         }
 
         /// @brief Pointer operator.
         /// @return Returns a pointer to the object the iterator is currently pointing to.
-        pointer operator->() const
+        pointer operator->() const noexcept
         {
             //TODO: check value initialization and bounds.
-            return &(*m_container)[m_logicalIndex];
+            return const_cast<pointer>(_rBuf_const_iterator<_rBuf>::operator->());
         }
 
         /// @brief Prefix increment
         /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
         /// See Iterator::operator* and ring_buffer::operator[].
-        _rBuf_iterator& operator++()
+        _rBuf_iterator& operator++() noexcept
         {
             ++m_logicalIndex;
             return (*this);
@@ -98,7 +95,7 @@ public:
         }
 
         /// @brief prefix decrement
-        _rBuf_iterator& operator--()
+        _rBuf_iterator& operator--() noexcept
         {
             --m_logicalIndex;
             if (m_logicalIndex < 0)
@@ -123,7 +120,7 @@ public:
 
         /// @brief Moves iterator forward.
         /// @param offset Amount of elements to move.
-        _rBuf_iterator& operator+=(difference_type offset)
+        _rBuf_iterator& operator+=(int offset) noexcept
         {
             const auto capacity = m_container->capacity();
             // TODO : make this better. Absolutely terrible
@@ -155,12 +152,12 @@ public:
         /// @param movement Amount of elements to move the iterator.
         _rBuf_iterator operator+(const difference_type offset) const
         {
-            _rBuf_iterator temp(m_container, m_logicalIndex);
+            _rBuf_iterator temp(*this);
             return (temp += offset);
         }
 
         // TODO
-        friend _rBuf_iterator operator+(difference_type offset, _rBuf_iterator iter)
+        friend _rBuf_iterator operator+(const difference_type offset, const _rBuf_iterator iter)
         {
             auto temp = iter;
             temp += offset;
@@ -171,7 +168,7 @@ public:
         /// @param offset The number of positions to move the iterator backward.
         /// @return An iterator pointing to the element that is offset positions before the current element.
         /// @note Undefined behavior for negative offset.
-        _rBuf_iterator& operator-=(const difference_type offset)
+        _rBuf_iterator& operator-=(const difference_type offset) noexcept
         {
             return (*this += -offset);
         }
@@ -179,16 +176,16 @@ public:
         /// @brief Returns an iterator that points to an element, which is the current element decremented by the given offset.
         /// @param offset The number of positions to move the iterator backward.
         /// @return An iterator pointing to the element that is offset positions before the current element.
-        _rBuf_iterator& operator-(const difference_type offset) const
+        _rBuf_iterator operator-(const difference_type offset) const
         {
-            _rBuf_iterator temp(m_container, m_logicalIndex);
+            _rBuf_iterator temp(*this);
             return (temp -= offset);
         }
 
         /// @brief Gets distance between two iterators.
         /// @param iterator Iterator to get distance to.
         /// @return Amount of elements between the iterators.
-        difference_type operator-(const _rBuf_iterator& other) const
+        difference_type operator-(const _rBuf_iterator& other) const noexcept
         {
             //TODO: compatibility check
             return (m_logicalIndex - other.m_logicalIndex);
@@ -197,35 +194,15 @@ public:
         /// @brief Index operator.
         /// @param offset The offset from iterator.
         /// @return Return object pointer by the iterator with an offset.
-        reference operator[](const difference_type offset) const
+        reference operator[](const difference_type offset) const noexcept
         {
-            return m_container->operator[](m_logicalIndex + offset);
-        }
-
-        /// @brief Comparison operator== overload
-        /// @param other iterator to compare
-        /// @return True if iterators point to same element in same container. Does not compare c-qualification.
-        /// @note As a matter of fact, just blatantly calls const-iterators operator, to access private members via friendness. All non-const iterators are converted to const for this comparison.
-        template<typename iterator>
-        bool operator==(const iterator& other) const
-        {
-            return _rBuf_const_iterator<_rBuf>(*this).operator==(other);
-        }
-
-        /// @brief Comparison operator != overload
-        /// @param other iterator to compare
-        /// @return ture if underlying pointers are not the same
-        template<typename iterator>
-        bool operator!=(const iterator& other) const
-        {
-
-            return !(*this == other);
+            return const_cast<reference>(m_container->operator[](offset));
         }
 
         /// @brief Comparison operator < overload
         /// @param other iterator to compare
         /// @return true if other is larger.
-        bool operator<(const _rBuf_iterator& other) const
+        bool operator<(const _rBuf_iterator& other) const noexcept
         {
             //TODO:compatibility check
             return (m_logicalIndex < other.m_logicalIndex);
@@ -234,27 +211,27 @@ public:
         /// @brief Comparison operator > overload
         /// @param other iterator to compare
         /// @return true if other is smaller.
-        bool operator>(const _rBuf_iterator& other) const
+        bool operator>(const _rBuf_iterator& other) const noexcept
         {
             //TODO:compatibility check
-            return (other.m_logicalIndex < m_logicalIndex);
+            return (m_logicalIndex > other.m_logicalIndex);
         }
 
-        bool operator<=(const _rBuf_iterator& other) const
+        bool operator<=(const _rBuf_iterator& other) const noexcept
         {
             //TODO:compatibility check
-            return: (!(other < m_logicalIndex));
+            return (m_logicalIndex <= other.m_logicalIndex);
         }
 
-        bool operator>=(const _rBuf_iterator& other) const
+        bool operator>=(const _rBuf_iterator& other) const noexcept
         {
-            return (!(m_logicalIndex < other.m_logicalIndex));
+            return (m_logicalIndex >= other.m_logicalIndex);
         }
 
         /// @brief Custom assingment operator overload.
         /// @param index Logical index of the element to set the iterator to.
         /// @note Undefined behaviour for negative index.
-        _rBuf_iterator& operator=(size_t index)
+        _rBuf_iterator& operator=(const size_t index) noexcept
         {
             m_logicalIndex = index;
             return (*this);
@@ -265,13 +242,6 @@ public:
             return m_logicalIndex;
         }
 
-    private:
-        // The parent container.
-        _rBuf* m_container;
-
-        // The iterator does not point to any memory location, but is interfaced to the Ring Buffer via an index which is the logical index
-        // to an element. Logical index 0 is the first element in the buffer and last is size - 1.
-        difference_type m_logicalIndex;
     };
 
     /// @brief Custom iterator class.
@@ -295,10 +265,6 @@ public:
         /// @param index Index representing the logical element of the.
         explicit _rBuf_const_iterator(const _rBuf* container, difference_type index) : m_container(container), m_logicalIndex(index) {}
 
-        /// @brief Conversion constructor
-        /// @param const_iterator const iterator to construct from.
-        _rBuf_const_iterator(const _rBuf_iterator<_rBuf>& iterator) : m_container(iterator.m_container), m_logicalIndex(iterator.m_logicalIndex) {}
-
         /// @brief Conversion assingment from non-const iterator
         /// @param iterator non-const iterator.
         /// @return Returns the new object by reference
@@ -308,7 +274,7 @@ public:
             {
                 return *this;
             }
-
+            
             m_logicalIndex = iterator.m_logicalIndex;
             m_container = iterator.m_container;
             return *this;
@@ -325,7 +291,7 @@ public:
         /// @brief Postfix increment
         /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
         /// See Iterator::operator* and ring_buffer::operator[].
-        _rBuf_const_iterator& operator++()
+        _rBuf_const_iterator& operator++() noexcept
         {
             m_logicalIndex++;
 
@@ -371,7 +337,7 @@ public:
 
         /// @brief Moves iterator.
         /// @param offset Amount of elements to move. Negative values move iterator backwards.
-        _rBuf_const_iterator& operator+=(difference_type offset)
+        _rBuf_const_iterator& operator+=(difference_type offset) noexcept
         {
             const auto capacity = m_container->capacity();
             // TODO : make this better. Absolutely terrible
@@ -407,7 +373,8 @@ public:
             return (temp += offset);
         }
 
-        friend _rBuf_const_iterator operator+(const difference_type offset, _rBuf_const_iterator iter) noexcept
+        // TODO
+        friend _rBuf_const_iterator operator+(const difference_type offset, _rBuf_const_iterator iter)
         {
             auto temp = iter;
             temp += offset;
@@ -418,7 +385,7 @@ public:
         /// @param offset The number of positions to move the iterator backward.
         /// @return An iterator pointing to the element that is offset positions before the current element.
         /// @note Undefined behaviour for negative offset.
-        _rBuf_const_iterator& operator-=(const difference_type offset)
+        _rBuf_const_iterator& operator-=(const difference_type offset) noexcept
         {
             return (*this += -offset);
         }
@@ -436,7 +403,7 @@ public:
         /// @brief Gets distance between two iterators.
         /// @param iterator Iterator to get distance to.
         /// @return Amount of elements between the iterators.
-        difference_type operator-(const _rBuf_const_iterator& other) const
+        difference_type operator-(const _rBuf_const_iterator& other) const noexcept
         {
             return (m_logicalIndex - other.m_logicalIndex);
         }
@@ -444,7 +411,7 @@ public:
         /// @brief Index operator.
         /// @param offset The offset from iterator.
         /// @return Return reference to element pointed by the iterator with offset.
-        reference operator[](const difference_type offset) const
+        reference operator[](const difference_type offset) const noexcept
         {
             return m_container->operator[](m_logicalIndex + offset);
         }
@@ -452,16 +419,15 @@ public:
         /// @brief Comparison operator== overload
         /// @param other iterator to compare
         /// @return True if iterators point to same element in same container. Does not compare c-qualification.
-        bool operator==(const _rBuf_const_iterator& other) const
+        bool operator==(const _rBuf_const_iterator& other) const noexcept
         {
-            const auto pointsToSame = (m_logicalIndex == other.m_logicalIndex);
-            return pointsToSame && m_container == other.m_container;
+            return (m_logicalIndex == other.m_logicalIndex) && (m_container == other.m_container);
         }
 
         /// @brief Comparison operator != overload
         /// @param other iterator to compare
         /// @return ture if underlying pointers are not the same
-        bool operator!=(const _rBuf_const_iterator& other) const
+        bool operator!=(const _rBuf_const_iterator& other) const noexcept
         {
             return !(m_logicalIndex == other.m_logicalIndex && m_container == other.m_container);
         }
@@ -469,7 +435,7 @@ public:
         /// @brief Comparison operator < overload
         /// @param other iterator to compare
         /// @return true if other is larger.
-        bool operator<(const _rBuf_const_iterator& other) const
+        bool operator<(const _rBuf_const_iterator& other) const noexcept
         {
             return (m_logicalIndex < other.m_logicalIndex);
         }
@@ -477,26 +443,26 @@ public:
         /// @brief Comparison operator > overload
         /// @param other iterator to compare
         /// @return true if other is smaller.
-        bool operator>(const _rBuf_const_iterator& other) const
+        bool operator>(const _rBuf_const_iterator& other) const noexcept
         {
             //TODO:compatibility check
             return (other.m_logicalIndex < m_logicalIndex);
         }
 
-        bool operator<=(const _rBuf_const_iterator& other) const
+        bool operator<=(const _rBuf_const_iterator& other) const noexcept
         {
             //TODO:compatibility check
             return: (!(other < m_logicalIndex));
         }
 
-        bool operator>=(const _rBuf_const_iterator& other) const
+        bool operator>=(const _rBuf_const_iterator& other) const noexcept
         {
             return (!(m_logicalIndex < other.m_logicalIndex));
         }
 
         /// @brief Custom assingment operator overload.
         /// @param index Logical index of the element which point to.
-        _rBuf_const_iterator& operator=(size_t index) const
+        _rBuf_const_iterator& operator=(const size_t index) noexcept
         {
             m_logicalIndex = index;
             return (*this);
@@ -504,18 +470,18 @@ public:
 
         /// @brief Dereference operator.
         /// @return Object pointed by iterator.
-        reference operator*() const
+        reference operator*() const noexcept
         {
             return (*m_container)[m_logicalIndex];
         }
 
         /// @brief Returns the logical index of the element the iterator is pointing to.
-        difference_type getIndex() noexcept
+        difference_type getIndex() const noexcept
         {
             return m_logicalIndex;
         }
 
-    private:
+    protected:
         // The parent container.
         const _rBuf* m_container;
 
@@ -561,7 +527,7 @@ public:
     /// @note Allocates memory for count + 2 elements.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
-    /// @details Linear complexity in relation to amount of constructed elements.
+    /// @details Linear complexity in relation to amount of constructed elements (O(n)).
     ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
     {
         m_data = m_allocator.allocate(count + 2);
@@ -578,7 +544,7 @@ public:
     /// @pre T must satisfy DefaultInsertable.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
-    /// @details Linear complexity in relation to count.
+    /// @details Linear complexity in relation to count (O(n)).
     explicit ring_buffer(size_type count, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
     {
         m_data = m_allocator.allocate(count + 2);
@@ -594,10 +560,10 @@ public:
     /// @brief Construct the buffer from range [begin,end).
     /// @param beginIt Iterator to first element of range.
     /// @param endIt Iterator pointing to past-the-last element of range.
-    /// @pre T must satisfy CopyInsertable. InputIt must meet LegacyInputIterator. Otherwise behaviour is undefined.
+    /// @pre valye_type must satisfy CopyInsertable. InputIt must be deferencable to value_type, and incrementing rangeBegin (repeatedly) must reach rangeEnd. Otherwise behaviour is undefined.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or something from T's constructor.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
-    /// @details Linear complexity in relation to the size of the range.
+    /// @details Linear complexity in relation to the size of the range (O(n)).
     /// @note Behavior is undefined if elements in range are not valid.
     template<typename InputIt>
     ring_buffer(InputIt beginIt, InputIt endIt) : m_tailIndex(0) , m_headIndex(0)
@@ -619,7 +585,7 @@ public:
     /// @pre T must satisfy CopyInsertable.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
-    /// @details Linear complexity in relation to initializer list size.
+    /// @details Linear complexity in relation to initializer list size (O(n)).
     explicit ring_buffer(std::initializer_list<T> init) : ring_buffer(init.begin(),init.end())
     {
     }
@@ -628,7 +594,8 @@ public:
     /// @param rhs Reference to a RingBuffer to create a copy from.
     /// @pre T must meet CopyInsertable.
     /// @post this == ring_buffer(rhs).
-    /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation.
+    /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation, or something from value_types constructor.
+    /// @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).
     /// @details Linear complexity in relation to buffer size.
     ring_buffer(const ring_buffer& rhs) : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex)
     {
@@ -644,13 +611,33 @@ public:
 
     /// @brief Move constructor.
     /// @param other Rvalue reference to other buffer.
-    /// @details Constant complexity.
+    /// @pre value_type must resolve std::is_nothrow_move_constructible<value_type>::value to true. Otherwise function does nothing.
+    /// @details Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant.
     ring_buffer(ring_buffer&& other) noexcept
     {
-        m_data = std::exchange(other.m_data, nullptr);
+        if (!std::is_nothrow_move_constructible<value_type>::value) return;
+
+        if (std::allocator_traits<allocator_type>::propagate_on_container_move_assignment::value)
+        {
+            m_allocator = other.get_allocator();
+            m_data = std::exchange(other.m_data, nullptr);
+        }
+        else if (m_allocator == other.get_allocator())
+        {
+            m_data = std::exchange(other.m_data, nullptr);
+        }
+        else
+        {
+            for (size_t i = 0; i < other.size(); i++)
+            {
+                m_allocator.construct(&this->operator[](other.begin().getIndex() + i), std::move(other[i]));
+            }
+        }
+
         m_capacity = std::exchange(other.m_capacity, 0);
         m_headIndex = std::exchange(other.m_headIndex, 0);
         m_tailIndex = std::exchange(other.m_tailIndex, 0);
+
     }
 
     /// Destructor.
@@ -703,16 +690,17 @@ public:
     }
 
     /// @brief Inserts a range of elements into the buffer to a specific position.
-    /// @tparam sourceIterator Type of iterator for the range.
+    /// @tparam InputIt Type of iterator for the range.
     /// @param pos Iterator to the position where range will be inserted to.
-    /// @param begin Iterator to first element of the range.
+    /// @param sourceBegin Iterator to first element of the range.
     /// @param sourceEnd Iterator past the last element of the range.
     /// @return Returns an iterator to an element in the buffer which is copy of the first element in the range.
     /// @note Internally calls insertRangeBase.
-    /// @pre pos must be a valid dereferenceable iterator within the container.Iterators must point to elements that are implicitly convertible to value_type. Otherwise behavior is undefined.
+    /// @pre pos must be a valid dereferenceable iterator within the container. Iterators must point to elements that are implicitly convertible to value_type. Otherwise behavior is undefined.
     /// @throw Can throw std::bad_alloc and something from value_types constructor. 
     /// @exception If any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee)
-    iterator insert(const_iterator pos, const_iterator sourceBegin, const_iterator sourceEnd)
+    template <typename InputIt>
+    iterator insert(const_iterator pos, InputIt sourceBegin, InputIt sourceEnd)
     {
         return insertRangeBase(pos, sourceBegin, sourceEnd);
     }
@@ -754,49 +742,70 @@ public:
 
     /// @brief Erase an element at a given position.
     /// @param pos Pointer to the element to be erased.
-    /// @pre pos must be a valid dereferenceable const_iterator within the container. Otherwise behavior is undefined.
-    /// @pre T Must be MoveAssignable.
+    /// @pre value_type must be nothrow-MoveConstructible. pos must be a valid dereferenceable iterator within the container. Otherwise behavior is undefined.
     /// @return Returns an iterator that was immediately following the ereased element. If the erased element was last in the buffer, returns a pointer to the new last element.
+    /// @except Linear Complexity.
     iterator erase(const_iterator pos)
     {
-        auto posIndex = pos.getIndex();
-        const auto endIndex = end().getIndex();
-        iterator it(this, posIndex);
+        iterator returnIt(this, pos.getIndex());
 
-        // Destroy element and move remaining elements to fill the void.
-        m_allocator.destroy(&pos);
+        if (pos != end() - 1)
+        {
+            // Move assign elements effectively overwriting the 
+            for (auto it = returnIt; it < end() - 1; it++)
+            {
+                *it = std::move(*(it + 1));
+            }
+            ++returnIt;
+        }
+
+
+        // Last element is always destroyed.
+        m_allocator.destroy(&*(end() - 1));
         decrement(m_headIndex);
-        for(size_t i = 0; i + posIndex + 1 < endIndex; i++)
-        {
-            // Move elements back one by one.
-            it[i] = std::move(it[i + 1]);
-        }
 
-        if(posIndex == endIndex)
-        {
-            return end();
-        }
-
-        return it;
+        return returnIt;
     }
 
-    /// @brief Erase the specified elements from the container according to the range [first,last).
+    /// @brief Erase the specified elements from the container according to the range [first,last). Might destroy or move assign to the elements depending if last == end(). If last == end(), elements in [first,last) are destroyed.
     /// @param first iterator to the first element to erase.
     /// @param last iterator past the last element to erase.
+    /// @pre First and last must be valid iterators to *this.
     /// @return Returns an iterator to the element that was immediately following the erased elements. If last == end(), then end() is returned.
+    /// @throw Possibly throws from value_types move/copy assignment operator if last != end().
+    /// @exception If last != end, this function will not throw (noexcept). If the assignemnt throws, the invariants are retained. (Basic exception guarantee).
+    /// @details Linear Complexity in relation to size of the range, and then linear in remaining elements after the erased range.
     iterator erase(const_iterator first, const_iterator last)
     {
-        auto rangeSize = last - first - 1;
-        const auto isLast  = (last == end());
-        iterator it(this, first.getIndex());
+        iterator returnIt(this, first.getIndex());
 
-        // Destroy elements
-        for(size_t i = 0; i <= rangeSize; i++)
+        const auto diff = std::distance(first, last);
+ 
+        // If the range does not reach the end, move elements.
+        if (last != end())
         {
-            it = erase(first);
+            auto tempIt = returnIt;
+            // Move elements effectively overwriting the elements to be erased.
+            for (; tempIt + diff !=  end(); ++tempIt)
+            {
+                *tempIt = std::move(*(tempIt + diff));
+            }
+
+            for (; tempIt != end(); ++tempIt)
+            {
+                m_allocator.destroy(&*tempIt);
+            }
+        }
+        else
+        {
+            for (auto it = end() - diff; it != end(); it++)
+            {
+                m_allocator.destroy(&*(it));
+            }
         }
 
-        return it;
+        decrement(m_headIndex, diff);
+        return returnIt;
     }
 
     /// @brief Destroys all elements in a buffer. Does not modify capacity.
@@ -804,7 +813,7 @@ public:
     /// @details Linear complexity in relation to size of the buffer.
     void clear() noexcept
     {
-        for(; m_tailIndex < m_headIndex ; m_tailIndex++)
+        for(; m_tailIndex < m_headIndex ; ++m_tailIndex)
         {
             m_allocator.destroy(&m_data[m_tailIndex]);
         }
@@ -813,16 +822,20 @@ public:
         m_tailIndex = 0;
     }
 
-
-
     /// @brief Replaces the elements in the buffer with copy of [sourceBegin, sourceEnd)
-    /// @pre T is CopyConstructible and [sourceBegin, sourceEnd) are not in the buffer.
+    /// @param sourceBegin Iterator to beginning of the range.
+    /// @param sourceEnd Past the end iterator of the range.
+    /// @pre value_type is CopyInsertable and elements of [sourceBegin, sourceEnd) are not in *this. InputIt must be dereferenceable to value_type, and incrementing sourceBegin (repeatedly) must reach sourceEnd. Otherwise behaviour is undefined.
     /// @post All existing references, pointers and iterators are to be considered invalid.
-    /// @note Undefined behaviour if either source iterator is an iterator to *this.
-    void assign(const_iterator sourceBegin, const_iterator sourceEnd)
+    /// @throw Can throw std::bad_alloc or from value_types constructor. 
+    /// @exception If any exception is throw, invariants are preserved (Basic Exception Guarantee).
+    /// @details Linear Complexity in relation to ranges size (O(n * 2) from linear clear and linear construction).
+    /// @note Destroys all elements in the buffer before constructing the assigned elements.
+    template <typename InputIt>
+    void assign(InputIt sourceBegin, InputIt sourceEnd)
     {
         clear();
-        for (; sourceBegin != sourceEnd; sourceBegin++)
+        for (; sourceBegin != sourceEnd; ++sourceBegin)
         {
             push_back(*sourceBegin);
         }
@@ -830,23 +843,26 @@ public:
 
     /// @brief Replaces the elements in the buffer.
     /// @param list Initializer list containing the elements to replace the existing ones.
-    /// @pre T is CopyInsertable.
-    /// @post All existing references, pointers and iterators are invalidated.
-    /// @note Leaves capacity of the buffer unchanged.
+    /// @pre value_type is CopyInsertable. List does not contain elements of *this.
+    /// @post All existing references, pointers and iterators are to be considered invalid.
+    /// @throw Can throw std::bad_alloc or from value_types constructor.
+    /// @exception If any exception is throw, invariants are preserved (Basic Exception Guarantee).
+    /// @details Linear Complexity in relation to ranges size (O(n * 2) from linear clear and linear construction).
+    /// @note Destroys all elements in the buffer before constructing the assigned elements.
     void assign(std::initializer_list<T> list)
     {
-        clear();
-        auto begin = list.begin();
-        const auto end = list.end();
-        for (; begin != end; begin++)
-        {
-            push_back(*begin);
-        }
+        assign(list.begin(), list.end());
     }
 
     /// @brief Replaces the elements in the buffer with given value.
     /// @param amount Size of the buffer after the assignment.
     /// @param value Value of all elements after the assignment.
+    /// @pre value_type is CopyInsertable.
+    /// @post All existing references, pointers and iterators are to be considered invalid.
+    /// @throw Can throw std::bad_alloc or from value_types constructor.
+    /// @exception If any exception is throw, invariants are preserved (Basic Exception Guarantee).
+    /// @details Linear Complexity in relation to ranges size (O(n * 2) from linear clear and linear construction).
+    /// @note Destroys all elements in the buffer before constructing the assigned elements.
     void assign(const size_type amount, value_type value)
     {
         clear();
@@ -861,7 +877,9 @@ public:
     /// @return Returns reference to the left hand side RungBuffer after swap.
     /// @post *this == other.
     /// @details Constant complexity.
+    /// @throw Can throw std::bad_alloc or something from value_types constructor.
     /// @exception If any exception is thrown, this function has no effect (Strong Exception Guarantee).
+    /// @details Linear complexity in relation to buffer size.
     ring_buffer& operator=(const ring_buffer& other)
     {
         ring_buffer copy(other);
@@ -871,10 +889,10 @@ public:
 
     /// @brief Move assignment operator.
     /// @param other Rvalue ref to other buffer.
-    /// @pre T is MoveConstructible or CopyConstuctible.
-    /// @post If T is MoveConstructible, *this has values other had before the assignment. Otherwise *this == other.
-    /// @return Reference to the buffer.
-    /// @exception If T is not MoveConstructible, and a throwing CopyConstructor which throws this function has no effect (Strong Exception Guarantee).
+    /// @pre value_type is MoveConstructible.
+    /// @post *this has values other had before the assignment.
+    /// @return Reference to the buffer to move from.
+    /// @exception If value_type is not MoveConstructible, and value_type provides a throwing CopyConstructor is used this function has undefined behaviour.
     /// @details Constant complexity.
     ring_buffer& operator=(ring_buffer&& other) noexcept
     {
@@ -986,6 +1004,7 @@ public:
         swap(m_headIndex, other.m_headIndex);
         swap(m_tailIndex, other.m_tailIndex);
         swap(m_capacity, other.m_capacity);
+        swap(m_allocator, other.m_allocator);
 
     }
 
@@ -1062,6 +1081,14 @@ public:
         return m_capacity;
     }
 
+    /// @brief Allocator getter.
+    /// @return Return the allocator used by the container.
+    /// @details Constant complexity.
+    allocator_type get_allocator() const noexcept
+    {
+        return m_allocator;
+    }
+
     /// @brief Check if buffer is empty
     /// @return True if buffer is empty
     /// @details Constant complexity.
@@ -1118,7 +1145,7 @@ public:
     /// @brief Inserts an element in the back of the buffer by move if move constructor is provided by value_type. If buffer would get full after the operation, allocates more memory.
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Rvalue reference to the element to insert.
-    /// @pre T needs to satisfy MoveInsertable or CopyInsertable.
+    /// @pre value_type needs to satisfy MoveInsertable or CopyInsertable.
     /// @note All iterators are invalidated. If allocation happens, all pointers and references are invalidated.
     /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
     /// @details Constant complexity.
@@ -1139,7 +1166,7 @@ public:
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
     /// @throw Can throw std::bad_alloc.
     /// @exception If the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
-    /// @pre T needs to satisfy CopyInsertable.
+    /// @pre value_type needs to satisfy CopyInsertable.
     /// @post If more memory is allocated, all pointers and references are invalidated.
     void push_back(const value_type& val)
     {
@@ -1154,7 +1181,7 @@ public:
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
     /// @throw Can throw std::bad_alloc if more memory is allocated.
     /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception (std::bad_alloc) this function has no effect (Strong Exception Guarantee).
-    /// @pre T needs to satisfy MoveInsertable or CopyInsertable.
+    /// @pre value_type needs to satisfy MoveInsertable or CopyInsertable.
     /// @post If more memory is allocated, all pointers and references are invalidated.
     /// @details Constant complexity.
     void push_back(value_type&& val)
@@ -1353,11 +1380,11 @@ private:
     /// @param rangeBegin Iterator pointing to the first element of the range.
     /// @param rangeEnd Iterator pointing past the last element to be inserted.
     /// @return Returns iterator pointing to the first element inserted.
-    /// @pre T must meet CopyInsertable.
+    /// @pre value_type must meet CopyInsertable. InputIt must be deferencable to value_type, and incrementing rangeBegin possibly multiple times should reach rangeEnd. Otherwise behaviour is undefined.
     /// @post Each iterator in [rangeBegin, rangeEnd) is dereferenced once.
     /// @throw Might throw std::bad_alloc from allocating memory and rotate(), or something from T's move/copy constructor.
     /// @exception  If any exception is thrown, invariants are retained. (Basic Exception guarantee).
-    /// @details Linear Complexity in relation to amount of inserted elements (O(n*2) from construction and rotate).
+    /// @details Linear Complexity in relation to amount of inserted elements (O(n*2) from element construction and rotation).
     template<typename InputIt>
     iterator insertRangeBase(const_iterator pos, InputIt rangeBegin, InputIt rangeEnd)
     {

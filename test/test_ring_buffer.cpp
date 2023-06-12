@@ -523,36 +523,30 @@ TYPED_TEST(RingBufferTest, insertInitializerList)
 TYPED_TEST(RingBufferTest, erase)
 {
     const auto offset = 1;
-    const auto beginIt = t_buffer.cbegin() + offset;
+    const auto erasePos = t_buffer.begin() + offset;
     const auto refBuffer(t_buffer);
 
-    const auto erasedIt = t_buffer.erase(beginIt);
-    ASSERT_EQ(erasedIt, beginIt);
-    for (auto i = offset; i < t_buffer.size() - offset; i++)
+    const auto erasedIt = t_buffer.erase(erasePos);
+
+    ASSERT_EQ(*erasedIt, *(erasePos + 1));
+
+    for (auto i = 0; i < t_buffer.size(); i++)
     {
-        ASSERT_EQ(refBuffer[i + 1], t_buffer[i]);
+        if(i < offset)
+        {
+            ASSERT_EQ(refBuffer[i], t_buffer[i]);
+        }
+        else
+        {
+            ASSERT_EQ(refBuffer[i + offset], t_buffer[i]);
+        }
     }
-}
 
-// Tests a special case of erase(). Erasing at end iterator (past the last element) basically does nothing.
-TYPED_TEST(RingBufferTest, eraseLast)
-{
-    const auto offset = 1;
-    const auto endIt = t_buffer.cend();
-    const auto refIt = t_buffer.cend() - offset;
-    const auto refBuffer(t_buffer);
-    const auto newLastValue = *refIt;
+    auto endBeforeErase = t_buffer.end();
+    auto erasedEnd = t_buffer.erase(t_buffer.end() - 1);
 
-    const auto erasedIt = t_buffer.erase(endIt);
-
-    ASSERT_EQ(erasedIt, refIt);
-    ASSERT_EQ(erasedIt, t_buffer.end());
-    ASSERT_EQ(newLastValue, *erasedIt);
-
-    for (size_t i = 0; i < t_buffer.size(); i++)
-    {
-        ASSERT_EQ(refBuffer[i], t_buffer[i]);
-    }
+    ASSERT_TRUE(endBeforeErase != erasedEnd);
+    ASSERT_TRUE(erasedEnd == t_buffer.end());
 }
 
 // Tests requirement: SequenceContainer erase() expression erase(q1 , q2)

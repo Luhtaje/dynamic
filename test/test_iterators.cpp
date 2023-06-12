@@ -36,19 +36,19 @@ TEST(Iterators, DefaultConstructible)
 // Tests requirement: LegacyInputIterator requirement EqualityComparable
 TEST(Iterators, EqualityComparable)
 {
-    const auto begin(itControl.begin());
-    const auto end(itControl.end());
+    auto begin(itControl.begin());
+    auto end(itControl.end());
 
-    const auto refIt(begin);
+    auto refIt(begin);
     ASSERT_TRUE(refIt == begin);
     ASSERT_TRUE(begin == refIt);
     ASSERT_FALSE(begin == end);
 
     // Const iterators
-    const auto cbegin(itControl.cbegin());
-    const auto cend(itControl.cend());
+    auto cbegin(itControl.cbegin());
+    auto cend(itControl.cend());
 
-    const auto crefIt(cbegin);
+    auto crefIt(cbegin);
     ASSERT_TRUE(crefIt == cbegin);
     ASSERT_TRUE(cbegin == crefIt);
     ASSERT_FALSE(cbegin == cend);
