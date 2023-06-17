@@ -206,6 +206,8 @@ TEST(Iterators, Dereferenceable)
     T convertibleToThis = *it;
     ASSERT_TRUE((std::is_same<decltype(convertibleToThis), typename ring_buffer<int>::value_type>::value));
 
+    auto end = itControl.end();
+
     // Validate assignment to dereferenced iterator.
     ASSERT_EQ(convertibleToThis, 5);
 }
@@ -246,6 +248,7 @@ TEST(Iterators, IncrementOperators)
 
     const auto pre = ++begin;
     const auto post = begin++;
+
     //Values should be the same
     ASSERT_EQ(pre, post);
     ASSERT_EQ(*post, itControl[1]);
