@@ -303,7 +303,6 @@ TEST(Iterators, DecrementOperators)
 // Tests requirement: LegacyRandomAccessIterator, expressions r += n, a + n / n + a. n can be negative.
 TEST(Iterators, Addition)
 {
-    const auto capacity = itControl.capacity();
     const auto size = itControl.size();
 
     auto it = itControl.begin();
@@ -314,17 +313,13 @@ TEST(Iterators, Addition)
 
     it += -1;
     ASSERT_EQ(*it, itControl[0]);
-    // Test that operator works correctly when the index loops around a buffer boundary. Moving iterator by capacity loops it to same element.
-    it += capacity * -1;
-    ASSERT_EQ(*it, itControl[0]);
-    it += capacity;
-    ASSERT_EQ(*it, itControl[0]);
 
     // a + n returns temporary iterator.
     ASSERT_EQ(*(it + 1), itControl[1]);
     ASSERT_EQ(*(1 + it), itControl[1]);
     ASSERT_EQ(*(end + (-1)), itControl[size - 1]);
     ASSERT_EQ(*(-1 + end), itControl[size-1]);
+
     // Make sure iterator was not moved.
     ASSERT_EQ(*it, itControl[0]);
 
@@ -336,11 +331,6 @@ TEST(Iterators, Addition)
     ASSERT_EQ(*cit, itControl[1]);
 
     cit += -1;
-    ASSERT_EQ(*cit, itControl[0]);
-
-    cit += capacity * -1;
-    ASSERT_EQ(*cit, itControl[0]);
-    cit += capacity;
     ASSERT_EQ(*cit, itControl[0]);
 
     ASSERT_EQ(*(cit+1), itControl[1]);

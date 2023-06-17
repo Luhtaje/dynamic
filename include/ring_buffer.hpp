@@ -78,7 +78,7 @@ public:
         }
 
         /// @brief Prefix increment.
-        /// @note If the iterator is incremented over the end() iterator, behaviour is undefined.
+        /// @note Incrementing the iterator over the end() iterator leads to invalid iterator (dereferencing is undefined behaviour).
         /// @details Constant complexity.
         _rBuf_iterator& operator++() noexcept
         {
@@ -88,7 +88,7 @@ public:
 
         /// @brief Postfix increment
         /// @param  int empty parameter to guide overload resolution.
-        /// @note If the iterator is incremented over the end() iterator, behaviour is undefined. 
+        /// @note Incrementing the iterator over the end() iterator leads to invalid iterator (dereferencing is undefined behaviour).
         /// @details Constant complexity.
         _rBuf_iterator operator++(int)
         {
@@ -97,9 +97,9 @@ public:
             return temp;
         }
 
-        /// @brief årefix decrement
+        /// @brief Prefix decrement
         /// @Details Constant complexity.
-        /// @note Decrementing the iterator past begin() is undefined behaviour.
+        /// @note Decrementing the iterator past begin() leads to invalid iterator (dereferencing is undefined behaviour).
         _rBuf_iterator& operator--() noexcept
         {
             --m_logicalIndex;
@@ -109,7 +109,7 @@ public:
         /// @brief Postfix decrement
         /// @param  int empty parameter to guide overload resolution.
         /// @details Constant complexity.
-        /// @note Decrementing the iterator past logical beginning is undefined behaviour. Logical beginning is where begin() points to, internal m_logicalIndex = 0.
+        /// @note Decrementing the iterator past begin() leads to invalid iterator (dereferencing is undefined behaviour).
         _rBuf_iterator operator--(int)
         {
             auto temp(*this);
@@ -159,7 +159,6 @@ public:
         /// @param offset The number of positions to move the iterator backward.
         /// @return An iterator pointing to the element that is offset positions before the current element.
         /// @details Constant complexity.
-        /// @note Undefined behavior for negative offset.
         _rBuf_iterator& operator-=(const difference_type offset) noexcept
         {
             return (*this += -offset);
@@ -167,7 +166,8 @@ public:
 
         /// @brief Get iterator decremented by offset.
         /// @param offset The number of positions to move the iterator backward.
-        /// @return An iterator pointing to an element that.
+        /// @return An iterator pointing to an element that points to *this - offset.
+        /// @note If offset is such that the index of the iterator is beyond end() or begin(), the return iterator is invalid (dereferencing it is undefined behaviour).
         /// @details Constant complexity.
         _rBuf_iterator operator-(const difference_type offset) const
         {
@@ -188,6 +188,7 @@ public:
         /// @brief Index operator.
         /// @param offset The offset from iterator.
         /// @return Return object pointer by the iterator with an offset.
+        /// @note If offset is such that the iterator is beyond end() or begin() this function has undefined behaviour.
         /// @details Constant complexity.
         reference operator[](const difference_type offset) const noexcept
         {
@@ -241,10 +242,7 @@ public:
             return (*this);
         };
 
-        /// <summary>
         /// 
-        /// </summary>
-        /// <returns></returns>
         /// @details Constant complexity.
         difference_type getIndex() noexcept
         {
@@ -276,7 +274,7 @@ public:
         /// @brief Conversion assingment from non-const iterator
         /// @param iterator non-const iterator.
         /// @return Returns the new object by reference
-        _rBuf_const_iterator& operator=(_rBuf_iterator<_rBuf>& iterator)
+        _rBuf_const_iterator& operator=(const _rBuf_iterator<_rBuf>& iterator)
         {
             if (m_logicalIndex == iterator.m_logicalIndex && m_container == iterator.m_container)
             {
@@ -298,8 +296,7 @@ public:
         }
 
         /// @brief Postfix increment
-        /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
-        /// See Iterator::operator* and ring_buffer::operator[].
+        /// @note If the iterator is incremented over the end() iterator leads to invalid iterator (dereferencing is undefined behaviour).
         /// @details Constant complexity.
         _rBuf_const_iterator& operator++() noexcept
         {
@@ -310,8 +307,7 @@ public:
 
         /// @brief Postfix increment
         /// @param  int empty parameter to guide overload resolution.
-        /// @note The index of the iterator can be incremented over the border of its owning buffer. The buffer converts logical index to correct element.
-        /// See Iterator::operator* and ring_buffer::operator[].
+        /// @note If the iterator is incremented over the end() iterator leads to invalid iterator (dereferencing is undefined behaviour).
         /// @details Constant complexity.
         _rBuf_const_iterator operator++(int)
         {
@@ -322,65 +318,46 @@ public:
         }
 
         /// @brief Prefix decrement.
+        /// @note Decrementing the iterator past begin() leads to invalid iterator (dereferencing is undefined behaviour).
         /// @details Constant complexity.
         _rBuf_const_iterator& operator--()
         {
             --m_logicalIndex;
-            if (m_logicalIndex < 0)
-            {
-                m_logicalIndex = m_container->capacity() - 1;
-            }
             return(*this);
         }
 
         /// @brief Postfix decrement
         /// @param  int empty parameter to guide overload resolution.
+        /// @note Decrementing iterator past begin() results in undefined behaviour.
         /// @details Constant complexity.
         _rBuf_const_iterator operator--(int)
         {
             //TODO:    check value initialization and "under" begin() decrement.
             auto temp(*this);
             --m_logicalIndex;
-            if (m_logicalIndex < 0)
-            {
-                m_logicalIndex = m_container->capacity() - 1;
-            }
             return temp;
         }
 
         /// @brief Moves iterator.
         /// @param offset Amount of elements to move. Negative values move iterator backwards.
+        /// @note If offset is such that the iterator is beyond end() or begin(), the return iterator is invalid (dereferencing it is undefined behaviour).
         /// @details Constant complexity.
         _rBuf_const_iterator& operator+=(difference_type offset) noexcept
         {
-            const auto capacity = m_container->capacity();
-            // TODO : make this better. Absolutely terrible
             if (offset < 0)
             {
-                offset = abs(offset) % capacity;
-                if (offset > m_logicalIndex)
-                {
-                    m_logicalIndex = capacity - (offset - m_logicalIndex);
-                }
-                else
-                {
-                    m_logicalIndex = m_logicalIndex - offset;
-                }
+                m_logicalIndex -= abs(offset);
             }
             else
             {
-                offset = offset % capacity;
                 m_logicalIndex += offset;
-                if (m_logicalIndex >= capacity)
-                {
-                    m_logicalIndex -= capacity;
-                }
             }
             return (*this);
         }
 
         /// @brief Move iterator forward by specified amount.
         /// @param movement Amount of elements to move the iterator.
+        /// @note If offset is such that the iterator is beyond end() or begin(), the return iterator is invalid (dereferencing it is undefined behaviour).
         /// @details Constant complexity.
         _rBuf_const_iterator operator+(const difference_type offset) const
         {
@@ -389,6 +366,7 @@ public:
         }
 
         // TODO
+        /// @note If offset is such that the iterator is beyond end() or begin(), the return iterator is invalid (dereferencing it is undefined behaviour).
         /// @details Constant complexity.
         friend _rBuf_const_iterator operator+(const difference_type offset, _rBuf_const_iterator iter)
         {
@@ -400,7 +378,6 @@ public:
         /// @brief Returns an iterator that points to an element, which is the current element decremented by the given offset.
         /// @param offset The number of positions to move the iterator backward.
         /// @return An iterator pointing to the element that is offset positions before the current element.
-        /// @note Undefined behaviour for negative offset.
         /// @details Constant complexity.
         _rBuf_const_iterator& operator-=(const difference_type offset) noexcept
         {
@@ -410,7 +387,7 @@ public:
         /// @brief Returns an iterator that points to an element, which is the current element decremented by the given offset.
         /// @param offset The number of positions to move the iterator backward.
         /// @return An iterator pointing to the element that is offset positions before the current element.
-        /// @note Undefined behaviour for negative offset.
+        /// @note If offset is such that the index of the iterator is beyond end() or begin(), the return iterator is invalid (dereferencing it is undefined behaviour).
         /// @details Constant complexity.
         _rBuf_const_iterator operator-(const difference_type offset) const
         {
@@ -430,6 +407,7 @@ public:
         /// @brief Index operator.
         /// @param offset The offset from iterator.
         /// @return Return reference to element pointed by the iterator with offset.
+        /// @note If offset is such that the iterator is beyond end() or begin() this function has undefined behaviour.
         /// @details Constant complexity.
         reference operator[](const difference_type offset) const noexcept
         {
@@ -438,7 +416,7 @@ public:
 
         /// @brief Comparison operator== overload
         /// @param other iterator to compare
-        /// @return True if iterators point to same element in same container. Does not compare c-qualification.
+        /// @return True if iterators point to same element in same container.
         /// @details Constant complexity.
         bool operator==(const _rBuf_const_iterator& other) const noexcept
         {
@@ -946,9 +924,9 @@ public:
     }
 
     /// @brief Index operator.
-    /// @param logicalIndex Index of the element.
+    /// @param logicalIndex Index of the element. If LogicalIndex >= size(), this function has undefined behavriour.
     /// @details Constant complexity.
-    /// @note The operator acts as interface that hides the physical memory layout from the user. Logical index neeeds to be added to internal tail index to get actual element address.
+    /// @note The operator acts as interface that hides the physical memory layout from the user. Logical index neeeds to be added to internal tail index to get actual element address. 
     /// @return Returns a reference to the element.
     reference operator[](const size_type logicalIndex) noexcept
     {
