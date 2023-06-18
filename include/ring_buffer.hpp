@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <limits>
 #include <utility>
+#include <stdexcept>
+
 
 // Forward declaration of _rBuf_const_iterator.
 template<class _rBuf>
@@ -24,8 +26,8 @@ public:
     using allocator_type = Allocator;
     using reference = T&;
     using const_reference= const T&;
-    using pointer = typename T*;
-    using const_pointer= typename const T*;
+    using pointer = T*;
+    using const_pointer= const T*;
 
     using difference_type = ptrdiff_t;
     using size_type = std::size_t;
@@ -33,225 +35,6 @@ public:
 //========================================
 // Iterators
 //========================================
-
-    /// @brief Custom iterator class.
-    /// @tparam T Type of the element what iterator points to.
-    template<class _rBuf>
-    class _rBuf_iterator : public _rBuf_const_iterator<_rBuf>
-    {
-
-    public:
-        using iterator_category = std::random_access_iterator_tag;
-
-        using value_type = typename _rBuf::value_type;
-        using difference_type = typename _rBuf::difference_type;
-        using pointer = typename _rBuf::pointer;
-        using reference = value_type&;
-
-    public:
-
-        /// @brief Default constructor
-        _rBuf_iterator() = default;
-
-        /// @brief Constructor.
-        /// @param container Pointer to the ring_buffer element which owns this iterator.
-        /// @param index Index pointing to the logical element of the ring_buffer.
-        /// @details Constant complexity.
-        explicit _rBuf_iterator(_rBuf* container, size_type index) : _rBuf_const_iterator(container, index) {}
-
-        /// @brief Dereference operator
-        /// @return  Returns the object the iterator is currently pointing to.
-        /// @details Constant complexity.
-        reference operator*() const noexcept
-        {
-            //TODO: bounds checking and value-initialization.
-            return const_cast<reference>(_rBuf_const_iterator<_rBuf>::operator*());
-        }
-
-        /// @brief Arrow operator. 
-        /// @return Returns a pointer to the object the iterator is currently pointing to.
-        /// @details Constant complexity.
-        pointer operator->() const noexcept
-        {
-            //TODO: check value initialization and bounds.
-            return const_cast<pointer>(_rBuf_const_iterator<_rBuf>::operator->());
-        }
-
-        /// @brief Prefix increment.
-        /// @note Incrementing the iterator over the end() iterator leads to invalid iterator (dereferencing is undefined behaviour).
-        /// @details Constant complexity.
-        _rBuf_iterator& operator++() noexcept
-        {
-            ++m_logicalIndex;
-            return (*this);
-        }
-
-        /// @brief Postfix increment
-        /// @param  int empty parameter to guide overload resolution.
-        /// @note Incrementing the iterator over the end() iterator leads to invalid iterator (dereferencing is undefined behaviour).
-        /// @details Constant complexity.
-        _rBuf_iterator operator++(int)
-        {
-            auto temp(*this);
-            ++m_logicalIndex;
-            return temp;
-        }
-
-        /// @brief Prefix decrement
-        /// @Details Constant complexity.
-        /// @note Decrementing the iterator past begin() leads to invalid iterator (dereferencing is undefined behaviour).
-        _rBuf_iterator& operator--() noexcept
-        {
-            --m_logicalIndex;
-            return(*this);
-        }
-
-        /// @brief Postfix decrement
-        /// @param  int empty parameter to guide overload resolution.
-        /// @details Constant complexity.
-        /// @note Decrementing the iterator past begin() leads to invalid iterator (dereferencing is undefined behaviour).
-        _rBuf_iterator operator--(int)
-        {
-            auto temp(*this);
-            --m_logicalIndex;
-            return temp;
-        }
-
-        /// @brief Moves iterator forward.
-        /// @param offset Amount of elements to move.
-        /// @note Moving the iterator beyond begin() or end() makes the iterator point to an invalid element.
-        /// @details Constant complexity.
-        _rBuf_iterator& operator+=(difference_type offset) noexcept
-        {
-            if (offset < 0)
-            {
-                m_logicalIndex -= abs(offset);
-            }
-            else
-            {
-                m_logicalIndex += offset;
-            }
-            return (*this);
-        }
-
-        /// @brief Create a temporary iterator that has been moved forward by specified amount.
-        /// @param offset Amount of elements to move the iterator.
-        /// @details Constant complexity.
-        _rBuf_iterator operator+(const difference_type offset) const
-        {
-            _rBuf_iterator temp(*this);
-            return (temp += offset);
-        }
-
-        /// @brief Friend operator+. Creates a copy of an iterator which has been moved by given amount.
-        /// @param offset Amount of elements to move the iterator. 
-        /// @param iter Reference to base iterator.
-        /// @note Enables (n + a) expression, where n is a constant and a is iterator type.
-        /// @details Constant complexity.
-        friend _rBuf_iterator operator+(const difference_type offset, const _rBuf_iterator& iter)
-        {
-            auto temp = iter;
-            temp += offset;
-            return temp;
-        }
-
-        /// @brief Decrement this iterator by offset.
-        /// @param offset The number of positions to move the iterator backward.
-        /// @return An iterator pointing to the element that is offset positions before the current element.
-        /// @details Constant complexity.
-        _rBuf_iterator& operator-=(const difference_type offset) noexcept
-        {
-            return (*this += -offset);
-        }
-
-        /// @brief Get iterator decremented by offset.
-        /// @param offset Signed amount to decrement from the iterator index.
-        /// @return An iterator pointing to an element that points to *this - offset.
-        /// @note If offset is such that the index of the iterator is beyond end() or begin(), the return iterator is invalid (dereferencing it is undefined behaviour).
-        /// @details Constant complexity.
-        _rBuf_iterator operator-(const difference_type offset) const
-        {
-            _rBuf_iterator temp(*this);
-            return (temp -= offset);
-        }
-
-        /// @brief Decrement operator between two iterators.
-        /// @param other Other iterator.
-        /// @return Return the difference between the elements to what the iterators point to.
-        /// @details Constant complexity.
-        difference_type operator-(const _rBuf_iterator& other) const noexcept
-        {
-            //TODO: compatibility check
-            return (m_logicalIndex - other.m_logicalIndex);
-        }
-
-        /// @brief Index operator.
-        /// @param offset Signed offset from iterator index.
-        /// @return Return object pointer by the iterator with an offset.
-        /// @note If offset is such that the iterator is beyond end() or begin() this function has undefined behaviour.
-        /// @details Constant complexity.
-        reference operator[](const difference_type offset) const noexcept
-        {
-            return const_cast<reference>(m_container->operator[](offset));
-        }
-
-        /// @brief Comparison operator < overload.
-        /// @param other iterator to compare.
-        /// @return true if others index is larger.
-        /// @details Constant complexity.
-        bool operator<(const _rBuf_iterator& other) const noexcept
-        {
-            //TODO:compatibility check
-            return (m_logicalIndex < other.m_logicalIndex);
-        }
-
-        /// @brief Comparison operator > overload.
-        /// @param other iterator to compare against.
-        /// @return True if others index is smaller.
-        /// @details Constant complexity.
-        bool operator>(const _rBuf_iterator& other) const noexcept
-        {
-            //TODO:compatibility check
-            return (m_logicalIndex > other.m_logicalIndex);
-        }
-
-        /// @brief Comparison <= overload.
-        /// @param other Other iterator to compare against.
-        /// @return True if other points to logically smaller or the same indexed element.
-        /// @details Constant complexity.
-        bool operator<=(const _rBuf_iterator& other) const noexcept
-        {
-            //TODO:compatibility check
-            return (m_logicalIndex <= other.m_logicalIndex);
-        }
-
-        /// @brief Comparison >= overload.
-        /// @param other Other iterator to compare against.
-        /// @return True if other points to logically larger or same indexed element.
-        /// @details Constant complexity.
-        bool operator>=(const _rBuf_iterator& other) const noexcept
-        {
-            return (m_logicalIndex >= other.m_logicalIndex);
-        }
-
-        /// @brief Custom assingment operator overload.
-        /// @param index Logical index of the element to set the iterator to.
-        /// @note Undefined behaviour for negative index.
-        /// @details Constant complexity.
-        _rBuf_iterator& operator=(const size_t index) noexcept
-        {
-            m_logicalIndex = index;
-            return (*this);
-        };
-
-        /// @brief Index getter.
-        /// @return Returns the index of the element this iterator is pointing to.
-        /// @details Constant complexity.
-        difference_type getIndex() noexcept
-        {
-            return m_logicalIndex;
-        }
-    };
 
     /// @brief Custom iterator class.
     /// @tparam _rBuf ring_buffer class type.
@@ -273,21 +56,6 @@ public:
         /// @brief Constructor.
         /// @param index Index representing the logical element of the.
         explicit _rBuf_const_iterator(const _rBuf* container, difference_type index) : m_container(container), m_logicalIndex(index) {}
-
-        /// @brief Conversion assingment from non-const iterator
-        /// @param iterator non-const iterator.
-        /// @return Returns the new object by reference
-        _rBuf_const_iterator& operator=(const _rBuf_iterator<_rBuf>& iterator)
-        {
-            if (m_logicalIndex == iterator.m_logicalIndex && m_container == iterator.m_container)
-            {
-                return *this;
-            }
-            
-            m_logicalIndex = iterator.m_logicalIndex;
-            m_container = iterator.m_container;
-            return *this;
-        }
 
         /// @brief Arrow operator.
         /// @return pointer.
@@ -459,7 +227,7 @@ public:
         bool operator<=(const _rBuf_const_iterator& other) const noexcept
         {
             //TODO:compatibility check
-            return: (!(other < m_logicalIndex));
+            return (!(other < m_logicalIndex));
         }
 
         /// <summary>
@@ -500,6 +268,225 @@ public:
         // The iterator does not point to any memory location, but is interfaced to the Ring Buffer via an index which is the logical index
         // to an element. Logical index 0 is the first element in the buffer and last is size - 1.
         difference_type m_logicalIndex;
+    };
+
+    /// @brief Custom iterator class.
+    /// @tparam T Type of the element what iterator points to.
+    template<class _rBuf>
+    class _rBuf_iterator : public _rBuf_const_iterator<_rBuf>
+    {
+
+    public:
+        using iterator_category = std::random_access_iterator_tag;
+
+        using value_type = typename _rBuf::value_type;
+        using difference_type = typename _rBuf::difference_type;
+        using pointer = typename _rBuf::pointer;
+        using reference = value_type&;
+
+    public:
+
+        /// @brief Default constructor
+        _rBuf_iterator() = default;
+
+        /// @brief Constructor.
+        /// @param container Pointer to the ring_buffer element which owns this iterator.
+        /// @param index Index pointing to the logical element of the ring_buffer.
+        /// @details Constant complexity.
+        explicit _rBuf_iterator(_rBuf* container, size_type index) : _rBuf_const_iterator<_rBuf>(container, index) {}
+
+        /// @brief Dereference operator
+        /// @return  Returns the object the iterator is currently pointing to.
+        /// @details Constant complexity.
+        reference operator*() const noexcept
+        {
+            //TODO: bounds checking and value-initialization.
+            return const_cast<reference>(_rBuf_const_iterator<_rBuf>::operator*());
+        }
+
+        /// @brief Arrow operator. 
+        /// @return Returns a pointer to the object the iterator is currently pointing to.
+        /// @details Constant complexity.
+        pointer operator->() const noexcept
+        {
+            //TODO: check value initialization and bounds.
+            return const_cast<pointer>(_rBuf_const_iterator<_rBuf>::operator->());
+        }
+
+        /// @brief Prefix increment.
+        /// @note Incrementing the iterator over the end() iterator leads to invalid iterator (dereferencing is undefined behaviour).
+        /// @details Constant complexity.
+        _rBuf_iterator& operator++() noexcept
+        {
+            ++_rBuf_const_iterator<_rBuf>::m_logicalIndex;
+            return (*this);
+        }
+
+        /// @brief Postfix increment
+        /// @param  int empty parameter to guide overload resolution.
+        /// @note Incrementing the iterator over the end() iterator leads to invalid iterator (dereferencing is undefined behaviour).
+        /// @details Constant complexity.
+        _rBuf_iterator operator++(int)
+        {
+            auto temp(*this);
+            ++_rBuf_const_iterator<_rBuf>::m_logicalIndex;
+            return temp;
+        }
+
+        /// @brief Prefix decrement
+        /// @Details Constant complexity.
+        /// @note Decrementing the iterator past begin() leads to invalid iterator (dereferencing is undefined behaviour).
+        _rBuf_iterator& operator--() noexcept
+        {
+            --_rBuf_const_iterator<_rBuf>::m_logicalIndex;
+            return(*this);
+        }
+
+        /// @brief Postfix decrement
+        /// @param  int empty parameter to guide overload resolution.
+        /// @details Constant complexity.
+        /// @note Decrementing the iterator past begin() leads to invalid iterator (dereferencing is undefined behaviour).
+        _rBuf_iterator operator--(int)
+        {
+            auto temp(*this);
+            --_rBuf_const_iterator<_rBuf>::m_logicalIndex;
+            return temp;
+        }
+
+        /// @brief Moves iterator forward.
+        /// @param offset Amount of elements to move.
+        /// @note Moving the iterator beyond begin() or end() makes the iterator point to an invalid element.
+        /// @details Constant complexity.
+        _rBuf_iterator& operator+=(difference_type offset) noexcept
+        {
+            if (offset < 0)
+            {
+                _rBuf_const_iterator<_rBuf>::m_logicalIndex -= abs(offset);
+            }
+            else
+            {
+                _rBuf_const_iterator<_rBuf>::m_logicalIndex += offset;
+            }
+            return (*this);
+        }
+
+        /// @brief Create a temporary iterator that has been moved forward by specified amount.
+        /// @param offset Amount of elements to move the iterator.
+        /// @details Constant complexity.
+        _rBuf_iterator operator+(const difference_type offset) const
+        {
+            _rBuf_iterator temp(*this);
+            return (temp += offset);
+        }
+
+        /// @brief Friend operator+. Creates a copy of an iterator which has been moved by given amount.
+        /// @param offset Amount of elements to move the iterator. 
+        /// @param iter Reference to base iterator.
+        /// @note Enables (n + a) expression, where n is a constant and a is iterator type.
+        /// @details Constant complexity.
+        friend _rBuf_iterator operator+(const difference_type offset, const _rBuf_iterator& iter)
+        {
+            auto temp = iter;
+            temp += offset;
+            return temp;
+        }
+
+        /// @brief Decrement this iterator by offset.
+        /// @param offset The number of positions to move the iterator backward.
+        /// @return An iterator pointing to the element that is offset positions before the current element.
+        /// @details Constant complexity.
+        _rBuf_iterator& operator-=(const difference_type offset) noexcept
+        {
+            return (*this += -offset);
+        }
+
+        /// @brief Get iterator decremented by offset.
+        /// @param offset Signed amount to decrement from the iterator index.
+        /// @return An iterator pointing to an element that points to *this - offset.
+        /// @note If offset is such that the index of the iterator is beyond end() or begin(), the return iterator is invalid (dereferencing it is undefined behaviour).
+        /// @details Constant complexity.
+        _rBuf_iterator operator-(const difference_type offset) const
+        {
+            _rBuf_iterator temp(*this);
+            return (temp -= offset);
+        }
+
+        /// @brief Decrement operator between two iterators.
+        /// @param other Other iterator.
+        /// @return Return the difference between the elements to what the iterators point to.
+        /// @details Constant complexity.
+        difference_type operator-(const _rBuf_iterator& other) const noexcept
+        {
+            //TODO: compatibility check
+            return (_rBuf_const_iterator<_rBuf>::m_logicalIndex - other._rBuf_const_iterator<_rBuf>::m_logicalIndex);
+        }
+
+        /// @brief Index operator.
+        /// @param offset Signed offset from iterator index.
+        /// @return Return object pointer by the iterator with an offset.
+        /// @note If offset is such that the iterator is beyond end() or begin() this function has undefined behaviour.
+        /// @details Constant complexity.
+        reference operator[](const difference_type offset) const noexcept
+        {
+            return const_cast<reference>(_rBuf_const_iterator<_rBuf>::m_container->operator[](offset));
+        }
+
+        /// @brief Comparison operator < overload.
+        /// @param other iterator to compare.
+        /// @return true if others index is larger.
+        /// @details Constant complexity.
+        bool operator<(const _rBuf_iterator& other) const noexcept
+        {
+            //TODO:compatibility check
+            return (_rBuf_const_iterator<_rBuf>::m_logicalIndex < other._rBuf_const_iterator<_rBuf>::m_logicalIndex);
+        }
+
+        /// @brief Comparison operator > overload.
+        /// @param other iterator to compare against.
+        /// @return True if others index is smaller.
+        /// @details Constant complexity.
+        bool operator>(const _rBuf_iterator& other) const noexcept
+        {
+            //TODO:compatibility check
+            return (_rBuf_const_iterator<_rBuf>::m_logicalIndex > other._rBuf_const_iterator<_rBuf>::m_logicalIndex);
+        }
+
+        /// @brief Comparison <= overload.
+        /// @param other Other iterator to compare against.
+        /// @return True if other points to logically smaller or the same indexed element.
+        /// @details Constant complexity.
+        bool operator<=(const _rBuf_iterator& other) const noexcept
+        {
+            //TODO:compatibility check
+            return (_rBuf_const_iterator<_rBuf>::m_logicalIndex <= other._rBuf_const_iterator<_rBuf>::m_logicalIndex);
+        }
+
+        /// @brief Comparison >= overload.
+        /// @param other Other iterator to compare against.
+        /// @return True if other points to logically larger or same indexed element.
+        /// @details Constant complexity.
+        bool operator>=(const _rBuf_iterator& other) const noexcept
+        {
+            return (_rBuf_const_iterator<_rBuf>::m_logicalIndex >= other._rBuf_const_iterator<_rBuf>::m_logicalIndex);
+        }
+
+        /// @brief Custom assingment operator overload.
+        /// @param index Logical index of the element to set the iterator to.
+        /// @note Undefined behaviour for negative index.
+        /// @details Constant complexity.
+        _rBuf_iterator& operator=(const size_t index) noexcept
+        {
+            _rBuf_const_iterator<_rBuf>::m_logicalIndex = index;
+            return (*this);
+        };
+
+        /// @brief Index getter.
+        /// @return Returns the index of the element this iterator is pointing to.
+        /// @details Constant complexity.
+        difference_type getIndex() noexcept
+        {
+            return _rBuf_const_iterator<_rBuf>::m_logicalIndex;
+        }
     };
 
 
@@ -1421,8 +1408,8 @@ private:
     /// @throw Might throw std::bad_alloc from allocating memory and rotate(), or something from T's move/copy constructor.
     /// @exception  If any exception is thrown, invariants are retained. (Basic Exception guarantee).
     /// @details Linear Complexity in relation to amount of inserted elements times (O(n*2) from construction and rotate).
-    template<typename T>
-    iterator insertBase(const_iterator pos, const size_type amount, T&& value)
+    template<typename InsertValue>
+    iterator insertBase(const_iterator pos, const size_type amount, InsertValue&& value)
     {
         iterator it(this, pos.getIndex());
 
@@ -1433,7 +1420,7 @@ private:
         for (size_type i = 0; i < amount; i++)
         {
             // Construct element at the end.
-            m_allocator.construct(&*end(), std::forward<T>(value));
+            m_allocator.construct(&*end(), std::forward<InsertValue>(value));
             increment(m_headIndex);
         }
 
