@@ -1,0 +1,1537 @@
+\hypertarget{classring__buffer}{}\doxysection{ring\+\_\+buffer\texorpdfstring{$<$}{<} T, Allocator \texorpdfstring{$>$}{>} Class Template Reference}
+\label{classring__buffer}\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+
+
+Dynamic Ringbuffer is a dynamically growing std\+::container with support for queue, stack and priority queue adaptor functionality.  
+
+
+
+
+{\ttfamily \#include $<$ring\+\_\+buffer.\+hpp$>$}
+
+\doxysubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}
+\begin{DoxyCompactList}\small\item\em Custom iterator class. \end{DoxyCompactList}\item 
+class \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\+\_\+r\+Buf\+\_\+iterator}}
+\begin{DoxyCompactList}\small\item\em Custom iterator class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classring__buffer_a86bb7fcf18efac4fd9392b0d1e7936e2}\label{classring__buffer_a86bb7fcf18efac4fd9392b0d1e7936e2}} 
+using {\bfseries value\+\_\+type} = T
+\item 
+\mbox{\Hypertarget{classring__buffer_a0ba882483fe1804a86e9050edaf246f2}\label{classring__buffer_a0ba882483fe1804a86e9050edaf246f2}} 
+using {\bfseries allocator\+\_\+type} = Allocator
+\item 
+\mbox{\Hypertarget{classring__buffer_ad513971955235a51282d9c51f6734fe7}\label{classring__buffer_ad513971955235a51282d9c51f6734fe7}} 
+using {\bfseries reference} = T \&
+\item 
+\mbox{\Hypertarget{classring__buffer_adca2866bc954c6d9feed98e06b480244}\label{classring__buffer_adca2866bc954c6d9feed98e06b480244}} 
+using {\bfseries const\+\_\+reference} = const T \&
+\item 
+\mbox{\Hypertarget{classring__buffer_aa37a287966cc5bbf8eefa27c82007d34}\label{classring__buffer_aa37a287966cc5bbf8eefa27c82007d34}} 
+using {\bfseries pointer} = typename T $\ast$
+\item 
+\mbox{\Hypertarget{classring__buffer_a9097acc95036817b641672f84a17d2d9}\label{classring__buffer_a9097acc95036817b641672f84a17d2d9}} 
+using {\bfseries const\+\_\+pointer} = typename const T $\ast$
+\item 
+\mbox{\Hypertarget{classring__buffer_af9bb2a577a8bc997739a848ab3efd0f9}\label{classring__buffer_af9bb2a577a8bc997739a848ab3efd0f9}} 
+using {\bfseries difference\+\_\+type} = ptrdiff\+\_\+t
+\item 
+\mbox{\Hypertarget{classring__buffer_abdc06ed4cdcd7970b6df48248af49ced}\label{classring__buffer_abdc06ed4cdcd7970b6df48248af49ced}} 
+using {\bfseries size\+\_\+type} = std\+::size\+\_\+t
+\item 
+\mbox{\Hypertarget{classring__buffer_aa5201496780447d1b83c9648e07752af}\label{classring__buffer_aa5201496780447d1b83c9648e07752af}} 
+using {\bfseries iterator} = \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\+\_\+r\+Buf\+\_\+iterator}}$<$ \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T $>$ $>$
+\item 
+\mbox{\Hypertarget{classring__buffer_af9a1ec5234f371d755ec75bfd9adafea}\label{classring__buffer_af9a1ec5234f371d755ec75bfd9adafea}} 
+using {\bfseries const\+\_\+iterator} = \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T $>$ $>$
+\item 
+\mbox{\Hypertarget{classring__buffer_a1b4c92d2b89348303d05286347c7f66e}\label{classring__buffer_a1b4c92d2b89348303d05286347c7f66e}} 
+using {\bfseries reverse\+\_\+iterator} = std\+::reverse\+\_\+iterator$<$ \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} $>$
+\item 
+\mbox{\Hypertarget{classring__buffer_afb9412feef29dc7e6e73b380578691a3}\label{classring__buffer_afb9412feef29dc7e6e73b380578691a3}} 
+using {\bfseries const\+\_\+reverse\+\_\+iterator} = std\+::reverse\+\_\+iterator$<$ \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} $>$
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classring__buffer_a3f9101235ae01592332386c047e17d0d}{ring\+\_\+buffer}} ()
+\begin{DoxyCompactList}\small\item\em Default constructor. Constructs to 0 size and 2 capacity. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_a4995dd6a70c19f3fb90e17a3c0d2daa4}{ring\+\_\+buffer}} (const allocator\+\_\+type \&alloc)
+\begin{DoxyCompactList}\small\item\em Constructs the container with a custom allocator to 0 size and 2 capacity. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_a2449de34e9c4a70e81c5c76a1a75e71f}{ring\+\_\+buffer}} (size\+\_\+type count, const\+\_\+reference val, const allocator\+\_\+type \&alloc=allocator\+\_\+type())
+\begin{DoxyCompactList}\small\item\em Constructs the buffer to a given size with given values and optionally a custom allocator. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_a2648ee9dbe34781862260df46ac0d1e5}{ring\+\_\+buffer}} (size\+\_\+type count, const allocator\+\_\+type \&alloc=allocator\+\_\+type())
+\begin{DoxyCompactList}\small\item\em Custom constructor. Initializes a buffer to a capacity without constructing any elemen. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+It $>$ }\\\mbox{\hyperlink{classring__buffer_a558ef45f751987abbdd4f458d0efb9a3}{ring\+\_\+buffer}} (Input\+It begin\+It, Input\+It end\+It)
+\begin{DoxyCompactList}\small\item\em Construct the buffer from range \mbox{[}begin,end). \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_a37abccd052de210c36f6f397cd841a93}{ring\+\_\+buffer}} (std\+::initializer\+\_\+list$<$ T $>$ init)
+\begin{DoxyCompactList}\small\item\em Initializer list contructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_ad8925b041c137104b31c975169dd05b0}{ring\+\_\+buffer}} (const \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \&rhs)
+\begin{DoxyCompactList}\small\item\em Copy constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_a232425cc3a36aeb1a844956fd93623f0}{ring\+\_\+buffer}} (\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \&\&other) noexcept
+\begin{DoxyCompactList}\small\item\em Move constructor. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classring__buffer_adba67a9f961ab436428b0710cd1af773}\label{classring__buffer_adba67a9f961ab436428b0710cd1af773}} 
+{\bfseries $\sim$ring\+\_\+buffer} ()
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a6e9bf60beea284ff8ec7288526fbe95f}{insert}} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} pos, const value\+\_\+type \&value)
+\begin{DoxyCompactList}\small\item\em Inserts an element to the buffer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_af647fe55fa023f8b9b6e948350c09ffe}{insert}} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} pos, value\+\_\+type \&\&value)
+\begin{DoxyCompactList}\small\item\em Inserts an element to the buffer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a36dccabe03199fe8f651cdeb92ec36aa}{insert}} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} pos, const size\+\_\+type amount, const value\+\_\+type \&value)
+\begin{DoxyCompactList}\small\item\em Inserts an element to the buffer. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+It $>$ }\\\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_ab68cc324f43afbaef53a5f6dec8e8f79}{insert}} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} pos, Input\+It source\+Begin, Input\+It source\+End)
+\begin{DoxyCompactList}\small\item\em Inserts a range of elements into the buffer to a specific position. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_acd0d87d9c657e5356151da13ab78e444}{insert}} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} pos, std\+::initializer\+\_\+list$<$ T $>$ list)
+\begin{DoxyCompactList}\small\item\em Inserts initializer list into buffer to a specific position. \end{DoxyCompactList}\item 
+{\footnotesize template$<$class... Args$>$ }\\\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_acefe57c42e075e935c20a4da038b7df7}{emplace}} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} pos, Args \&\&... args)
+\begin{DoxyCompactList}\small\item\em Construct an element in place from arguments. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_ad68227da7f12db1402a6bce1cc8b834a}{erase}} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} pos)
+\begin{DoxyCompactList}\small\item\em Erase an element at a given position. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a36c5e76881f854c9083ae3ea0083a3ea}{erase}} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} first, \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} last)
+\begin{DoxyCompactList}\small\item\em Erase the specified elements from the container according to the range \mbox{[}first,last). Might destroy or move assign to the elements depending if last == \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}}. If last == \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}}, elements in \mbox{[}first,last) are destroyed. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_a69a41fdbb783e1acf736ab5b3d154472}{clear}} () noexcept
+\begin{DoxyCompactList}\small\item\em Destroys all elements in a buffer. Does not modify capacity. \end{DoxyCompactList}\item 
+{\footnotesize template$<$typename Input\+It $>$ }\\void \mbox{\hyperlink{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}{assign}} (Input\+It source\+Begin, Input\+It source\+End)
+\begin{DoxyCompactList}\small\item\em Replaces the elements in the buffer with copy of \mbox{[}source\+Begin, source\+End) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_acf5e7138c98dc161fad55891ec10a35b}{assign}} (std\+::initializer\+\_\+list$<$ T $>$ list)
+\begin{DoxyCompactList}\small\item\em Replaces the elements in the buffer. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_aacccdd4522868dc3549ac9c7c0bed128}{assign}} (const size\+\_\+type amount, value\+\_\+type value)
+\begin{DoxyCompactList}\small\item\em Replaces the elements in the buffer with given value. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \& \mbox{\hyperlink{classring__buffer_abff7619acabb085c8a582dd02c0737cb}{operator=}} (const \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \&other)
+\begin{DoxyCompactList}\small\item\em Copy assignment operator. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \& \mbox{\hyperlink{classring__buffer_a3e98268d8b4fc82a786f32c000b78018}{operator=}} (\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \&\&other) noexcept
+\begin{DoxyCompactList}\small\item\em Move assignment operator. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \& \mbox{\hyperlink{classring__buffer_ac8b1641644c85ff869a2458ee6e2912f}{operator=}} (std\+::initializer\+\_\+list$<$ T $>$ init)
+\begin{DoxyCompactList}\small\item\em Initializer list assign operator. \end{DoxyCompactList}\item 
+reference \mbox{\hyperlink{classring__buffer_a7c14c9afba67aad502b36653d1bbc2ca}{operator\mbox{[}$\,$\mbox{]}}} (const size\+\_\+type logical\+Index) noexcept
+\begin{DoxyCompactList}\small\item\em Index operator. \end{DoxyCompactList}\item 
+const\+\_\+reference \mbox{\hyperlink{classring__buffer_a3bbae1471c094bf84d8f1950a525e513}{operator\mbox{[}$\,$\mbox{]}}} (const size\+\_\+type logical\+Index) const noexcept
+\begin{DoxyCompactList}\small\item\em Index operator. \end{DoxyCompactList}\item 
+reference \mbox{\hyperlink{classring__buffer_a15eb085b3f95fdedb1906f4fb9f22c8f}{at}} (size\+\_\+type logical\+Index)
+\begin{DoxyCompactList}\small\item\em Get a specific element of the buffer with bounds checking. \end{DoxyCompactList}\item 
+const\+\_\+reference \mbox{\hyperlink{classring__buffer_a988f02984769a27167341843f36060a4}{at}} (size\+\_\+type logical\+Index) const
+\begin{DoxyCompactList}\small\item\em Get a specific element of the buffer. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_aa53ef9bfdabd3a5e613413b27c66de61}{swap}} (\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \&other) noexcept
+\begin{DoxyCompactList}\small\item\em Member swap implementation. Swaps Ring\+Buffers member to member. \end{DoxyCompactList}\item 
+pointer \mbox{\hyperlink{classring__buffer_a5b078b39ae40a0c1bc0b4e60a81f67ac}{data}} ()
+\begin{DoxyCompactList}\small\item\em Sorts ringbuffer so that logical tail matches the first element in physical memory. \end{DoxyCompactList}\item 
+size\+\_\+type \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Gets the size of the container. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classring__buffer_a09435a2152f9b680154e1e51e4472787}\label{classring__buffer_a09435a2152f9b680154e1e51e4472787}} 
+size\+\_\+type {\bfseries max\+\_\+size} () const noexcept
+\begin{DoxyCompactList}\small\item\em TODO what is this, is this needed somewhere? \end{DoxyCompactList}\item 
+size\+\_\+type \mbox{\hyperlink{classring__buffer_aeb98388fa6ae8a7a86e968d95534c8fd}{capacity}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Capacity getter. \end{DoxyCompactList}\item 
+allocator\+\_\+type \mbox{\hyperlink{classring__buffer_a527ba7169a95db0c12da90173963c2f9}{get\+\_\+allocator}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Allocator getter. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classring__buffer_aa8e1113807a6554022cee5af36d3e1f0}{empty}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Check if buffer is empty. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}{reserve}} (size\+\_\+type new\+Capacity, bool enable\+Shrink=false)
+\begin{DoxyCompactList}\small\item\em Allocates memory and copies the existing buffer to the new memory location. Can be used to increase or decrease capacity. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_a8c31052b14b558f6656dd06dc6f00436}{push\+\_\+front}} (value\+\_\+type val)
+\begin{DoxyCompactList}\small\item\em Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_ab2d27891d77e19442f1d8acaa26b11ee}{push\+\_\+front}} (value\+\_\+type \&\&val)
+\begin{DoxyCompactList}\small\item\em Inserts an element in the back of the buffer by move if move constructor is provided by value\+\_\+type. If buffer would get full after the operation, allocates more memory. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_a3de0c8df71d288b2948d618bdd930250}{push\+\_\+back}} (const value\+\_\+type \&val)
+\begin{DoxyCompactList}\small\item\em Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_a7d8ed70b4ef81563f9e8d349f256d84c}{push\+\_\+back}} (value\+\_\+type \&\&val)
+\begin{DoxyCompactList}\small\item\em Inserts an element in the back of the buffer by move if move constructor is provided for value\+\_\+type. If buffer would get full after the operation, allocates more memory. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_aef28bc848394b3bc6a1dea129dbb412f}{pop\+\_\+front}} () noexcept
+\begin{DoxyCompactList}\small\item\em Remove the first element in the buffer. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_ad1c703f9814872877775d2a5c2fef243}{pop\+\_\+back}} () noexcept
+\begin{DoxyCompactList}\small\item\em Erase an element from the logical back of the buffer. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{classring__buffer_a4404cf478938dc61b93a963581bd2f3a}{shrink\+\_\+to\+\_\+fit}} ()
+\begin{DoxyCompactList}\small\item\em Releases unused allocated memory. \end{DoxyCompactList}\item 
+reference \mbox{\hyperlink{classring__buffer_a6dee6af7622eafe9662e32f10d78b6b6}{front}} () noexcept
+\begin{DoxyCompactList}\small\item\em Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer. \end{DoxyCompactList}\item 
+const\+\_\+reference \mbox{\hyperlink{classring__buffer_a96289837a2a156411bddba7f214cce3a}{front}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer. \end{DoxyCompactList}\item 
+reference \mbox{\hyperlink{classring__buffer_ae7ca98342bbe89dd9aba19838cb7b407}{back}} () noexcept
+\begin{DoxyCompactList}\small\item\em Returns a reference to the last element in the buffer. Behaviour is undefined for empty buffer. \end{DoxyCompactList}\item 
+const\+\_\+reference \mbox{\hyperlink{classring__buffer_a0661379f8b19f49d5e5d026455be9617}{back}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Returns a const-\/reference to the last element in the buffer. Behaviour is undefined for empty buffer. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}} () noexcept
+\begin{DoxyCompactList}\small\item\em Construct iterator at begin. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer_a8347b456303e02b7a9ee23312859a621}{begin}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Construct const\+\_\+iterator at begin. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}} () noexcept
+\begin{DoxyCompactList}\small\item\em Construct iterator at end. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer_a8b3a0562418674a74bbc28eaa6ca793e}{end}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Construct const\+\_\+iterator at end. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer_a9494413971913e7702426e7fe8968c6a}{cbegin}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Construct const\+\_\+iterator at begin. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer_a3bce1fcd742096534d78bc450371775a}{cend}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Construct const\+\_\+iterator pointing to past the last element. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classring__buffer_ab456f054b5903b00e9b23ecf0b93675d}\label{classring__buffer_ab456f054b5903b00e9b23ecf0b93675d}} 
+reverse\+\_\+iterator {\bfseries rbegin} ()
+\begin{DoxyCompactList}\small\item\em Get a reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity. \end{DoxyCompactList}\item 
+const\+\_\+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer_aa243a80e8756739ce4b64f73e9a4338e}{rbegin}} () const
+\begin{DoxyCompactList}\small\item\em Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity. \end{DoxyCompactList}\item 
+const\+\_\+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer_a109b2e943558eab49ca6d33ca398a838}{crbegin}} () const
+\begin{DoxyCompactList}\small\item\em Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity. \end{DoxyCompactList}\item 
+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer_a81ee796bf66742e0d25716ce4c9d6f5d}{rend}} ()
+\begin{DoxyCompactList}\small\item\em Get a reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity. \end{DoxyCompactList}\item 
+const\+\_\+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer_ae9dcf3f2bfc1c9be3d18ab2d25eebd48}{rend}} () const
+\begin{DoxyCompactList}\small\item\em Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity. \end{DoxyCompactList}\item 
+const\+\_\+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer_a8a25432bd918d4cafbfb9e5bd47ea296}{crend}} () const
+\begin{DoxyCompactList}\small\item\em Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}} (\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \&a, \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \&b) noexcept
+\begin{DoxyCompactList}\small\item\em Friend swap. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename T, typename Allocator = std\+::allocator$<$\+T$>$$>$\newline
+class ring\+\_\+buffer$<$ T, Allocator $>$}
+Dynamic Ringbuffer is a dynamically growing std\+::container with support for queue, stack and priority queue adaptor functionality. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em T} & Type of the elements. \\
+\hline
+{\em Allocator} & Allocator used for (de)allocation and (de)construction. Defaults to std\+::allocator$<$\+T$>$ \\
+\hline
+\end{DoxyTemplParams}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classring__buffer_a3f9101235ae01592332386c047e17d0d}\label{classring__buffer_a3f9101235ae01592332386c047e17d0d}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!ring\_buffer@{ring\_buffer}}
+\index{ring\_buffer@{ring\_buffer}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ring\_buffer()}{ring\_buffer()}\hspace{0.1cm}{\footnotesize\ttfamily [1/8]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{classring__buffer}{\+::ring\+\_\+buffer}} (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Default constructor. Constructs to 0 size and 2 capacity. 
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory available for allocation. \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyPostcond}{Postcondition}
+this-\/\texorpdfstring{$>$}{>}\mbox{\hyperlink{classring__buffer_aa8e1113807a6554022cee5af36d3e1f0}{empty()}} == true. 
+\end{DoxyPostcond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em If} & any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a4995dd6a70c19f3fb90e17a3c0d2daa4}\label{classring__buffer_a4995dd6a70c19f3fb90e17a3c0d2daa4}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!ring\_buffer@{ring\_buffer}}
+\index{ring\_buffer@{ring\_buffer}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ring\_buffer()}{ring\_buffer()}\hspace{0.1cm}{\footnotesize\ttfamily [2/8]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{classring__buffer}{\+::ring\+\_\+buffer}} (\begin{DoxyParamCaption}\item[{const allocator\+\_\+type \&}]{alloc }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Constructs the container with a custom allocator to 0 size and 2 capacity. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em alloc} & Custom allocator for the buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPostcond}{Postcondition}
+this-\/\texorpdfstring{$>$}{>}\mbox{\hyperlink{classring__buffer_aa8e1113807a6554022cee5af36d3e1f0}{empty()}} == true. 
+\end{DoxyPostcond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory available for allocation. \\
+\hline
+{\em If} & any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a2449de34e9c4a70e81c5c76a1a75e71f}\label{classring__buffer_a2449de34e9c4a70e81c5c76a1a75e71f}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!ring\_buffer@{ring\_buffer}}
+\index{ring\_buffer@{ring\_buffer}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ring\_buffer()}{ring\_buffer()}\hspace{0.1cm}{\footnotesize\ttfamily [3/8]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{classring__buffer}{\+::ring\+\_\+buffer}} (\begin{DoxyParamCaption}\item[{size\+\_\+type}]{count,  }\item[{const\+\_\+reference}]{val,  }\item[{const allocator\+\_\+type \&}]{alloc = {\ttfamily allocator\+\_\+type()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Constructs the buffer to a given size with given values and optionally a custom allocator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em size} & Amount of elements to be initialized in the buffer. \\
+\hline
+{\em val} & Reference to a value which the elements are initialized to. \\
+\hline
+{\em alloc} & Custom allocator. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+T needs to satisfy Copy\+Insertable. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+std\+::distance(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}}, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}}) == count. 
+\end{DoxyPostcond}
+\begin{DoxyNote}{Note}
+Allocates memory for count + 2 elements. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory available for allocation. \\
+\hline
+{\em If} & any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear complexity in relation to amount of constructed elements (O(n)). \mbox{\Hypertarget{classring__buffer_a2648ee9dbe34781862260df46ac0d1e5}\label{classring__buffer_a2648ee9dbe34781862260df46ac0d1e5}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!ring\_buffer@{ring\_buffer}}
+\index{ring\_buffer@{ring\_buffer}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ring\_buffer()}{ring\_buffer()}\hspace{0.1cm}{\footnotesize\ttfamily [4/8]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{classring__buffer}{\+::ring\+\_\+buffer}} (\begin{DoxyParamCaption}\item[{size\+\_\+type}]{count,  }\item[{const allocator\+\_\+type \&}]{alloc = {\ttfamily allocator\+\_\+type()} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Custom constructor. Initializes a buffer to a capacity without constructing any elemen. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em capacity} & Capacity of the buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+T must satisfy Default\+Insertable. 
+\end{DoxyPrecond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory available for allocation, or some exception from T\textquotesingle{}s constructor. \\
+\hline
+{\em If} & any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear complexity in relation to count (O(n)). \mbox{\Hypertarget{classring__buffer_a558ef45f751987abbdd4f458d0efb9a3}\label{classring__buffer_a558ef45f751987abbdd4f458d0efb9a3}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!ring\_buffer@{ring\_buffer}}
+\index{ring\_buffer@{ring\_buffer}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ring\_buffer()}{ring\_buffer()}\hspace{0.1cm}{\footnotesize\ttfamily [5/8]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$typename Input\+It $>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{classring__buffer}{\+::ring\+\_\+buffer}} (\begin{DoxyParamCaption}\item[{Input\+It}]{begin\+It,  }\item[{Input\+It}]{end\+It }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Construct the buffer from range \mbox{[}begin,end). 
+
+
+\begin{DoxyParams}{Parameters}
+{\em begin\+It} & Iterator to first element of range. \\
+\hline
+{\em end\+It} & Iterator pointing to past-\/the-\/last element of range. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+valye\+\_\+type must satisfy Copy\+Insertable. Input\+It must be deferencable to value\+\_\+type, and incrementing range\+Begin (repeatedly) must reach range\+End. Otherwise behaviour is undefined. 
+\end{DoxyPrecond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory available for allocation, or something from T\textquotesingle{}s constructor. \\
+\hline
+{\em If} & any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear complexity in relation to the size of the range (O(n)). \begin{DoxyNote}{Note}
+Behavior is undefined if elements in range are not valid. 
+\end{DoxyNote}
+\mbox{\Hypertarget{classring__buffer_a37abccd052de210c36f6f397cd841a93}\label{classring__buffer_a37abccd052de210c36f6f397cd841a93}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!ring\_buffer@{ring\_buffer}}
+\index{ring\_buffer@{ring\_buffer}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ring\_buffer()}{ring\_buffer()}\hspace{0.1cm}{\footnotesize\ttfamily [6/8]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{classring__buffer}{\+::ring\+\_\+buffer}} (\begin{DoxyParamCaption}\item[{std\+::initializer\+\_\+list$<$ T $>$}]{init }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Initializer list contructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em init} & Initializer list to initialize the buffer from. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+T must satisfy Copy\+Insertable. 
+\end{DoxyPrecond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory for allocation. \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyNote}{Note}
+Allocates memory for 2 extra elements.
+\end{DoxyNote}
+Linear complexity in relation to initializer list size (O(n)). \mbox{\Hypertarget{classring__buffer_ad8925b041c137104b31c975169dd05b0}\label{classring__buffer_ad8925b041c137104b31c975169dd05b0}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!ring\_buffer@{ring\_buffer}}
+\index{ring\_buffer@{ring\_buffer}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ring\_buffer()}{ring\_buffer()}\hspace{0.1cm}{\footnotesize\ttfamily [7/8]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{classring__buffer}{\+::ring\+\_\+buffer}} (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$ \&}]{rhs }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Copy constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rhs} & Reference to a Ring\+Buffer to create a copy from. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+T must meet Copy\+Insertable. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+this == \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer(rhs)}}. 
+\end{DoxyPostcond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory for memory allocation, or something from value\+\_\+types constructor. @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear complexity in relation to buffer size. \mbox{\Hypertarget{classring__buffer_a232425cc3a36aeb1a844956fd93623f0}\label{classring__buffer_a232425cc3a36aeb1a844956fd93623f0}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!ring\_buffer@{ring\_buffer}}
+\index{ring\_buffer@{ring\_buffer}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{ring\_buffer()}{ring\_buffer()}\hspace{0.1cm}{\footnotesize\ttfamily [8/8]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{classring__buffer}{\+::ring\+\_\+buffer}} (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$ \&\&}]{other }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Move constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & Rvalue reference to other buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+value\+\_\+type must resolve std\+::is\+\_\+nothrow\+\_\+move\+\_\+constructible$<$value\+\_\+type$>$\+::value to true. Otherwise function does nothing.
+\end{DoxyPrecond}
+Linear complexity in relation to buffer size, unless other\textquotesingle{}s allocator compares equal or is propagated on move assignment, then complexity is Constant. 
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classring__buffer_aacccdd4522868dc3549ac9c7c0bed128}\label{classring__buffer_aacccdd4522868dc3549ac9c7c0bed128}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!assign@{assign}}
+\index{assign@{assign}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{assign()}{assign()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::assign (\begin{DoxyParamCaption}\item[{const size\+\_\+type}]{amount,  }\item[{value\+\_\+type}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Replaces the elements in the buffer with given value. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em amount} & Size of the buffer after the assignment. \\
+\hline
+{\em value} & Value of all elements after the assignment. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+value\+\_\+type is Copy\+Insertable. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+All existing references, pointers and iterators are to be considered invalid. 
+\end{DoxyPostcond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc or from value\+\_\+types constructor. \\
+\hline
+{\em If} & any exception is throw, invariants are preserved (Basic Exception Guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear Complexity in relation to ranges size (O(n $\ast$ 2) from linear clear and linear construction). \begin{DoxyNote}{Note}
+Destroys all elements in the buffer before constructing the assigned elements. 
+\end{DoxyNote}
+\mbox{\Hypertarget{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}\label{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!assign@{assign}}
+\index{assign@{assign}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{assign()}{assign()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$typename Input\+It $>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::assign (\begin{DoxyParamCaption}\item[{Input\+It}]{source\+Begin,  }\item[{Input\+It}]{source\+End }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Replaces the elements in the buffer with copy of \mbox{[}source\+Begin, source\+End) 
+
+
+\begin{DoxyParams}{Parameters}
+{\em source\+Begin} & Iterator to beginning of the range. \\
+\hline
+{\em source\+End} & Past the end iterator of the range. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+value\+\_\+type is Copy\+Insertable and elements of \mbox{[}source\+Begin, source\+End) are not in $\ast$this. Input\+It must be dereferenceable to value\+\_\+type, and incrementing source\+Begin (repeatedly) must reach source\+End. Otherwise behaviour is undefined. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+All existing references, pointers and iterators are to be considered invalid. 
+\end{DoxyPostcond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc or from value\+\_\+types constructor. \\
+\hline
+{\em If} & any exception is throw, invariants are preserved (Basic Exception Guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear Complexity in relation to ranges size (O(n $\ast$ 2) from linear clear and linear construction). \begin{DoxyNote}{Note}
+Destroys all elements in the buffer before constructing the assigned elements. 
+\end{DoxyNote}
+\mbox{\Hypertarget{classring__buffer_acf5e7138c98dc161fad55891ec10a35b}\label{classring__buffer_acf5e7138c98dc161fad55891ec10a35b}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!assign@{assign}}
+\index{assign@{assign}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{assign()}{assign()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::assign (\begin{DoxyParamCaption}\item[{std\+::initializer\+\_\+list$<$ T $>$}]{list }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Replaces the elements in the buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em list} & Initializer list containing the elements to replace the existing ones. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+value\+\_\+type is Copy\+Insertable. List does not contain elements of $\ast$this. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+All existing references, pointers and iterators are to be considered invalid. 
+\end{DoxyPostcond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc or from value\+\_\+types constructor. \\
+\hline
+{\em If} & any exception is throw, invariants are preserved (Basic Exception Guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear Complexity in relation to ranges size (O(n $\ast$ 2) from linear clear and linear construction). \begin{DoxyNote}{Note}
+Destroys all elements in the buffer before constructing the assigned elements. 
+\end{DoxyNote}
+\mbox{\Hypertarget{classring__buffer_a15eb085b3f95fdedb1906f4fb9f22c8f}\label{classring__buffer_a15eb085b3f95fdedb1906f4fb9f22c8f}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!at@{at}}
+\index{at@{at}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at()}{at()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::at (\begin{DoxyParamCaption}\item[{size\+\_\+type}]{logical\+Index }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get a specific element of the buffer with bounds checking. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em logical\+Index} & Index of the element. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns a reference the the element at index. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Throws} & std\+::out\+\_\+of\+\_\+range if index is larger or equal to buffers size. \\
+\hline
+{\em If} & any exceptions is thrown this function has no effect (Strong exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a988f02984769a27167341843f36060a4}\label{classring__buffer_a988f02984769a27167341843f36060a4}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!at@{at}}
+\index{at@{at}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{at()}{at()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+const\+\_\+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::at (\begin{DoxyParamCaption}\item[{size\+\_\+type}]{logical\+Index }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get a specific element of the buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em logical\+Index} & Index of the element. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns a const reference the the element at index. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Throws} & std\+::out\+\_\+of\+\_\+range if index is larger or equal to buffers size. \\
+\hline
+{\em If} & any exceptions is thrown this function has no effect (Strong exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a0661379f8b19f49d5e5d026455be9617}\label{classring__buffer_a0661379f8b19f49d5e5d026455be9617}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!back@{back}}
+\index{back@{back}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{back()}{back()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+const\+\_\+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::back (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Returns a const-\/reference to the last element in the buffer. Behaviour is undefined for empty buffer. 
+
+\begin{DoxyReturn}{Returns}
+const-\/reference to the last element in the buffer.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_ae7ca98342bbe89dd9aba19838cb7b407}\label{classring__buffer_ae7ca98342bbe89dd9aba19838cb7b407}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!back@{back}}
+\index{back@{back}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{back()}{back()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::back (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Returns a reference to the last element in the buffer. Behaviour is undefined for empty buffer. 
+
+\begin{DoxyReturn}{Returns}
+Reference to the last element in the buffer.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a8347b456303e02b7a9ee23312859a621}\label{classring__buffer_a8347b456303e02b7a9ee23312859a621}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!begin@{begin}}
+\index{begin@{begin}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::begin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Construct const\+\_\+iterator at begin. 
+
+\begin{DoxyReturn}{Returns}
+Const\+\_\+iterator pointing to first element.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}\label{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!begin@{begin}}
+\index{begin@{begin}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::begin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Construct iterator at begin. 
+
+\begin{DoxyReturn}{Returns}
+Iterator pointing to first element.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_aeb98388fa6ae8a7a86e968d95534c8fd}\label{classring__buffer_aeb98388fa6ae8a7a86e968d95534c8fd}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!capacity@{capacity}}
+\index{capacity@{capacity}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{capacity()}{capacity()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+size\+\_\+type \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::capacity (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Capacity getter. 
+
+\begin{DoxyReturn}{Returns}
+m\+\_\+capacity Returns how many elements have been allocated for the buffers use.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a9494413971913e7702426e7fe8968c6a}\label{classring__buffer_a9494413971913e7702426e7fe8968c6a}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!cbegin@{cbegin}}
+\index{cbegin@{cbegin}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{cbegin()}{cbegin()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::cbegin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Construct const\+\_\+iterator at begin. 
+
+\begin{DoxyReturn}{Returns}
+Const\+\_\+iterator pointing to first element.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a3bce1fcd742096534d78bc450371775a}\label{classring__buffer_a3bce1fcd742096534d78bc450371775a}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!cend@{cend}}
+\index{cend@{cend}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{cend()}{cend()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::cend (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Construct const\+\_\+iterator pointing to past the last element. 
+
+\begin{DoxyReturn}{Returns}
+Const\+\_\+iterator pointing past last element.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a69a41fdbb783e1acf736ab5b3d154472}\label{classring__buffer_a69a41fdbb783e1acf736ab5b3d154472}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!clear@{clear}}
+\index{clear@{clear}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Destroys all elements in a buffer. Does not modify capacity. 
+
+\begin{DoxyPostcond}{Postcondition}
+All existing references, pointers and iterators are to be considered invalid.
+\end{DoxyPostcond}
+Linear complexity in relation to size of the buffer. \mbox{\Hypertarget{classring__buffer_a109b2e943558eab49ca6d33ca398a838}\label{classring__buffer_a109b2e943558eab49ca6d33ca398a838}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!crbegin@{crbegin}}
+\index{crbegin@{crbegin}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{crbegin()}{crbegin()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+const\+\_\+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::crbegin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity. 
+
+\begin{DoxyReturn}{Returns}
+const\+\_\+reverse\+\_\+iterator pointing to the first element in reverse order. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_a8a25432bd918d4cafbfb9e5bd47ea296}\label{classring__buffer_a8a25432bd918d4cafbfb9e5bd47ea296}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!crend@{crend}}
+\index{crend@{crend}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{crend()}{crend()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+const\+\_\+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::crend (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity. 
+
+\begin{DoxyReturn}{Returns}
+const\+\_\+reverse\+\_\+iterator pointing to one past the last element in reverse order. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_a5b078b39ae40a0c1bc0b4e60a81f67ac}\label{classring__buffer_a5b078b39ae40a0c1bc0b4e60a81f67ac}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!data@{data}}
+\index{data@{data}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{data()}{data()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+pointer \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Sorts ringbuffer so that logical tail matches the first element in physical memory. 
+
+\begin{DoxyReturn}{Returns}
+Returns a pointer to the first element. 
+\end{DoxyReturn}
+\begin{DoxyPrecond}{Precondition}
+T must meet Move\+Insertable, or Copy\+Insertable. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+\&this\mbox{[}0\mbox{]} == m\+\_\+data. 
+\end{DoxyPostcond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc. \\
+\hline
+{\em If} & T\textquotesingle{}s Move (or copy) constructor is not noexcept and throws, behaviour is undefined. Otherwise if exceptions are thrown (std\+::bad\+\_\+alloc) this function has no effect (Strong exception guarantee). \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyNote}{Note}
+Invalidates all existing pointers and references.
+\end{DoxyNote}
+Linear complexity in relation to buffer size. \mbox{\Hypertarget{classring__buffer_acefe57c42e075e935c20a4da038b7df7}\label{classring__buffer_acefe57c42e075e935c20a4da038b7df7}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!emplace@{emplace}}
+\index{emplace@{emplace}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{emplace()}{emplace()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class... Args$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::emplace (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}}}]{pos,  }\item[{Args \&\&...}]{args }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Construct an element in place from arguments. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pos} & Iterator pointing to the element where the new element will be constructed. \\
+\hline
+{\em args} & Argument pack containing arguments to construct value\+\_\+type element. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns an iterator pointing to the element constructed from args. 
+\end{DoxyReturn}
+\begin{DoxyPrecond}{Precondition}
+T must meet Emplace\+Constructible. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+returned iterator points at the element constructed from args. 
+\end{DoxyPostcond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc if memory is allocated. Can also throw from T\textquotesingle{}s constructor when constructing the element. Additionally, rotate can throw bad\+\_\+alloc and if T does not provide a noexcept move semantics. \\
+\hline
+{\em If} & any exception is thrown, invariants are preserved. (Basic exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_aa8e1113807a6554022cee5af36d3e1f0}\label{classring__buffer_aa8e1113807a6554022cee5af36d3e1f0}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!empty@{empty}}
+\index{empty@{empty}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{empty()}{empty()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+bool \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::empty (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Check if buffer is empty. 
+
+\begin{DoxyReturn}{Returns}
+True if buffer is empty
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a8b3a0562418674a74bbc28eaa6ca793e}\label{classring__buffer_a8b3a0562418674a74bbc28eaa6ca793e}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!end@{end}}
+\index{end@{end}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::end (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Construct const\+\_\+iterator at end. 
+
+\begin{DoxyReturn}{Returns}
+Const\+\_\+iterator pointing past last element.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}\label{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!end@{end}}
+\index{end@{end}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::end (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Construct iterator at end. 
+
+\begin{DoxyReturn}{Returns}
+Iterator pointing past last element.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a36c5e76881f854c9083ae3ea0083a3ea}\label{classring__buffer_a36c5e76881f854c9083ae3ea0083a3ea}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!erase@{erase}}
+\index{erase@{erase}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{erase()}{erase()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::erase (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}}}]{first,  }\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}}}]{last }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Erase the specified elements from the container according to the range \mbox{[}first,last). Might destroy or move assign to the elements depending if last == \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}}. If last == \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}}, elements in \mbox{[}first,last) are destroyed. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em first} & iterator to the first element to erase. \\
+\hline
+{\em last} & iterator past the last element to erase. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+First and last must be valid iterators to $\ast$this. 
+\end{DoxyPrecond}
+\begin{DoxyReturn}{Returns}
+Returns an iterator to the element that was immediately following the erased elements. If last == \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}}, then \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} is returned. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Possibly} & throws from value\+\_\+types move/copy assignment operator if last != \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}}. \\
+\hline
+{\em If} & last != end, this function will not throw (noexcept). If the assignemnt throws, the invariants are retained. (Basic exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear Complexity in relation to size of the range, and then linear in remaining elements after the erased range. \mbox{\Hypertarget{classring__buffer_ad68227da7f12db1402a6bce1cc8b834a}\label{classring__buffer_ad68227da7f12db1402a6bce1cc8b834a}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!erase@{erase}}
+\index{erase@{erase}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{erase()}{erase()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::erase (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}}}]{pos }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Erase an element at a given position. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pos} & Pointer to the element to be erased. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+value\+\_\+type must be nothrow-\/\+Move\+Constructible. pos must be a valid dereferenceable iterator within the container. Otherwise behavior is undefined. 
+\end{DoxyPrecond}
+\begin{DoxyReturn}{Returns}
+Returns an iterator that was immediately following the ereased element. If the erased element was last in the buffer, returns a pointer to the new last element. @except Linear Complexity. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_a96289837a2a156411bddba7f214cce3a}\label{classring__buffer_a96289837a2a156411bddba7f214cce3a}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!front@{front}}
+\index{front@{front}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{front()}{front()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+const\+\_\+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::front (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer. 
+
+\begin{DoxyReturn}{Returns}
+const-\/\+Reference to the first element.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a6dee6af7622eafe9662e32f10d78b6b6}\label{classring__buffer_a6dee6af7622eafe9662e32f10d78b6b6}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!front@{front}}
+\index{front@{front}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{front()}{front()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::front (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer. 
+
+\begin{DoxyReturn}{Returns}
+Reference to the first element.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a527ba7169a95db0c12da90173963c2f9}\label{classring__buffer_a527ba7169a95db0c12da90173963c2f9}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!get\_allocator@{get\_allocator}}
+\index{get\_allocator@{get\_allocator}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{get\_allocator()}{get\_allocator()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+allocator\+\_\+type \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::get\+\_\+allocator (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Allocator getter. 
+
+\begin{DoxyReturn}{Returns}
+Return the allocator used by the container.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a36dccabe03199fe8f651cdeb92ec36aa}\label{classring__buffer_a36dccabe03199fe8f651cdeb92ec36aa}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!insert@{insert}}
+\index{insert@{insert}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [1/5]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::insert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}}}]{pos,  }\item[{const size\+\_\+type}]{amount,  }\item[{const value\+\_\+type \&}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Inserts an element to the buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pos} & Iterator where the the element should be inserted \\
+\hline
+{\em value} & Value to insert. T must meet the requirements of Copy\+Insertable. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Iterator that pos to the inserted element. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Internally calls insert\+Base. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc, or something from T\textquotesingle{}s move/copy constructor. \\
+\hline
+{\em If} & any exception is thrown, invariants are retained. (Basic Exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear Complexity in relation to amount of inserted elements. \mbox{\Hypertarget{classring__buffer_a6e9bf60beea284ff8ec7288526fbe95f}\label{classring__buffer_a6e9bf60beea284ff8ec7288526fbe95f}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!insert@{insert}}
+\index{insert@{insert}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [2/5]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::insert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}}}]{pos,  }\item[{const value\+\_\+type \&}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Inserts an element to the buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pos} & Iterator where the the element should be inserted. \\
+\hline
+{\em value} & Value to insert. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Iterator that points to the inserted element. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Internally calls insert\+Base. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc, or something from T\textquotesingle{}s move/copy constructor. \\
+\hline
+{\em If} & any exception is thrown, invariants are retained. (Basic Exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear Complexity in relation to amount of inserted elements. \mbox{\Hypertarget{classring__buffer_ab68cc324f43afbaef53a5f6dec8e8f79}\label{classring__buffer_ab68cc324f43afbaef53a5f6dec8e8f79}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!insert@{insert}}
+\index{insert@{insert}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [3/5]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$typename Input\+It $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::insert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}}}]{pos,  }\item[{Input\+It}]{source\+Begin,  }\item[{Input\+It}]{source\+End }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Inserts a range of elements into the buffer to a specific position. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Input\+It} & Type of iterator for the range. \\
+\hline
+\end{DoxyTemplParams}
+
+\begin{DoxyParams}{Parameters}
+{\em pos} & Iterator to the position where range will be inserted to. \\
+\hline
+{\em source\+Begin} & Iterator to first element of the range. \\
+\hline
+{\em source\+End} & Iterator past the last element of the range. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns an iterator to an element in the buffer which is copy of the first element in the range. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Internally calls insert\+Range\+Base. 
+\end{DoxyNote}
+\begin{DoxyPrecond}{Precondition}
+pos must be a valid dereferenceable iterator within the container. Iterators must point to elements that are implicitly convertible to value\+\_\+type. Otherwise behavior is undefined. 
+\end{DoxyPrecond}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc and something from value\+\_\+types constructor. \\
+\hline
+{\em If} & any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee) \\
+\hline
+\end{DoxyExceptions}
+\mbox{\Hypertarget{classring__buffer_acd0d87d9c657e5356151da13ab78e444}\label{classring__buffer_acd0d87d9c657e5356151da13ab78e444}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!insert@{insert}}
+\index{insert@{insert}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [4/5]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::insert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}}}]{pos,  }\item[{std\+::initializer\+\_\+list$<$ T $>$}]{list }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Inserts initializer list into buffer to a specific position. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pos} & Iterator where the list will be inserted. \\
+\hline
+{\em list} & Initiliazer list to insert. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+pos must be a valid dereferenceable iterator within the container. Otherwise behavior is undefined. 
+\end{DoxyPrecond}
+\begin{DoxyReturn}{Returns}
+Returns Iterator to the first element inserted, or the element pointed by pos if the initializer list was empty. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Internally calls insert\+Range\+Base. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc and something from value\+\_\+types constructor. \\
+\hline
+{\em If} & any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee) \\
+\hline
+\end{DoxyExceptions}
+\mbox{\Hypertarget{classring__buffer_af647fe55fa023f8b9b6e948350c09ffe}\label{classring__buffer_af647fe55fa023f8b9b6e948350c09ffe}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!insert@{insert}}
+\index{insert@{insert}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [5/5]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::insert (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\+\_\+iterator}}}]{pos,  }\item[{value\+\_\+type \&\&}]{value }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Inserts an element to the buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pos} & Iterator where the the element should be inserted \\
+\hline
+{\em value} & Value to insert. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Iterator that pos to the inserted element. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+Internally calls insert\+Base. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc, or something from T\textquotesingle{}s move/copy constructor. \\
+\hline
+{\em If} & any exception is thrown, invariants are retained. (Basic Exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear Complexity in relation to amount of inserted elements. \mbox{\Hypertarget{classring__buffer_abff7619acabb085c8a582dd02c0737cb}\label{classring__buffer_abff7619acabb085c8a582dd02c0737cb}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \& \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$ \&}]{other }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Copy assignment operator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & Ringbuffer to be copied. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns reference to the left hand side Rung\+Buffer after swap. 
+\end{DoxyReturn}
+\begin{DoxyPostcond}{Postcondition}
+$\ast$this == other.
+\end{DoxyPostcond}
+Constant complexity. 
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc or something from value\+\_\+types constructor. \\
+\hline
+{\em If} & any exception is thrown, this function has no effect (Strong Exception Guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear complexity in relation to buffer size. \mbox{\Hypertarget{classring__buffer_a3e98268d8b4fc82a786f32c000b78018}\label{classring__buffer_a3e98268d8b4fc82a786f32c000b78018}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \& \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::operator= (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$ \&\&}]{other }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Move assignment operator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & Rvalue ref to other buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+value\+\_\+type is Move\+Constructible. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+$\ast$this has values other had before the assignment. 
+\end{DoxyPostcond}
+\begin{DoxyReturn}{Returns}
+Reference to the buffer to move from. 
+\end{DoxyReturn}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em If} & value\+\_\+type is not Move\+Constructible, and value\+\_\+type provides a throwing Copy\+Constructor is used this function has undefined behaviour.\\
+\hline
+\end{DoxyExceptions}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_ac8b1641644c85ff869a2458ee6e2912f}\label{classring__buffer_ac8b1641644c85ff869a2458ee6e2912f}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} \& \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::operator= (\begin{DoxyParamCaption}\item[{std\+::initializer\+\_\+list$<$ T $>$}]{init }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Initializer list assign operator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em init} & Initializer list to assign to the buffer. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns a reference to the buffer. 
+\end{DoxyReturn}
+\begin{DoxyPrecond}{Precondition}
+T is Copy\+Insertable. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+All existing iterators are invalidated. 
+\end{DoxyPostcond}
+\begin{DoxyNote}{Note}
+Internally calls \mbox{\hyperlink{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}{assign()}}, which destroys all elements before Copy\+Inserting from initializer list.
+\end{DoxyNote}
+Linear complexity in relation to amount of existing elements and size of initializer list. \mbox{\Hypertarget{classring__buffer_a3bbae1471c094bf84d8f1950a525e513}\label{classring__buffer_a3bbae1471c094bf84d8f1950a525e513}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+const\+\_\+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const size\+\_\+type}]{logical\+Index }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Index operator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em logical\+Index} & Index of the element used to access n\+:th element of the buffer.\\
+\hline
+\end{DoxyParams}
+Constant complexity \begin{DoxyNote}{Note}
+The operator acts as interface that hides the physical memory layout from the user. Logical index neeeds to be added to internal tail index to get actual element address. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+Returns a const reference the the element ad logical\+Index. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_a7c14c9afba67aad502b36653d1bbc2ca}\label{classring__buffer_a7c14c9afba67aad502b36653d1bbc2ca}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const size\+\_\+type}]{logical\+Index }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Index operator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em logical\+Index} & Index of the element. If Logical\+Index \texorpdfstring{$>$}{>}= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size()}}, this function has undefined behavriour.\\
+\hline
+\end{DoxyParams}
+Constant complexity. \begin{DoxyNote}{Note}
+The operator acts as interface that hides the physical memory layout from the user. Logical index neeeds to be added to internal tail index to get actual element address. 
+\end{DoxyNote}
+\begin{DoxyReturn}{Returns}
+Returns a reference to the element. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_ad1c703f9814872877775d2a5c2fef243}\label{classring__buffer_ad1c703f9814872877775d2a5c2fef243}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!pop\_back@{pop\_back}}
+\index{pop\_back@{pop\_back}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{pop\_back()}{pop\_back()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::pop\+\_\+back (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Erase an element from the logical back of the buffer. 
+
+\begin{DoxyPrecond}{Precondition}
+Buffers size \texorpdfstring{$>$}{>} 0, otherwise behaviour is undefined. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+All pointers and references are invalidated. Iterators persist except \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} -\/ 1 iterator is invalidated (it becomes new past-\/the-\/last iterator).
+\end{DoxyPostcond}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_aef28bc848394b3bc6a1dea129dbb412f}\label{classring__buffer_aef28bc848394b3bc6a1dea129dbb412f}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!pop\_front@{pop\_front}}
+\index{pop\_front@{pop\_front}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{pop\_front()}{pop\_front()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::pop\+\_\+front (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Remove the first element in the buffer. 
+
+\begin{DoxyPrecond}{Precondition}
+Buffers size \texorpdfstring{$>$}{>} 0, otherwise behaviour is undefined. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+All iterators, pointers and references are invalidated.
+\end{DoxyPostcond}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a3de0c8df71d288b2948d618bdd930250}\label{classring__buffer_a3de0c8df71d288b2948d618bdd930250}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!push\_back@{push\_back}}
+\index{push\_back@{push\_back}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{push\_back()}{push\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::push\+\_\+back (\begin{DoxyParamCaption}\item[{const value\+\_\+type \&}]{val }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory. 
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory for allocation. \\
+\hline
+\end{DoxyExceptions}
+
+\begin{DoxyParams}{Parameters}
+{\em val} & Value of type T to be appended. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Allocates memory before the insertion if the buffer would be full after the operation. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc. \\
+\hline
+{\em If} & the copy constructor of value\+\_\+type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee). \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyPrecond}{Precondition}
+value\+\_\+type needs to satisfy Copy\+Insertable. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+If more memory is allocated, all pointers and references are invalidated. 
+\end{DoxyPostcond}
+\mbox{\Hypertarget{classring__buffer_a7d8ed70b4ef81563f9e8d349f256d84c}\label{classring__buffer_a7d8ed70b4ef81563f9e8d349f256d84c}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!push\_back@{push\_back}}
+\index{push\_back@{push\_back}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{push\_back()}{push\_back()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::push\+\_\+back (\begin{DoxyParamCaption}\item[{value\+\_\+type \&\&}]{val }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Inserts an element in the back of the buffer by move if move constructor is provided for value\+\_\+type. If buffer would get full after the operation, allocates more memory. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em val} & Rvalue reference to the value to be appended. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Allocates memory before the insertion if the buffer would be full after the operation. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc if more memory is allocated. \\
+\hline
+{\em If} & the move/copy constructor of value\+\_\+type throws, behaviour is undefined. Otherwise in case of exception (std\+::bad\+\_\+alloc) this function has no effect (Strong Exception Guarantee). \\
+\hline
+\end{DoxyExceptions}
+\begin{DoxyPrecond}{Precondition}
+value\+\_\+type needs to satisfy Move\+Insertable or Copy\+Insertable. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+If more memory is allocated, all pointers and references are invalidated.
+\end{DoxyPostcond}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_ab2d27891d77e19442f1d8acaa26b11ee}\label{classring__buffer_ab2d27891d77e19442f1d8acaa26b11ee}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!push\_front@{push\_front}}
+\index{push\_front@{push\_front}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{push\_front()}{push\_front()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::push\+\_\+front (\begin{DoxyParamCaption}\item[{value\+\_\+type \&\&}]{val }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Inserts an element in the back of the buffer by move if move constructor is provided by value\+\_\+type. If buffer would get full after the operation, allocates more memory. 
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory for allocation. \\
+\hline
+\end{DoxyExceptions}
+
+\begin{DoxyParams}{Parameters}
+{\em val} & Rvalue reference to the element to insert. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyPrecond}{Precondition}
+value\+\_\+type needs to satisfy Move\+Insertable or Copy\+Insertable. 
+\end{DoxyPrecond}
+\begin{DoxyNote}{Note}
+All iterators are invalidated. If allocation happens, all pointers and references are invalidated. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em If} & the move/copy constructor of value\+\_\+type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).\\
+\hline
+\end{DoxyExceptions}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_a8c31052b14b558f6656dd06dc6f00436}\label{classring__buffer_a8c31052b14b558f6656dd06dc6f00436}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!push\_front@{push\_front}}
+\index{push\_front@{push\_front}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{push\_front()}{push\_front()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::push\+\_\+front (\begin{DoxyParamCaption}\item[{value\+\_\+type}]{val }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory. 
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if there is not enough memory for allocation. \\
+\hline
+\end{DoxyExceptions}
+
+\begin{DoxyParams}{Parameters}
+{\em val} & Element to insert. Needs to be Copy\+Constructible. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+All iterators are invalidated. If allocation happens, all pointers and references are invalidated. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em If} & the move/copy constructor of value\+\_\+type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).\\
+\hline
+\end{DoxyExceptions}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_aa243a80e8756739ce4b64f73e9a4338e}\label{classring__buffer_aa243a80e8756739ce4b64f73e9a4338e}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!rbegin@{rbegin}}
+\index{rbegin@{rbegin}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{rbegin()}{rbegin()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+const\+\_\+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::rbegin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity. 
+
+\begin{DoxyReturn}{Returns}
+const\+\_\+reverse\+\_\+iterator pointing to the first element in reverse order. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_a81ee796bf66742e0d25716ce4c9d6f5d}\label{classring__buffer_a81ee796bf66742e0d25716ce4c9d6f5d}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!rend@{rend}}
+\index{rend@{rend}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{rend()}{rend()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::rend (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get a reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity. 
+
+\begin{DoxyReturn}{Returns}
+reverse\+\_\+iterator pointing to one past the last element in reverse order. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_ae9dcf3f2bfc1c9be3d18ab2d25eebd48}\label{classring__buffer_ae9dcf3f2bfc1c9be3d18ab2d25eebd48}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!rend@{rend}}
+\index{rend@{rend}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{rend()}{rend()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+const\+\_\+reverse\+\_\+iterator \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::rend (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity. 
+
+\begin{DoxyReturn}{Returns}
+const\+\_\+reverse\+\_\+iterator pointing to one past the last element in reverse order. 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}\label{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!reserve@{reserve}}
+\index{reserve@{reserve}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{reserve()}{reserve()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::reserve (\begin{DoxyParamCaption}\item[{size\+\_\+type}]{new\+Capacity,  }\item[{bool}]{enable\+Shrink = {\ttfamily false} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Allocates memory and copies the existing buffer to the new memory location. Can be used to increase or decrease capacity. 
+
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Throws} & std\+::bad\+\_\+alloc if there is not enough memory for allocation. Throws std\+::bad\+\_\+array\+\_\+new\+\_\+lenght if std\+::numeric\+\_\+limits$<$std\+::size\+\_\+t$>$\+::max() / sizeof(\+T) \texorpdfstring{$<$}{<} newsize. \\
+\hline
+\end{DoxyExceptions}
+
+\begin{DoxyParams}{Parameters}
+{\em new\+Capacity} & Amount of memory to allocate. If new\+Capacity is less than or equal to m\+\_\+capacity, function does nothing. \\
+\hline
+{\em enable\+Shrink} & True to enable reserve to reduce the capacity, to a minimum of \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size()}} +2. \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Can} & throw std\+::bad\+\_\+alloc. \\
+\hline
+{\em If} & T\textquotesingle{}s move (or copy if T has no move) constructor throws, behaviour is undefined. Otherwise Stong Exception Guarantee. @notes All references and pointers are invalidated (iterators stay valid). If memory is allocated, the memory layout is rotated so that first element matches the beginning of physical memory.\\
+\hline
+\end{DoxyExceptions}
+Linear complexity in relation to size of the buffer. \mbox{\Hypertarget{classring__buffer_a4404cf478938dc61b93a963581bd2f3a}\label{classring__buffer_a4404cf478938dc61b93a963581bd2f3a}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!shrink\_to\_fit@{shrink\_to\_fit}}
+\index{shrink\_to\_fit@{shrink\_to\_fit}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{shrink\_to\_fit()}{shrink\_to\_fit()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::shrink\+\_\+to\+\_\+fit (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Releases unused allocated memory. 
+
+\begin{DoxyPrecond}{Precondition}
+T must satisfy Move\+Constructible or Copy\+Constructible. 
+\end{DoxyPrecond}
+\begin{DoxyPostcond}{Postcondition}
+m\+\_\+capacity == \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size()}} + 2. 
+\end{DoxyPostcond}
+\begin{DoxyNote}{Note}
+Reduces capacity by allocating a smaller memory area and moving the elements. 
+\end{DoxyNote}
+
+\begin{DoxyExceptions}{Exceptions}
+{\em Might} & throw std\+::bad\+\_\+alloc if memory allocation fails. \\
+\hline
+{\em If} & T\textquotesingle{}s move (or copy) constructor can and does throw, behaviour is undefined. If any other exception is thrown (bad\+\_\+alloc) this function has no effect (Strong exception guarantee).\\
+\hline
+\end{DoxyExceptions}
+Linear complexity in relation to size of the buffer. \mbox{\Hypertarget{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}\label{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!size@{size}}
+\index{size@{size}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{size()}{size()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+size\+\_\+type \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Gets the size of the container. 
+
+\begin{DoxyReturn}{Returns}
+Size of buffer. @det 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_aa53ef9bfdabd3a5e613413b27c66de61}\label{classring__buffer_aa53ef9bfdabd3a5e613413b27c66de61}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!swap@{swap}}
+\index{swap@{swap}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{swap()}{swap()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\+::swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$ \&}]{other }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Member swap implementation. Swaps Ring\+Buffers member to member. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & Reference to a \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} to swap with.\\
+\hline
+\end{DoxyParams}
+Constant complexity. 
+
+\doxysubsection{Friends And Related Function Documentation}
+\mbox{\Hypertarget{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}\label{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}} 
+\index{ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}!swap@{swap}}
+\index{swap@{swap}!ring\_buffer$<$ T, Allocator $>$@{ring\_buffer$<$ T, Allocator $>$}}
+\doxysubsubsection{\texorpdfstring{swap}{swap}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+void swap (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$ \&}]{a,  }\item[{\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$ \&}]{b }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+
+
+Friend swap. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em a} & Swap candidate. \\
+\hline
+{\em b} & Swap candidate.\\
+\hline
+\end{DoxyParams}
+Constant complexity. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/ring\+\_\+buffer.\+hpp\end{DoxyCompactItemize}

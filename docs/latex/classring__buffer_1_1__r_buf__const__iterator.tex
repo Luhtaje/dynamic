@@ -1,0 +1,530 @@
+\hypertarget{classring__buffer_1_1__r_buf__const__iterator}{}\doxysection{ring\+\_\+buffer\texorpdfstring{$<$}{<} T, Allocator \texorpdfstring{$>$}{>}\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator\texorpdfstring{$<$}{<} \+\_\+r\+Buf \texorpdfstring{$>$}{>} Class Template Reference}
+\label{classring__buffer_1_1__r_buf__const__iterator}\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+
+
+Custom iterator class.  
+
+
+
+
+{\ttfamily \#include $<$ring\+\_\+buffer.\+hpp$>$}
+
+Inheritance diagram for ring\+\_\+buffer\texorpdfstring{$<$}{<} T, Allocator \texorpdfstring{$>$}{>}\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator\texorpdfstring{$<$}{<} \+\_\+r\+Buf \texorpdfstring{$>$}{>}\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classring__buffer_1_1__r_buf__const__iterator}
+\end{center}
+\end{figure}
+\doxysubsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a10ac4d052c99c1ca8ddbc9ea3eca7318}\label{classring__buffer_1_1__r_buf__const__iterator_a10ac4d052c99c1ca8ddbc9ea3eca7318}} 
+using {\bfseries iterator\+\_\+category} = std\+::random\+\_\+access\+\_\+iterator\+\_\+tag
+\item 
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a662213521c40d83da0b59c0ecd9f8ccf}\label{classring__buffer_1_1__r_buf__const__iterator_a662213521c40d83da0b59c0ecd9f8ccf}} 
+using {\bfseries value\+\_\+type} = typename \+\_\+r\+Buf\+::value\+\_\+type
+\item 
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_aaf505c7ebd1e067721e9cfbceba9e783}\label{classring__buffer_1_1__r_buf__const__iterator_aaf505c7ebd1e067721e9cfbceba9e783}} 
+using {\bfseries difference\+\_\+type} = typename \+\_\+r\+Buf\+::difference\+\_\+type
+\item 
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_aed7e7973a728b801eb45f8c83dc8fb6e}\label{classring__buffer_1_1__r_buf__const__iterator_aed7e7973a728b801eb45f8c83dc8fb6e}} 
+using {\bfseries pointer} = typename \+\_\+r\+Buf\+::const\+\_\+pointer
+\item 
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_ae4fa0ad5ad2fdcdfce18b5be9a306708}\label{classring__buffer_1_1__r_buf__const__iterator_ae4fa0ad5ad2fdcdfce18b5be9a306708}} 
+using {\bfseries reference} = const value\+\_\+type \&
+\end{DoxyCompactItemize}
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a39ffb0997dbbee53fec425e61209b30b}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} (const \+\_\+r\+Buf $\ast$container, difference\+\_\+type index)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_adfbe465de2e4529a430305af5470d8ed}{operator=}} (const \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\+\_\+r\+Buf\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$ \&\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}})
+\begin{DoxyCompactList}\small\item\em Conversion assingment from non-\/const iterator. \end{DoxyCompactList}\item 
+pointer \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab14417fd24a7bfabdb6dd52b03862fca}{operator-\/$>$}} () const
+\begin{DoxyCompactList}\small\item\em Arrow operator. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aca7cee193e987b2ce4d5fdba535abae3}{operator++}} () noexcept
+\begin{DoxyCompactList}\small\item\em Postfix increment. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ad46df6886512a0c64168cec7490de198}{operator++}} (int)
+\begin{DoxyCompactList}\small\item\em Postfix increment. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a85141b6eb35f4dbcb02c6aed31574b64}{operator-\/-\/}} ()
+\begin{DoxyCompactList}\small\item\em Prefix decrement. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_afbe74e5e0100d8d9c9040f93530dc67c}{operator-\/-\/}} (int)
+\begin{DoxyCompactList}\small\item\em Postfix decrement. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_af5d7340e4a7f820af7ae86740aeaf1cc}{operator+=}} (difference\+\_\+type offset) noexcept
+\begin{DoxyCompactList}\small\item\em Moves iterator. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a2a61122cc3b74dc3a040f0f6c980f780}{operator+}} (const difference\+\_\+type offset) const
+\begin{DoxyCompactList}\small\item\em Move iterator forward by specified amount. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a393729659a366a6051531c96248f9ea5}{operator-\/=}} (const difference\+\_\+type offset) noexcept
+\begin{DoxyCompactList}\small\item\em Returns an iterator that points to an element, which is the current element decremented by the given offset. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a7a121d238c574bb38c3d1b404852ba90}{operator-\/}} (const difference\+\_\+type offset) const
+\begin{DoxyCompactList}\small\item\em Returns an iterator that points to an element, which is the current element decremented by the given offset. \end{DoxyCompactList}\item 
+difference\+\_\+type \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a461a9192c9cb0511ef2a6161d1cfe24c}{operator-\/}} (const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \&other) const noexcept
+\begin{DoxyCompactList}\small\item\em Gets distance between two iterators. \end{DoxyCompactList}\item 
+reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a8cbae76c8a5e690b75732199300e9eed}{operator\mbox{[}$\,$\mbox{]}}} (const difference\+\_\+type offset) const noexcept
+\begin{DoxyCompactList}\small\item\em Index operator. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_afab61a8b0bd26fb977cc0e7e5df62df8}{operator==}} (const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \&other) const noexcept
+\begin{DoxyCompactList}\small\item\em Comparison operator== overload. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a929de86bc7edffe208bbd49491c58b88}{operator!=}} (const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \&other) const noexcept
+\begin{DoxyCompactList}\small\item\em Comparison operator != overload. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a21c3dd35be1cea6182d7b5432cf7ed11}{operator$<$}} (const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \&other) const noexcept
+\begin{DoxyCompactList}\small\item\em Comparison operator \texorpdfstring{$<$}{<} overload. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a17d7116b08ad624451e1a9a1ef8760b7}{operator$>$}} (const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \&other) const noexcept
+\begin{DoxyCompactList}\small\item\em Comparison operator \texorpdfstring{$>$}{>} overload. \end{DoxyCompactList}\item 
+bool \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aa3726bfd128564ae621bdb7f93b12eaf}{operator$<$=}} (const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \&other) const noexcept
+\item 
+bool \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a98155743ed2e16c39cb797b68de1895e}{operator$>$=}} (const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \&other) const noexcept
+\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a355600e1a031d2263c6f4cf44cd275d4}{operator=}} (const size\+\_\+t index) noexcept
+\begin{DoxyCompactList}\small\item\em Custom assingment operator overload. \end{DoxyCompactList}\item 
+reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aab40614225addf5854e7cf348ca7ba6b}{operator$\ast$}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Dereference operator. \end{DoxyCompactList}\item 
+difference\+\_\+type \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}{get\+Index}} () const noexcept
+\begin{DoxyCompactList}\small\item\em Returns the logical index of the element the iterator is pointing to. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a069873c586a4ec4373c6b3a056bf9207}\label{classring__buffer_1_1__r_buf__const__iterator_a069873c586a4ec4373c6b3a056bf9207}} 
+const \+\_\+r\+Buf $\ast$ {\bfseries m\+\_\+container}
+\item 
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a09fdfd1a7784ede2e027376c7f193d51}\label{classring__buffer_1_1__r_buf__const__iterator_a09fdfd1a7784ede2e027376c7f193d51}} 
+difference\+\_\+type {\bfseries m\+\_\+logical\+Index}
+\end{DoxyCompactItemize}
+\doxysubsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ae9784eb7c27cd79d03e037ac8c513901}{operator+}} (const difference\+\_\+type offset, \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} iter)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\subsubsection*{template$<$typename T, typename Allocator = std\+::allocator$<$\+T$>$$>$\newline
+template$<$class \+\_\+r\+Buf$>$\newline
+class ring\+\_\+buffer$<$ T, Allocator $>$\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator$<$ \+\_\+r\+Buf $>$}
+Custom iterator class. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em \+\_\+r\+Buf} & \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}} class type. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a39ffb0997dbbee53fec425e61209b30b}\label{classring__buffer_1_1__r_buf__const__iterator_a39ffb0997dbbee53fec425e61209b30b}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!\_rBuf\_const\_iterator@{\_rBuf\_const\_iterator}}
+\index{\_rBuf\_const\_iterator@{\_rBuf\_const\_iterator}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{\_rBuf\_const\_iterator()}{\_rBuf\_const\_iterator()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} (\begin{DoxyParamCaption}\item[{const \+\_\+r\+Buf $\ast$}]{container,  }\item[{difference\+\_\+type}]{index }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [explicit]}}
+
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & Index representing the logical element of the. \\
+\hline
+\end{DoxyParams}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}\label{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!getIndex@{getIndex}}
+\index{getIndex@{getIndex}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{getIndex()}{getIndex()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+difference\+\_\+type \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::get\+Index (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Returns the logical index of the element the iterator is pointing to. 
+
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a929de86bc7edffe208bbd49491c58b88}\label{classring__buffer_1_1__r_buf__const__iterator_a929de86bc7edffe208bbd49491c58b88}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator"!=@{operator"!=}}
+\index{operator"!=@{operator"!=}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator"!=()}{operator!=()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+bool \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator!= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$ \&}]{other }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Comparison operator != overload. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & iterator to compare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+ture if underlying pointers are not the same
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_aab40614225addf5854e7cf348ca7ba6b}\label{classring__buffer_1_1__r_buf__const__iterator_aab40614225addf5854e7cf348ca7ba6b}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator$\ast$()}{operator*()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator$\ast$ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Dereference operator. 
+
+\begin{DoxyReturn}{Returns}
+Object pointed by iterator.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a2a61122cc3b74dc3a040f0f6c980f780}\label{classring__buffer_1_1__r_buf__const__iterator_a2a61122cc3b74dc3a040f0f6c980f780}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator+@{operator+}}
+\index{operator+@{operator+}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator+()}{operator+()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator+ (\begin{DoxyParamCaption}\item[{const difference\+\_\+type}]{offset }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Move iterator forward by specified amount. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em movement} & Amount of elements to move the iterator. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+If offset is such that the iterator is beyond \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} or \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}}, the return iterator is invalid (dereferencing it is undefined behaviour).
+\end{DoxyNote}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_aca7cee193e987b2ce4d5fdba535abae3}\label{classring__buffer_1_1__r_buf__const__iterator_aca7cee193e987b2ce4d5fdba535abae3}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator++@{operator++}}
+\index{operator++@{operator++}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator++()}{operator++()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator++ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Postfix increment. 
+
+\begin{DoxyNote}{Note}
+If the iterator is incremented over the \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} iterator leads to invalid iterator (dereferencing is undefined behaviour).
+\end{DoxyNote}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_ad46df6886512a0c64168cec7490de198}\label{classring__buffer_1_1__r_buf__const__iterator_ad46df6886512a0c64168cec7490de198}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator++@{operator++}}
+\index{operator++@{operator++}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator++()}{operator++()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator++ (\begin{DoxyParamCaption}\item[{int}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Postfix increment. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em int} & empty parameter to guide overload resolution. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+If the iterator is incremented over the \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} iterator leads to invalid iterator (dereferencing is undefined behaviour).
+\end{DoxyNote}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_af5d7340e4a7f820af7ae86740aeaf1cc}\label{classring__buffer_1_1__r_buf__const__iterator_af5d7340e4a7f820af7ae86740aeaf1cc}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator+=()}{operator+=()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator+= (\begin{DoxyParamCaption}\item[{difference\+\_\+type}]{offset }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Moves iterator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em offset} & Amount of elements to move. Negative values move iterator backwards. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+If offset is such that the iterator is beyond \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} or \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}}, the return iterator is invalid (dereferencing it is undefined behaviour).
+\end{DoxyNote}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a461a9192c9cb0511ef2a6161d1cfe24c}\label{classring__buffer_1_1__r_buf__const__iterator_a461a9192c9cb0511ef2a6161d1cfe24c}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+difference\+\_\+type \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator-\/ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$ \&}]{other }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Gets distance between two iterators. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em iterator} & Iterator to get distance to. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Amount of elements between the iterators.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a7a121d238c574bb38c3d1b404852ba90}\label{classring__buffer_1_1__r_buf__const__iterator_a7a121d238c574bb38c3d1b404852ba90}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/()}{operator-()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator-\/ (\begin{DoxyParamCaption}\item[{const difference\+\_\+type}]{offset }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Returns an iterator that points to an element, which is the current element decremented by the given offset. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em offset} & The number of positions to move the iterator backward. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An iterator pointing to the element that is offset positions before the current element. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+If offset is such that the index of the iterator is beyond \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} or \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}}, the return iterator is invalid (dereferencing it is undefined behaviour).
+\end{DoxyNote}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a85141b6eb35f4dbcb02c6aed31574b64}\label{classring__buffer_1_1__r_buf__const__iterator_a85141b6eb35f4dbcb02c6aed31574b64}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator-\/-\/@{operator-\/-\/}}
+\index{operator-\/-\/@{operator-\/-\/}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/-\/()}{operator--()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator-\/-\/ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Prefix decrement. 
+
+\begin{DoxyNote}{Note}
+Decrementing the iterator past \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}} leads to invalid iterator (dereferencing is undefined behaviour).
+\end{DoxyNote}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_afbe74e5e0100d8d9c9040f93530dc67c}\label{classring__buffer_1_1__r_buf__const__iterator_afbe74e5e0100d8d9c9040f93530dc67c}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator-\/-\/@{operator-\/-\/}}
+\index{operator-\/-\/@{operator-\/-\/}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/-\/()}{operator--()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator-\/-\/ (\begin{DoxyParamCaption}\item[{int}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Postfix decrement. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em int} & empty parameter to guide overload resolution. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyNote}{Note}
+Decrementing iterator past \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}} results in undefined behaviour.
+\end{DoxyNote}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a393729659a366a6051531c96248f9ea5}\label{classring__buffer_1_1__r_buf__const__iterator_a393729659a366a6051531c96248f9ea5}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator-\/=@{operator-\/=}}
+\index{operator-\/=@{operator-\/=}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/=()}{operator-=()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator-\/= (\begin{DoxyParamCaption}\item[{const difference\+\_\+type}]{offset }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Returns an iterator that points to an element, which is the current element decremented by the given offset. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em offset} & The number of positions to move the iterator backward. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+An iterator pointing to the element that is offset positions before the current element.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_ab14417fd24a7bfabdb6dd52b03862fca}\label{classring__buffer_1_1__r_buf__const__iterator_ab14417fd24a7bfabdb6dd52b03862fca}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator-\/$>$@{operator-\/$>$}}
+\index{operator-\/$>$@{operator-\/$>$}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator-\/$>$()}{operator->()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+pointer \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator-\/$>$ (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Arrow operator. 
+
+\begin{DoxyReturn}{Returns}
+pointer.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a21c3dd35be1cea6182d7b5432cf7ed11}\label{classring__buffer_1_1__r_buf__const__iterator_a21c3dd35be1cea6182d7b5432cf7ed11}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator$<$@{operator$<$}}
+\index{operator$<$@{operator$<$}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator$<$()}{operator<()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+bool \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator$<$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$ \&}]{other }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Comparison operator \texorpdfstring{$<$}{<} overload. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & iterator to compare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if other is larger.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_aa3726bfd128564ae621bdb7f93b12eaf}\label{classring__buffer_1_1__r_buf__const__iterator_aa3726bfd128564ae621bdb7f93b12eaf}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator$<$=@{operator$<$=}}
+\index{operator$<$=@{operator$<$=}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator$<$=()}{operator<=()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+bool \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator$<$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$ \&}]{other }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+
+
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_adfbe465de2e4529a430305af5470d8ed}\label{classring__buffer_1_1__r_buf__const__iterator_adfbe465de2e4529a430305af5470d8ed}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\+\_\+r\+Buf\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$ \&}]{iterator }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Conversion assingment from non-\/const iterator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em iterator} & non-\/const iterator. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Returns the new object by reference 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a355600e1a031d2263c6f4cf44cd275d4}\label{classring__buffer_1_1__r_buf__const__iterator_a355600e1a031d2263c6f4cf44cd275d4}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator=@{operator=}}
+\index{operator=@{operator=}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator=()}{operator=()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} \& \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator= (\begin{DoxyParamCaption}\item[{const size\+\_\+t}]{index }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Custom assingment operator overload. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & Logical index of the element which point to.\\
+\hline
+\end{DoxyParams}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_afab61a8b0bd26fb977cc0e7e5df62df8}\label{classring__buffer_1_1__r_buf__const__iterator_afab61a8b0bd26fb977cc0e7e5df62df8}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator==@{operator==}}
+\index{operator==@{operator==}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator==()}{operator==()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+bool \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator== (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$ \&}]{other }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Comparison operator== overload. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & iterator to compare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if iterators point to same element in same container.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a17d7116b08ad624451e1a9a1ef8760b7}\label{classring__buffer_1_1__r_buf__const__iterator_a17d7116b08ad624451e1a9a1ef8760b7}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator$>$@{operator$>$}}
+\index{operator$>$@{operator$>$}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator$>$()}{operator>()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+bool \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator$>$ (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$ \&}]{other }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Comparison operator \texorpdfstring{$>$}{>} overload. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em other} & iterator to compare \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if other is smaller.
+\end{DoxyReturn}
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a98155743ed2e16c39cb797b68de1895e}\label{classring__buffer_1_1__r_buf__const__iterator_a98155743ed2e16c39cb797b68de1895e}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator$>$=@{operator$>$=}}
+\index{operator$>$=@{operator$>$=}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator$>$=()}{operator>=()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+bool \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator$>$= (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$ \&}]{other }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+
+
+Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_a8cbae76c8a5e690b75732199300e9eed}\label{classring__buffer_1_1__r_buf__const__iterator_a8cbae76c8a5e690b75732199300e9eed}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+reference \mbox{\hyperlink{classring__buffer}{ring\+\_\+buffer}}$<$ T, Allocator $>$\mbox{\hyperlink{class__r_buf__const__iterator}{\+::\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const difference\+\_\+type}]{offset }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [noexcept]}}
+
+
+
+Index operator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em offset} & The offset from iterator. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Return reference to element pointed by the iterator with offset. 
+\end{DoxyReturn}
+\begin{DoxyNote}{Note}
+If offset is such that the iterator is beyond \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} or \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}} this function has undefined behaviour.
+\end{DoxyNote}
+Constant complexity. 
+
+\doxysubsection{Friends And Related Function Documentation}
+\mbox{\Hypertarget{classring__buffer_1_1__r_buf__const__iterator_ae9784eb7c27cd79d03e037ac8c513901}\label{classring__buffer_1_1__r_buf__const__iterator_ae9784eb7c27cd79d03e037ac8c513901}} 
+\index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}!operator+@{operator+}}
+\index{operator+@{operator+}!ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_const\_iterator$<$ \_rBuf $>$}}
+\doxysubsubsection{\texorpdfstring{operator+}{operator+}}
+{\footnotesize\ttfamily template$<$typename T , typename Allocator  = std\+::allocator$<$\+T$>$$>$ \\
+template$<$class \+\_\+r\+Buf $>$ \\
+\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}} operator+ (\begin{DoxyParamCaption}\item[{const difference\+\_\+type}]{offset,  }\item[{\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$}]{iter }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [friend]}}
+
+\begin{DoxyNote}{Note}
+If offset is such that the iterator is beyond \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} or \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}}, the return iterator is invalid (dereferencing it is undefined behaviour).
+\end{DoxyNote}
+Constant complexity. 
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+include/ring\+\_\+buffer.\+hpp\end{DoxyCompactItemize}
