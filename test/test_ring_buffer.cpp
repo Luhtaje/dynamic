@@ -751,6 +751,19 @@ TYPED_TEST(RingBufferTest, front)
     ASSERT_EQ(t_buffer.front(), *t_buffer.begin());
 }
 
+TYPED_TEST(RingBufferTest, back)
+{
+    ASSERT_EQ(t_buffer.back(), *(t_buffer.end() - 1));
+
+    t_buffer.pop_front();
+    t_buffer.pop_front();
+
+    t_buffer.push_back(getValue<TypeParam>());
+    t_buffer.push_back(getValue<TypeParam>());
+    
+    ASSERT_EQ(t_buffer.back(), *(t_buffer.end() - 1));
+}
+
 TYPED_TEST(RingBufferTest, clear)
 {
     t_buffer.clear();

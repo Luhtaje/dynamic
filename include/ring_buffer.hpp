@@ -165,7 +165,7 @@ public:
         }
 
         /// @brief Get iterator decremented by offset.
-        /// @param offset The number of positions to move the iterator backward.
+        /// @param offset Signed amount to decrement from the iterator index.
         /// @return An iterator pointing to an element that points to *this - offset.
         /// @note If offset is such that the index of the iterator is beyond end() or begin(), the return iterator is invalid (dereferencing it is undefined behaviour).
         /// @details Constant complexity.
@@ -186,7 +186,7 @@ public:
         }
 
         /// @brief Index operator.
-        /// @param offset The offset from iterator.
+        /// @param offset Signed offset from iterator index.
         /// @return Return object pointer by the iterator with an offset.
         /// @note If offset is such that the iterator is beyond end() or begin() this function has undefined behaviour.
         /// @details Constant complexity.
@@ -195,9 +195,9 @@ public:
             return const_cast<reference>(m_container->operator[](offset));
         }
 
-        /// @brief Comparison operator < overload
-        /// @param other iterator to compare
-        /// @return true if other is larger.
+        /// @brief Comparison operator < overload.
+        /// @param other iterator to compare.
+        /// @return true if others index is larger.
         /// @details Constant complexity.
         bool operator<(const _rBuf_iterator& other) const noexcept
         {
@@ -205,9 +205,9 @@ public:
             return (m_logicalIndex < other.m_logicalIndex);
         }
 
-        /// @brief Comparison operator > overload
-        /// @param other iterator to compare
-        /// @return true if other is smaller.
+        /// @brief Comparison operator > overload.
+        /// @param other iterator to compare against.
+        /// @return True if others index is smaller.
         /// @details Constant complexity.
         bool operator>(const _rBuf_iterator& other) const noexcept
         {
@@ -215,8 +215,9 @@ public:
             return (m_logicalIndex > other.m_logicalIndex);
         }
 
-        /// <summary>
-        ///
+        /// @brief Comparison <= overload.
+        /// @param other Other iterator to compare against.
+        /// @return True if other points to logically smaller or the same indexed element.
         /// @details Constant complexity.
         bool operator<=(const _rBuf_iterator& other) const noexcept
         {
@@ -224,8 +225,9 @@ public:
             return (m_logicalIndex <= other.m_logicalIndex);
         }
 
-        /// <summary>
-        /// 
+        /// @brief Comparison >= overload.
+        /// @param other Other iterator to compare against.
+        /// @return True if other points to logically larger or same indexed element.
         /// @details Constant complexity.
         bool operator>=(const _rBuf_iterator& other) const noexcept
         {
@@ -242,7 +244,8 @@ public:
             return (*this);
         };
 
-        /// 
+        /// @brief Index getter.
+        /// @return Returns the index of the element this iterator is pointing to.
         /// @details Constant complexity.
         difference_type getIndex() noexcept
         {
@@ -500,12 +503,15 @@ public:
     };
 
 
+    using iterator = _rBuf_iterator<ring_buffer<T>>;
+    using const_iterator = _rBuf_const_iterator<ring_buffer<T>>;
+
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
 //============================
 // End of iterators
 //============================
-
-    using iterator = _rBuf_iterator<ring_buffer<T>>;
-    using const_iterator = _rBuf_const_iterator<ring_buffer<T>>;
 
 
     /// @brief Default constructor. Constructs to 0 size and 2 capacity.
@@ -1290,6 +1296,7 @@ public:
 
     /// @brief Construct iterator at begin.
     /// @return Iterator pointing to first element.
+    /// @details Constant complexity.
     iterator begin() noexcept
     {
         return iterator(this, 0);
@@ -1297,6 +1304,7 @@ public:
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
+    /// @details Constant complexity.
     const_iterator begin() const noexcept
     {
         return const_iterator(this, 0);
@@ -1304,6 +1312,7 @@ public:
 
     /// @brief Construct iterator at end.
     /// @return Iterator pointing past last element.
+    /// @details Constant complexity.
     iterator end() noexcept
     {
         return iterator(this, size());
@@ -1311,6 +1320,7 @@ public:
 
     /// @brief Construct const_iterator at end.
     /// @return Const_iterator pointing past last element.
+    /// @details Constant complexity.
     const_iterator end() const noexcept
     {
         return const_iterator(this, size());
@@ -1318,17 +1328,67 @@ public:
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
+    /// @details Constant complexity.
     const_iterator cbegin() const noexcept
     {
         return const_iterator(this, 0);
     }
 
-    /// @brief Construct const_iterator.
+    /// @brief Construct const_iterator pointing to past the last element.
     /// @return Const_iterator pointing past last element.
+    /// @details Constant complexity.
     const_iterator cend() const noexcept
     {
         return const_iterator(this, size());
     }
+
+    /// @brief Get a reverse iterator pointing to the first element in reverse order (last element in normal order).
+    /// Constant complexity.
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(end());
+    }
+
+    /// @brief Get a const reverse iterator pointing to the first element in reverse order (last element in normal order).
+    /// Constant complexity.
+    /// @return const_reverse_iterator pointing to the first element in reverse order.
+    const_reverse_iterator rbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+
+    /// @brief Get a const reverse iterator pointing to the first element in reverse order (last element in normal order).
+    /// Constant complexity.
+    /// @return const_reverse_iterator pointing to the first element in reverse order.
+    const_reverse_iterator crbegin() const
+    {
+        return const_reverse_iterator(end());
+    }
+
+    /// @brief Get a reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order).
+    /// Constant complexity.
+    /// @return reverse_iterator pointing to one past the last element in reverse order.
+    reverse_iterator rend()
+    {
+        return reverse_iterator(begin());
+    }
+
+    /// @brief Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order).
+    /// Constant complexity.
+    /// @return const_reverse_iterator pointing to one past the last element in reverse order.
+    const_reverse_iterator rend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+
+    /// @brief Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order).
+    /// Constant complexity.
+    /// @return const_reverse_iterator pointing to one past the last element in reverse order.
+    const_reverse_iterator crend() const
+    {
+        return const_reverse_iterator(begin());
+    }
+
 
 private:
 
