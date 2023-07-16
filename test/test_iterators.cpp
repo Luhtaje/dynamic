@@ -83,11 +83,7 @@ TEST(Iterators, Swappable)
     ASSERT_EQ(cRef, cend);
     swap(cRef, cbegin);
     ASSERT_EQ(cend, cbegin);
-
-    ASSERT_TRUE(std::_Is_swappable<ring_buffer<int>::iterator>::value);
-    ASSERT_TRUE(std::_Is_swappable<ring_buffer<int>::const_iterator>::value);
 }
-
 // Tests requirement: LegacyIterator / Destructible
 TEST(Iterators, Destructible)
 {
