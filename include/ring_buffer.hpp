@@ -568,14 +568,14 @@ public:
     /// @details Linear complexity in relation to the size of the range (O(n)).
     /// @note Behavior is undefined if elements in range are not valid.
     template<typename InputIt>
-    ring_buffer(InputIt beginIt, InputIt endIt) : m_tailIndex(0) , m_headIndex(0)
+    ring_buffer(InputIt beginIt, InputIt endIt) : m_headIndex(0) , m_tailIndex(0)
     {
         const auto size = std::distance<InputIt>(beginIt , endIt);
 
         m_data = m_allocator.allocate(size + 2);
         m_capacity = size + 2;
 
-        for (size_t i = 0; i < size; i++)
+        for (difference_type i = 0; i < size; i++)
         {
             m_allocator.construct(m_data + i, *(beginIt + i));
             increment(m_headIndex);
@@ -868,7 +868,7 @@ public:
     void assign(const size_type amount, value_type value)
     {
         clear();
-        for(auto i = 0; i < amount; i++)
+        for(size_t i = 0; i < amount; i++)
         {
             push_back(value);
         }
@@ -1539,7 +1539,7 @@ inline bool operator==(const ring_buffer<T,Alloc>& lhs, const ring_buffer<T,Allo
         return false;
     }
 
-    for(int i = 0; i < lhs.size(); i++)
+    for(size_t i = 0; i < lhs.size(); i++)
     {
         if(lhs[i] != rhs[i])
         {

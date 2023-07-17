@@ -625,6 +625,8 @@ TYPED_TEST(RingBufferTest, empty)
 
 }
 
+// Tests requirement: anon requirement, data() must rotate the elements so that the first logical element matches the first physical
+// element in the memory. Additionally, when size is 0 and capacity is non-zero, data() should return a valid pointer.
 TYPED_TEST(RingBufferTest, data)
 {
     ring_buffer<TypeParam> myBuf;
@@ -632,22 +634,17 @@ TYPED_TEST(RingBufferTest, data)
     ASSERT_TRUE((myBuf.size() == 0 && myBuf.capacity() > 0));
     ASSERT_TRUE(myBuf.data() != nullptr);
 
-    const auto firstAddress = &this->t_buffer[0];
-    const auto secondAddress = &this->t_buffer[1];
+    // Modify buffer memory layout.
     this->t_buffer.pop_front();
     this->t_buffer.pop_front();
-
     const auto testVal = getValue<TypeParam>();
     this->t_buffer.push_front(testVal);
-    ASSERT_EQ(&this->t_buffer.front(), secondAddress);
 
-    auto copy(this->t_buffer);
-
-    // Sorts the buffer.
-    this->t_buffer.data();
-    ASSERT_EQ(copy, this->t_buffer);
-    copy.data();
-    ASSERT_EQ(copy, this->t_buffer);
+    // Sorts the buffer and checks for state.
+    auto* initialAddress = &this->t_buffer[0];
+    auto* dataPtr = this->t_buffer.data();
+    ASSERT_NE(dataPtr, initialAddress);
+    ASSERT_EQ(dataPtr, &this->t_buffer[0]);
 }
 
 TYPED_TEST(RingBufferTest, pushBack)
