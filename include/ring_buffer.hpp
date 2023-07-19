@@ -1133,7 +1133,7 @@ public:
     /// @note All iterators are invalidated. If allocation happens, all pointers and references are invalidated.
     /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
     /// @details Constant complexity.
-    void push_front(value_type val)
+    void push_front(const value_type& val)
     {
         validateCapacity(1);
 
@@ -1158,7 +1158,7 @@ public:
         // Decrement temporary index incase constructor throws to retain invariants (elements of the buffer are always initialized).
         auto newIndex = m_tailIndex;
         decrement(newIndex);
-        m_allocator.construct(&m_data[newIndex], std::forward(val));
+        m_allocator.construct(&m_data[newIndex], std::forward<value_type>(val));
         m_tailIndex = newIndex;
     }
 
