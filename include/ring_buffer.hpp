@@ -742,6 +742,39 @@ public:
         return it;
     }
 
+    /// @brief Constructs an element in place to front from argumets.
+    /// @param args Argument pack containing arguments to construct value_type element.
+    /// @pre value_type is EmplaceConstructible from args.
+    /// @throw Can throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element.
+    /// @exception If any exception is thrown, invariants are preserved. (Basic exception guarantee).
+    /// @details Constant complexity.
+    template<class... Args>
+    void emplace_front(Args&&... args)
+    {
+        validateCapacity(1);
+
+        auto tempIndex = m_tailIndex;
+        decrement(tempIndex);
+        
+        m_allocator.construct(&m_data[tempIndex], std::forward<Args>(args)...);
+        m_tailIndex = tempIndex;
+    }
+
+    /// @brief Constructs an element in place to front from argumets.
+    /// @param args Argument pack containing arguments to construct value_type element.
+    /// @pre value_type is EmplaceConstructible from args.
+    /// @throw Can throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element.
+    /// @exception If any exception is thrown, invariants are preserved. (Basic exception guarantee).
+    /// @details Constant complexity.
+    template<class... Args>
+    void emplace_back(Args&&... args)
+    {
+        validateCapacity(1);
+
+        m_allocator.construct(&*end(), std::forward<Args>(args)...);
+        increment(m_headIndex);
+    }
+
     /// @brief Erase an element at a given position.
     /// @param pos Pointer to the element to be erased.
     /// @pre value_type must be nothrow-MoveConstructible. pos must be a valid dereferenceable iterator within the container. Otherwise behavior is undefined.
@@ -929,7 +962,7 @@ public:
 
         if(m_capacity <= index)
         {
-            index = index % m_capacity;
+            index -= m_capacity;
         }
 
         return m_data[index];
@@ -1131,7 +1164,7 @@ public:
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @param val Element to insert.  Needs to be CopyConstructible.
     /// @note All iterators are invalidated. If allocation happens, all pointers and references are invalidated.
-    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
+    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function retains invariants (Basic Exception Guarantee).
     /// @details Constant complexity.
     void push_front(const value_type& val)
     {
@@ -1149,7 +1182,7 @@ public:
     /// @param val Rvalue reference to the element to insert.
     /// @pre value_type needs to satisfy MoveInsertable or CopyInsertable.
     /// @note All iterators are invalidated. If allocation happens, all pointers and references are invalidated.
-    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
+    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function retains invariants (Basic Exception Guarantee).
     /// @details Constant complexity.
     void push_front(value_type&& val)
     {
@@ -1167,9 +1200,10 @@ public:
     /// @param val Value of type T to be appended.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
     /// @throw Can throw std::bad_alloc.
-    /// @exception If the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
+    /// @exception If the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function retains invariants (Basic Exception Guarantee).
     /// @pre value_type needs to satisfy CopyInsertable.
     /// @post If more memory is allocated, all pointers and references are invalidated.
+    /// @details Constant complexity.
     void push_back(const value_type& val)
     {
         validateCapacity(1);
@@ -1182,7 +1216,7 @@ public:
     /// @param val Rvalue reference to the value to be appended.
     /// @note Allocates memory before the insertion if the buffer would be full after the operation.
     /// @throw Can throw std::bad_alloc if more memory is allocated.
-    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception (std::bad_alloc) this function has no effect (Strong Exception Guarantee).
+    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function retains invariants (Basic Exception Guarantee).
     /// @pre value_type needs to satisfy MoveInsertable or CopyInsertable.
     /// @post If more memory is allocated, all pointers and references are invalidated.
     /// @details Constant complexity.
@@ -1210,7 +1244,6 @@ public:
     /// @details Constant complexity.
     void pop_back() noexcept
     {
-
         decrement(m_headIndex);
         m_allocator.destroy(&m_data[m_headIndex]);
 
@@ -1219,12 +1252,13 @@ public:
     /// @brief Releases unused allocated memory. 
     /// @pre T must satisfy MoveConstructible or CopyConstructible.
     /// @post m_capacity == size() + 2.
-    /// @note Reduces capacity by allocating a smaller memory area and moving the elements. 
+    /// @note Reduces capacity by allocating a smaller memory area and moving the elements.
     /// @throw Might throw std::bad_alloc if memory allocation fails.
     /// @exception If T's move (or copy) constructor can and does throw, behaviour is undefined. If any other exception is thrown (bad_alloc) this function has no effect (Strong exception guarantee).
     /// @details Linear complexity in relation to size of the buffer.
     void shrink_to_fit()
     {
+        // Reserve would allocate size + 2 elements, so no point in shrinking if buffer is smaller than that.
         if (m_capacity <= size() + 2)
         { 
             return;
@@ -1283,7 +1317,7 @@ public:
 
     /// @brief Construct iterator at begin.
     /// @return Iterator pointing to first element.
-    /// @details Constant complexity.
+    /// @details Constant complexity. Iterator is invalid if the buffer is empty (dereferencing points to uninitialized memory.).
     iterator begin() noexcept
     {
         return iterator(this, 0);
@@ -1291,7 +1325,7 @@ public:
 
     /// @brief Construct const_iterator at begin.
     /// @return Const_iterator pointing to first element.
-    /// @details Constant complexity.
+    /// @details Constant complexity. Iterator is invalid if the buffer is empty (dereferencing points to uninitialized memory.).
     const_iterator begin() const noexcept
     {
         return const_iterator(this, 0);
@@ -1330,22 +1364,23 @@ public:
     }
 
     /// @brief Get a reverse iterator pointing to the first element in reverse order (last element in normal order).
-    /// Constant complexity.
+    /// @return reverse_iterator pointing to first element in reverse order.
+    /// @details Constant complexity. Iterator is invalid if the buffer is empty (dereferencing points to uninitialized memory.).
     reverse_iterator rbegin()
     {
         return reverse_iterator(end());
     }
 
     /// @brief Get a const reverse iterator pointing to the first element in reverse order (last element in normal order).
-    /// Constant complexity.
     /// @return const_reverse_iterator pointing to the first element in reverse order.
+    /// @details Constant complexity.
     const_reverse_iterator rbegin() const
     {
         return const_reverse_iterator(end());
     }
 
     /// @brief Get a const reverse iterator pointing to the first element in reverse order (last element in normal order).
-    /// Constant complexity.
+    /// @details Constant complexity.
     /// @return const_reverse_iterator pointing to the first element in reverse order.
     const_reverse_iterator crbegin() const
     {
@@ -1353,7 +1388,7 @@ public:
     }
 
     /// @brief Get a reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order).
-    /// Constant complexity.
+    /// @details Constant complexity.
     /// @return reverse_iterator pointing to one past the last element in reverse order.
     reverse_iterator rend()
     {
@@ -1361,7 +1396,7 @@ public:
     }
 
     /// @brief Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order).
-    /// Constant complexity.
+    /// @details Constant complexity.
     /// @return const_reverse_iterator pointing to one past the last element in reverse order.
     const_reverse_iterator rend() const
     {
@@ -1369,13 +1404,12 @@ public:
     }
 
     /// @brief Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order).
-    /// Constant complexity.
+    /// @details Constant complexity.
     /// @return const_reverse_iterator pointing to one past the last element in reverse order.
     const_reverse_iterator crend() const
     {
         return const_reverse_iterator(begin());
     }
-
 
 private:
 
@@ -1459,21 +1493,23 @@ private:
         return it;
     }
 
-    /// @brief Increment an index.
+    /// @brief Increment an index. The ringbuffer internally increments the head and tail index when adding elements.
     /// @param index The index to increment.
+    /// @details Constant complexity.
     void increment(size_t& index) noexcept
     {   
         ++index;
-        // Wrap index around at end of capacity.
+        // Wrap index around at end of physical memory area.
         if(index >= m_capacity)
         {
             index = 0;
         }
     }
 
-    /// @brief Increments an index multiple times.
+    /// @brief Increments an index multiple times. The ringbuffer internally increments the head and tail index when adding elements.
     /// @param index Index to increment.
     /// @param times Amount of increments.
+    /// @details Linear complexity in relation to size of times argument.
     void increment(size_t& index, size_t times) noexcept
     {
         while(times > 0)
@@ -1483,8 +1519,9 @@ private:
         }
     }
 
-    /// @brief Decrements an index.
+    /// @brief Decrements an index. The ringbuffer internally decrements the head and tail index when removing elements.
     /// @param index The index to decrement.
+    /// @details Constant complexity.
     void decrement(size_t& index) noexcept
     {
         if(index == 0)
@@ -1497,7 +1534,7 @@ private:
         }
     }
     
-    /// @brief Decrements an index multiple times.
+    /// @brief Decrements an index multiple times. The ringbuffer internally decrements the head and tail index when removing elements.
     /// @param index Index to decrement.
     /// @param times Amount of decrements.
     void decrement(size_t& index, size_t times) noexcept
@@ -1513,8 +1550,8 @@ private:
 // Members 
 //==========================================
 
-    size_type m_headIndex; /*!< Index of the head. Index past the last element, acts as "back" of the buffer.*/ 
-    size_type m_tailIndex; /*!< Index of the tail. Index to the "first" element in the buffer.*/
+    size_type m_headIndex; /*!< Index of the head. Index pointing to past the last element.*/ 
+    size_type m_tailIndex; /*!< Index of the tail. Index to the first element in the buffer.*/
     size_type m_capacity;  /*!< Capacity of the buffer. How many elements of type T the buffer has currently allocated memory for.*/
     
     T* m_data;  /*!< Pointer to allocated memory.*/

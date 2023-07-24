@@ -130,7 +130,7 @@ TEST(Iterators, MoveConstructible)
     auto it = itControl.begin();
     const auto movedIt(std::move(it));
 
-    const auto cit = itControl.cbegin();
+    auto cit = itControl.cbegin();
     const auto movedCit(std::move(cit));
 
     ASSERT_EQ(movedIt,movedCit);

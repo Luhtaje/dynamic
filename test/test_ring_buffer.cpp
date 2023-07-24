@@ -289,11 +289,11 @@ TEST(NonTypedTest, emplace)
 {
     ring_buffer<std::pair<int, std::string>> testBuffer;
 
-    std::pair<int, std::string> first { 51, "hello" };
-    std::pair<int, std::string> second{ 53, "world" };
+    std::pair<int, std::string> fillerOne { 51, "hello" };
+    std::pair<int, std::string> fillerTwo{ 53, "world" };
 
-    testBuffer.push_back(first);
-    testBuffer.push_back(second);
+    testBuffer.push_back(fillerOne);
+    testBuffer.push_back(fillerTwo);
 
 
     std::pair<int, std::string> emplaced{ 1, "I love Mackerel" };
@@ -558,16 +558,143 @@ TYPED_TEST(RingBufferTest, assignSizeVal)
     ASSERT_EQ(this->t_buffer.size(), size);
 }
 
-// Tests requirement Null?
+// Tests requirement: SequenceContainer a.front().
+TYPED_TEST(RingBufferTest, front)
+{
+    ASSERT_EQ(this->t_buffer.front(), *(this->t_buffer.begin()));
+}
+
+// Tests requirement: SequenceContainer a.back().
+TYPED_TEST(RingBufferTest, back)
+{
+    ASSERT_EQ(this->t_buffer.back(), *(this->t_buffer.end() - 1));
+}
+
+// Tests requirement: SequenceContainer a.emplace_front(args)
+TEST(NonTypedTest, emplace_front)
+{
+    ring_buffer<std::pair<int, std::string>> testBuffer;
+
+    std::pair<int, std::string> fillerOne{ 51, "hello" };
+    std::pair<int, std::string> fillerTwo{ 53, "world" };
+
+    testBuffer.push_back(fillerOne);
+    testBuffer.push_back(fillerTwo);
+
+
+    std::pair<int, std::string> emplaced{ 1, "I love Mackerel" };
+
+    testBuffer.emplace_front(emplaced.first, emplaced.second);
+
+    ASSERT_EQ(*testBuffer.begin(), emplaced);
+    ASSERT_EQ(*(testBuffer.begin() + 1), fillerOne);
+    ASSERT_EQ(*(testBuffer.begin() + 2), fillerTwo);
+}
+
+// Tests requirement: SequenceContainer a.emplace_back(args)
+TEST(NonTypedTest, emplace_back)
+{
+    ring_buffer<std::pair<int, std::string>> testBuffer;
+
+    std::pair<int, std::string> fillerOne{ 51, "hello" };
+    std::pair<int, std::string> fillerTwo{ 53, "world" };
+
+    testBuffer.push_back(fillerOne);
+    testBuffer.push_back(fillerTwo);
+
+    std::pair<int, std::string> emplaced{ 1, "I love Mackerel" };
+
+    testBuffer.emplace_back(emplaced.first, emplaced.second);
+
+    ASSERT_EQ(*testBuffer.begin(), fillerOne);
+    ASSERT_EQ(*(testBuffer.begin() + 1), fillerTwo);
+    ASSERT_EQ(*(testBuffer.begin() + 2), emplaced);
+}
+
+// Tests requirement: SequenceContainer a.push_front(t).
+TYPED_TEST(RingBufferTest, push_front)
+{
+    const auto someVal = getValue<TypeParam>();
+    this->t_buffer.push_front(someVal);
+    ASSERT_EQ(this->t_buffer.front(), someVal);
+}
+
+// Tests requirement: SequenceContainer a.push_front(rv), where rv is a rvalue ref.
+TYPED_TEST(RingBufferTest, pushFrontRV)
+{
+    std::shared_ptr<TypeParam> owningPtr;
+    ring_buffer<std::shared_ptr<TypeParam>> ptrBuffer;
+
+    // Push one element to exist in the empty buffer before actually testing the function.
+    owningPtr = std::make_shared<TypeParam>(getValue<TypeParam>());
+    ptrBuffer.push_front(std::move(owningPtr));
+
+    // Create test pointer and a copy of the underlying value as a reference.
+    owningPtr = std::make_shared<TypeParam>(getValue<TypeParam>());
+    const auto oldFront = ptrBuffer.front();
+    const auto newFrontReferenceCopy = owningPtr;
+    ptrBuffer.push_front(std::move(owningPtr));
+
+    // Tests that the value is actually at the front.
+    ASSERT_EQ(ptrBuffer.front(), newFrontReferenceCopy);
+
+    // Old value is second in the buffer.
+    ASSERT_EQ(*(ptrBuffer.begin() + 1), oldFront);
+
+    ASSERT_TRUE(owningPtr.get() == nullptr);
+}
+
+// Tests requirement: SequenceContainer a.push_back(t)
+TYPED_TEST(RingBufferTest, pushBack)
+{
+    const auto someVal = getValue<TypeParam>();
+    this->t_buffer.push_back(someVal);
+    ASSERT_EQ(this->t_buffer.back(), someVal);
+}
+
+// Tests requirement: SequenceContainer a.push_back(rv)
+TYPED_TEST(RingBufferTest, pushBackRV)
+{
+    const auto someVal = getValue<TypeParam>();
+    const auto refVal = someVal;
+    this->t_buffer.push_back(std::move(someVal));
+
+    ASSERT_EQ(this->t_buffer.back(), refVal);
+}
+
+// Tests requirement: SequenceContainer, a.pop_front()
+TYPED_TEST(RingBufferTest, pop_front)
+{
+    const auto newFront = *(this->t_buffer.begin() + 1);
+    this->t_buffer.pop_front();
+
+    ASSERT_NE(newFront, this->t_buffer.back());
+}
+
+// Tests requirement: SequenceContainer, a.pop_back()
+TYPED_TEST(RingBufferTest, pop_back)
+{
+    const auto oldBack = this->t_buffer.back();
+    const auto newBack = *(this->t_buffer.end() - 2);
+    this->t_buffer.pop_back();
+
+    ASSERT_NE(oldBack, this->t_buffer.back());
+    ASSERT_EQ(newBack, this->t_buffer.back());
+}
+
+// Tests requirement: SequenceContainer, a[n]
 TYPED_TEST(RingBufferTest, accessOperator)
 {
-    const auto frontVal = getValue<TypeParam>();
-    this->t_buffer.push_front(frontVal);
-    ASSERT_EQ(frontVal, this->t_buffer[0]);
+    ASSERT_EQ(this->t_buffer[0], *(this->t_buffer.begin()));
+    ASSERT_EQ(this->t_buffer[this->t_buffer.size() - 1], *(this->t_buffer.end() - 1));
+    ASSERT_FALSE(std::is_const<std::remove_reference_t<decltype(this->t_buffer[0])>>::value);
+    
+    // Tests const version of the function.
+    const auto constBuffer(this->t_buffer);
 
-    const auto backVal = getValue<TypeParam>();
-    this->t_buffer.push_back(backVal);
-    ASSERT_EQ(backVal, this->t_buffer[this->t_buffer.size() -1]);
+    ASSERT_EQ(constBuffer[0], *(constBuffer.begin()));
+    ASSERT_EQ(constBuffer[constBuffer.size() - 1], *(constBuffer.end() - 1));
+    ASSERT_TRUE(std::is_const<std::remove_reference_t<decltype(constBuffer[0])>>::value);
 }
 
 TYPED_TEST(RingBufferTest, swap)
@@ -631,105 +758,6 @@ TYPED_TEST(RingBufferTest, data)
     auto* dataPtr = this->t_buffer.data();
     ASSERT_NE(dataPtr, initialAddress);
     ASSERT_EQ(dataPtr, &this->t_buffer[0]);
-}
-
-TYPED_TEST(RingBufferTest, pushBack)
-{
-    // Push few times to make buffer allocate more memory.
-    const auto someVal = getValue<TypeParam>();
-    this->t_buffer.push_back(someVal);
-    ASSERT_EQ(this->t_buffer.back(), someVal);
-
-    const auto someVal2 = getValue<TypeParam>();
-    this->t_buffer.push_back(someVal2);
-    ASSERT_EQ(this->t_buffer.back(), someVal2);
-
-    const auto someVal3 = getValue<TypeParam>();
-    this->t_buffer.push_back(someVal3);
-    ASSERT_EQ(this->t_buffer.back(), someVal3);
-
-    const auto someVal4 = getValue<TypeParam>();
-    this->t_buffer.push_back(someVal4);
-    ASSERT_EQ(this->t_buffer.back(),someVal4);
-
-    const auto someVal5 = getValue<TypeParam>();
-    this->t_buffer.push_back(someVal5);
-    ASSERT_EQ(this->t_buffer.back(), someVal5);
-
-    const auto someVal6 = getValue<TypeParam>();
-    this->t_buffer.push_back(someVal6);
-    ASSERT_EQ(this->t_buffer.back(), someVal6);
-}
-
-TYPED_TEST(RingBufferTest, pushBackRV)
-{
-    auto refBuffer = CreateBuffer<TypeParam>();
-
-    // Push rval ref to buffer, check against refValue.
-    for(size_t i = 0; i < TEST_BUFFER_SIZE ; i++)
-    {
-        const auto moveValue = getValue<TypeParam>();
-        const auto refValue = moveValue;
-        refBuffer.push_back(std::move(moveValue));
-        ASSERT_EQ(refBuffer.back(), refValue);
-    }
-}
-
-// Tests requirement: 
-TYPED_TEST(RingBufferTest, pop_back)
-{
-    const auto oldBack = this->t_buffer.back();
-    const auto newBack = *(this->t_buffer.end() - 2);
-    this->t_buffer.pop_back();
-
-    ASSERT_NE(oldBack, this-> t_buffer.back());
-    ASSERT_EQ(newBack, this-> t_buffer.back());
-
- }
-
-// Tests requirement: SequenceContainer a.push_front(t).
-TYPED_TEST(RingBufferTest, push_front)
-{    
-    const auto someVal = getValue<TypeParam>();
-    this->t_buffer.push_front(someVal);
-    ASSERT_EQ(this->t_buffer.front(), someVal);
-}
-
-// Tests requirement: SequenceContainer a.push_front(rv), where rv is a rvalue ref.
-TYPED_TEST(RingBufferTest, pushFrontRV)
-{
-    std::shared_ptr<TypeParam> owningPtr;
-    ring_buffer<std::shared_ptr<TypeParam>> ptrBuffer;
-
-    // Push one element to exist in the empty buffer before actually testing the function.
-    owningPtr = std::make_shared<TypeParam>(getValue<TypeParam>());
-    ptrBuffer.push_front(std::move(owningPtr));
-
-    // Create test pointer and a copy of the underlying value as a reference.
-    owningPtr = std::make_shared<TypeParam>(getValue<TypeParam>());
-    const auto oldFront = ptrBuffer.front();
-    const auto newFrontReferenceCopy = owningPtr;
-    ptrBuffer.push_front(std::move(owningPtr));
-
-    // Tests that the value is actually at the front.
-    ASSERT_EQ(ptrBuffer.front(), newFrontReferenceCopy);
-    
-    // Old value is second in the buffer.
-    ASSERT_EQ(*(ptrBuffer.begin() + 1), oldFront);
-
-    ASSERT_TRUE(owningPtr.get() == nullptr);
-}
-
-// Tests requirement: SequenceContainer a.front().
-TYPED_TEST(RingBufferTest, front)
-{
-    ASSERT_EQ(this->t_buffer.front(), *(this->t_buffer.begin()));
-}
-
-// Tests requirement: SequenceContainer a.back().
-TYPED_TEST(RingBufferTest, back)
-{
-    ASSERT_EQ(this->t_buffer.back(), *(this->t_buffer.end() - 1));
 }
 
 // Tests requirement:
