@@ -14,7 +14,7 @@ The project is structured as follows:
 
 - `googletest/`: This directory contains the GoogleTest framework files. Note that GoogleTest is included as a GitHub submodule.
 
-- `includ/`: This directory houses all the header(s) for the ring buffer library.
+- `include/`: This directory houses all the header(s) for the ring buffer library.
 
 - `test/`: This directory contains the test files for the ring buffer library.
 

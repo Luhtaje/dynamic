@@ -599,10 +599,9 @@ public:
     /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation, or something from value_types constructor.
     /// @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).
     /// @details Linear complexity in relation to buffer size.
-    ring_buffer(const ring_buffer& rhs) : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex)
+    ring_buffer(const ring_buffer& rhs) : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex), m_capacity(rhs.m_capacity)
     {
         m_data = m_allocator.allocate(rhs.capacity());
-        m_capacity = rhs.capacity();
 
         for (size_t i = 0; i < rhs.size(); i++)
         {
@@ -615,7 +614,7 @@ public:
     /// @param other Rvalue reference to other buffer.
     /// @pre value_type must resolve std::is_nothrow_move_constructible<value_type>::value to true. Otherwise function does nothing.
     /// @details Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant.
-    ring_buffer(ring_buffer&& other) noexcept
+    ring_buffer(ring_buffer&& other) noexcept : m_headIndex(0), m_tailIndex(0), m_capacity(0)
     {
         if (!std::is_nothrow_move_constructible<value_type>::value) return;
 
@@ -636,9 +635,9 @@ public:
             }
         }
 
-        m_capacity = std::exchange(other.m_capacity, 0);
-        m_headIndex = std::exchange(other.m_headIndex, 0);
-        m_tailIndex = std::exchange(other.m_tailIndex, 0);
+        m_capacity = std::exchange(other.m_capacity, m_capacity);
+        m_headIndex = std::exchange(other.m_headIndex, m_headIndex);
+        m_tailIndex = std::exchange(other.m_tailIndex, m_tailIndex);
 
     }
 
