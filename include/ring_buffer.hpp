@@ -1090,7 +1090,7 @@ public:
 
     /// @brief Gets the size of the container.
     /// @return Size of buffer.
-    /// @det
+    /// @details Constant complexity.
     size_type size() const noexcept
     {
         if(m_headIndex < m_tailIndex)
@@ -1101,7 +1101,9 @@ public:
         return m_headIndex - m_tailIndex;
     }
 
-    /// TODO what is this, is this needed somewhere?
+    /// @brief Gets the theoretical maximum size of the container.
+    /// @return Maximum size of the buffer.
+    /// @note 
     size_type max_size() const noexcept
     {
         constexpr auto maxSize = std::numeric_limits<std::size_t>::max();
@@ -1413,7 +1415,7 @@ public:
 
 private:
 
-    /// @brief Reserves more memory if needed for an increase in size. If more memory is needed, allocates capacity * 1.5 or if that is not enough (capacity * 1.5 + increase).
+    /// @brief Reserves more memory if needed for an increase in size. If more memory is needed, allocates (capacity * 1.5) or if that is not enough (capacity * 1.5 + increase).
     /// @param increase Expected increase in size of the buffer, based on which memory is allocated.
     /// @details Linear complexity in relation to buffer size if more memory needs to be allocated, otherwise constant complexity.
     /// @exception May throw std::bad_alloc. If any exception is thrown this function does nothing. Strong exception guarantee.

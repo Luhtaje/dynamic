@@ -304,6 +304,7 @@ TEST(NonTypedTest, emplace)
     ASSERT_EQ(*posIt, emplaced);
 }
 
+
 // Tests requirement: SequenceContainer, insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
 TYPED_TEST(RingBufferTest, insert)
 {
@@ -697,19 +698,49 @@ TYPED_TEST(RingBufferTest, accessOperator)
     ASSERT_TRUE(std::is_const<std::remove_reference_t<decltype(constBuffer[0])>>::value);
 }
 
+// Tests requirement: SequenceContainer, a.at(n)
+TYPED_TEST(RingBufferTest, at)
+{
+    for (size_t i = 0; i < this->t_buffer.size(); i++)
+    {
+        ASSERT_EQ(this->t_buffer[i], this->t_buffer.at(i));
+    }
+
+    const auto c_buffer(this->t_buffer);
+
+    for (size_t i = 0; i < this->t_buffer.size(); i++)
+    {
+        ASSERT_EQ(c_buffer[i], c_buffer.at(i));
+    }
+
+    // Test OB access.
+    ASSERT_THROW(this->t_buffer.at(6), std::out_of_range);
+    ASSERT_THROW(c_buffer.at(6), std::out_of_range);
+}
+
+// Tests requirement: Container, a.swap(b), swap(a, b).
 TYPED_TEST(RingBufferTest, swap)
 {
     using std::swap;
     auto control = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
-    auto experiment1(control);
-    ASSERT_EQ(control, experiment1);
+    auto temp(control);
 
-    swap(experiment1, this->t_buffer);
+    // Temp gets populated buffer.
+    swap(temp, this->t_buffer);
 
     ASSERT_EQ(control, this->t_buffer);
-    ASSERT_NE(control, experiment1);
+    ASSERT_NE(control, temp);
+
+    // Temp gets empty buffer.
+    temp.swap(this->t_buffer);
+
+    ASSERT_EQ(temp, control);
+
+    // Check validity of t_buffer.
+    ASSERT_FALSE(this->t_buffer.empty());
 }
 
+// Tests requirement: Container, a.size().
 TYPED_TEST(RingBufferTest, size)
 {
     ASSERT_EQ(this->t_buffer.size(), std::distance(this->t_buffer.cbegin(), this->t_buffer.cend()));
@@ -718,12 +749,20 @@ TYPED_TEST(RingBufferTest, size)
     ASSERT_EQ(emptyBuf.size(), 0);
 }
 
-TYPED_TEST(RingBufferTest, MaxSize)
+// Tests requirement: Container, a.max_size().
+TEST(RingBufferTest, MaxSize)
 {
-    // Yeah.
-    ASSERT_NE(this->t_buffer.max_size(), 1);
+    ring_buffer<int> intBuffer;
+    ring_buffer<std::pair<int, char>> pairBuffer;
+
+    ASSERT_TRUE(intBuffer.max_size() > 0);
+
+    ASSERT_TRUE(intBuffer.max_size() >= pairBuffer.max_size());
+
+    ASSERT_TRUE(intBuffer.max_size() == ring_buffer<int>().max_size());
 }
 
+// Tests requirement: Container, a.empty()
 TYPED_TEST(RingBufferTest, empty)
 {
     ring_buffer<TypeParam> control;
@@ -735,10 +774,9 @@ TYPED_TEST(RingBufferTest, empty)
 
     ASSERT_TRUE(control.empty());
     ASSERT_FALSE(this->t_buffer.empty());
-
 }
 
-// Tests requirement: anon requirement, data() must rotate the elements so that the first logical element matches the first physical
+// Tests requirement: data() must rotate the elements so that the first logical element matches the first physical
 // element in the memory. Additionally, when size is 0 and capacity is non-zero, data() should return a valid pointer.
 TYPED_TEST(RingBufferTest, data)
 {
@@ -760,26 +798,9 @@ TYPED_TEST(RingBufferTest, data)
     ASSERT_EQ(dataPtr, &this->t_buffer[0]);
 }
 
-// Tests requirement:
-TYPED_TEST(RingBufferTest, at)
-{
-    for(size_t i = 0; i < this->t_buffer.size(); i++)
-    {
-        ASSERT_EQ(this->t_buffer[i], this->t_buffer.at(i));
-    }
 
-    const auto c_buffer(this->t_buffer);
-    for(size_t i = 0; i < this->t_buffer.size(); i++)
-    {
-        ASSERT_EQ(c_buffer[i], c_buffer.at(i));
-    }
 
-    // Test OB access.
-    ASSERT_THROW(this->t_buffer.at(6), std::out_of_range);
-    ASSERT_THROW(c_buffer.at(6), std::out_of_range);
-}
-
-// No requirement
+// Tests requirement: Optional a.shrink_to_fit().
 TYPED_TEST(RingBufferTest, shrink_to_fit)
 {
     this->t_buffer.reserve(100);
