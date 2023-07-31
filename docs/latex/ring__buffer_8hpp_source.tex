@@ -9,1048 +9,1058 @@
 \DoxyCodeLine{5 \textcolor{preprocessor}{\#include <algorithm>}}
 \DoxyCodeLine{6 \textcolor{preprocessor}{\#include <limits>}}
 \DoxyCodeLine{7 \textcolor{preprocessor}{\#include <utility>}}
-\DoxyCodeLine{8 }
-\DoxyCodeLine{9 \textcolor{comment}{// Forward declaration of \_rBuf\_const\_iterator.}}
-\DoxyCodeLine{10 \textcolor{keyword}{template}<\textcolor{keyword}{class} \_rBuf>}
-\DoxyCodeLine{11 \textcolor{keyword}{class }\mbox{\hyperlink{class__r_buf__const__iterator}{\_rBuf\_const\_iterator}};}
-\DoxyCodeLine{12 }
-\DoxyCodeLine{13 }
-\DoxyCodeLine{17 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} Allocator = std::allocator<T>> }
-\DoxyCodeLine{18 \textcolor{keyword}{class }\mbox{\hyperlink{classring__buffer}{ring\_buffer}}}
-\DoxyCodeLine{19 \{}
-\DoxyCodeLine{20 }
-\DoxyCodeLine{21 \textcolor{keyword}{public}:}
+\DoxyCodeLine{8 \textcolor{preprocessor}{\#include <stdexcept>}}
+\DoxyCodeLine{9 }
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11 \textcolor{comment}{// Forward declaration of \_rBuf\_const\_iterator.}}
+\DoxyCodeLine{12 \textcolor{keyword}{template}<\textcolor{keyword}{class} \_rBuf>}
+\DoxyCodeLine{13 \textcolor{keyword}{class }\mbox{\hyperlink{class__r_buf__const__iterator}{\_rBuf\_const\_iterator}};}
+\DoxyCodeLine{14 }
+\DoxyCodeLine{15 }
+\DoxyCodeLine{19 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T, \textcolor{keyword}{typename} Allocator = std::allocator<T>> }
+\DoxyCodeLine{20 \textcolor{keyword}{class }\mbox{\hyperlink{classring__buffer}{ring\_buffer}}}
+\DoxyCodeLine{21 \{}
 \DoxyCodeLine{22 }
-\DoxyCodeLine{23     \textcolor{keyword}{using }value\_type = T;}
-\DoxyCodeLine{24     \textcolor{keyword}{using }allocator\_type = Allocator;}
-\DoxyCodeLine{25     \textcolor{keyword}{using }reference = T\&;}
-\DoxyCodeLine{26     \textcolor{keyword}{using }const\_reference= \textcolor{keyword}{const} T\&;}
-\DoxyCodeLine{27     \textcolor{keyword}{using }pointer = \textcolor{keyword}{typename} T*;}
-\DoxyCodeLine{28     \textcolor{keyword}{using }const\_pointer= \textcolor{keyword}{typename} \textcolor{keyword}{const} T*;}
-\DoxyCodeLine{29 }
-\DoxyCodeLine{30     \textcolor{keyword}{using }difference\_type = ptrdiff\_t;}
-\DoxyCodeLine{31     \textcolor{keyword}{using }size\_type = std::size\_t;}
-\DoxyCodeLine{32 }
-\DoxyCodeLine{33 \textcolor{comment}{//========================================}}
-\DoxyCodeLine{34 \textcolor{comment}{// Iterators}}
+\DoxyCodeLine{23 \textcolor{keyword}{public}:}
+\DoxyCodeLine{24 }
+\DoxyCodeLine{25     \textcolor{keyword}{using }value\_type = T;}
+\DoxyCodeLine{26     \textcolor{keyword}{using }allocator\_type = Allocator;}
+\DoxyCodeLine{27     \textcolor{keyword}{using }reference = T\&;}
+\DoxyCodeLine{28     \textcolor{keyword}{using }const\_reference= \textcolor{keyword}{const} T\&;}
+\DoxyCodeLine{29     \textcolor{keyword}{using }pointer = T*;}
+\DoxyCodeLine{30     \textcolor{keyword}{using }const\_pointer= \textcolor{keyword}{const} T*;}
+\DoxyCodeLine{31 }
+\DoxyCodeLine{32     \textcolor{keyword}{using }difference\_type = ptrdiff\_t;}
+\DoxyCodeLine{33     \textcolor{keyword}{using }size\_type = std::size\_t;}
+\DoxyCodeLine{34 }
 \DoxyCodeLine{35 \textcolor{comment}{//========================================}}
-\DoxyCodeLine{36 }
-\DoxyCodeLine{39     \textcolor{keyword}{template}<\textcolor{keyword}{class} \_rBuf>}
-\DoxyCodeLine{40     \textcolor{keyword}{class }\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} : \textcolor{keyword}{public} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}<\_rBuf>}
-\DoxyCodeLine{41     \{}
-\DoxyCodeLine{42 }
-\DoxyCodeLine{43     \textcolor{keyword}{public}:}
-\DoxyCodeLine{44         \textcolor{keyword}{using }iterator\_category = std::random\_access\_iterator\_tag;}
-\DoxyCodeLine{45 }
-\DoxyCodeLine{46         \textcolor{keyword}{using }value\_type = \textcolor{keyword}{typename} \_rBuf::value\_type;}
-\DoxyCodeLine{47         \textcolor{keyword}{using }difference\_type = \textcolor{keyword}{typename} \_rBuf::difference\_type;}
-\DoxyCodeLine{48         \textcolor{keyword}{using }pointer = \textcolor{keyword}{typename} \_rBuf::pointer;}
-\DoxyCodeLine{49         \textcolor{keyword}{using }reference = value\_type\&;}
-\DoxyCodeLine{50 }
-\DoxyCodeLine{51     \textcolor{keyword}{public}:}
+\DoxyCodeLine{36 \textcolor{comment}{// Iterators}}
+\DoxyCodeLine{37 \textcolor{comment}{//========================================}}
+\DoxyCodeLine{38 }
+\DoxyCodeLine{41     \textcolor{keyword}{template}<\textcolor{keyword}{class} \_rBuf>}
+\DoxyCodeLine{42     \textcolor{keyword}{class }\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}}
+\DoxyCodeLine{43     \{}
+\DoxyCodeLine{44 }
+\DoxyCodeLine{45     \textcolor{keyword}{public}:}
+\DoxyCodeLine{46         \textcolor{keyword}{using }iterator\_category = std::random\_access\_iterator\_tag;}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48         \textcolor{keyword}{using }value\_type = \textcolor{keyword}{typename} \_rBuf::value\_type;}
+\DoxyCodeLine{49         \textcolor{keyword}{using }difference\_type = \textcolor{keyword}{typename} \_rBuf::difference\_type;}
+\DoxyCodeLine{50         \textcolor{keyword}{using }pointer = \textcolor{keyword}{typename} \_rBuf::const\_pointer;}
+\DoxyCodeLine{51         \textcolor{keyword}{using }reference = \textcolor{keyword}{const} value\_type\&;}
 \DoxyCodeLine{52 }
-\DoxyCodeLine{54         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a03bac114e2387843a4eab228fa8b72d1}{\_rBuf\_iterator}}() = \textcolor{keywordflow}{default};}
+\DoxyCodeLine{53     \textcolor{keyword}{public}:}
+\DoxyCodeLine{54         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}() : m\_container(\textcolor{keyword}{nullptr}), m\_logicalIndex(0) \{\}}
 \DoxyCodeLine{55 }
-\DoxyCodeLine{60         \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ad4e3b070b89ff17f3ca53fe89c710f1f}{\_rBuf\_iterator}}(\_rBuf* container, size\_type index) : \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}(container, index) \{\}}
-\DoxyCodeLine{61 }
-\DoxyCodeLine{65         reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a981a9240fa460ca2bdac31a950810fc9}{operator*}}() const noexcept}
-\DoxyCodeLine{66         \{}
-\DoxyCodeLine{67             \textcolor{comment}{//TODO: bounds checking and value-\/initialization.}}
-\DoxyCodeLine{68             \textcolor{keywordflow}{return} \textcolor{keyword}{const\_cast<}reference\textcolor{keyword}{>}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aab40614225addf5854e7cf348ca7ba6b}{\_rBuf\_const\_iterator<\_rBuf>::operator*}}());}
-\DoxyCodeLine{69         \}}
-\DoxyCodeLine{70 }
-\DoxyCodeLine{74         pointer \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ab1ef05bf53b0e7fa0f527749b1d3d402}{operator-\/>}}() const noexcept}
-\DoxyCodeLine{75         \{}
-\DoxyCodeLine{76             \textcolor{comment}{//TODO: check value initialization and bounds.}}
-\DoxyCodeLine{77             \textcolor{keywordflow}{return} \textcolor{keyword}{const\_cast<}pointer\textcolor{keyword}{>}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab14417fd24a7bfabdb6dd52b03862fca}{\_rBuf\_const\_iterator<\_rBuf>::operator-\/>}}());}
-\DoxyCodeLine{78         \}}
-\DoxyCodeLine{79 }
-\DoxyCodeLine{83         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_aa9574aeb5d61c9affe0648f6e96b6e28}{operator++}}() noexcept}
+\DoxyCodeLine{58         \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a39ffb0997dbbee53fec425e61209b30b}{\_rBuf\_const\_iterator}}(\textcolor{keyword}{const} \_rBuf* container, difference\_type index) : m\_container(container), m\_logicalIndex(index) \{\}}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{63         pointer \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab14417fd24a7bfabdb6dd52b03862fca}{operator-\/>}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{64 \textcolor{keyword}{        }\{}
+\DoxyCodeLine{65             \textcolor{comment}{//TODO: check value initialization and bounds. Shhhh......}}
+\DoxyCodeLine{66             \textcolor{keywordflow}{return} \&(*m\_container)[m\_logicalIndex];}
+\DoxyCodeLine{67         \}}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{72         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aca7cee193e987b2ce4d5fdba535abae3}{operator++}}() noexcept}
+\DoxyCodeLine{73         \{}
+\DoxyCodeLine{74             m\_logicalIndex++;}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
+\DoxyCodeLine{77         \}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{83         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ad46df6886512a0c64168cec7490de198}{operator++}}(\textcolor{keywordtype}{int})}
 \DoxyCodeLine{84         \{}
-\DoxyCodeLine{85             ++m\_logicalIndex;}
-\DoxyCodeLine{86             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
-\DoxyCodeLine{87         \}}
-\DoxyCodeLine{88 }
-\DoxyCodeLine{93         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_afbdb52730a48f02dcb654f07b247b037}{operator++}}(\textcolor{keywordtype}{int})}
-\DoxyCodeLine{94         \{}
-\DoxyCodeLine{95             \textcolor{keyword}{auto} temp(*\textcolor{keyword}{this});}
-\DoxyCodeLine{96             ++m\_logicalIndex;}
-\DoxyCodeLine{97             \textcolor{keywordflow}{return} temp;}
+\DoxyCodeLine{85             \textcolor{keyword}{auto} temp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{86             ++m\_logicalIndex;}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{88             \textcolor{keywordflow}{return} temp;}
+\DoxyCodeLine{89         \}}
+\DoxyCodeLine{90 }
+\DoxyCodeLine{94         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a85141b6eb35f4dbcb02c6aed31574b64}{operator-\/-\/}}()}
+\DoxyCodeLine{95         \{}
+\DoxyCodeLine{96             -\/-\/m\_logicalIndex;}
+\DoxyCodeLine{97             \textcolor{keywordflow}{return}(*\textcolor{keyword}{this});}
 \DoxyCodeLine{98         \}}
 \DoxyCodeLine{99 }
-\DoxyCodeLine{103         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ae781569223b5080635152a6e7b8323d2}{operator-\/-\/}}() noexcept}
-\DoxyCodeLine{104         \{}
-\DoxyCodeLine{105             -\/-\/m\_logicalIndex;}
-\DoxyCodeLine{106             \textcolor{keywordflow}{return}(*\textcolor{keyword}{this});}
-\DoxyCodeLine{107         \}}
-\DoxyCodeLine{108 }
-\DoxyCodeLine{113         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a409a93766429c19e16455a9af2c6568b}{operator-\/-\/}}(\textcolor{keywordtype}{int})}
-\DoxyCodeLine{114         \{}
-\DoxyCodeLine{115             \textcolor{keyword}{auto} temp(*\textcolor{keyword}{this});}
-\DoxyCodeLine{116             -\/-\/m\_logicalIndex;}
-\DoxyCodeLine{117             \textcolor{keywordflow}{return} temp;}
-\DoxyCodeLine{118         \}}
-\DoxyCodeLine{119 }
-\DoxyCodeLine{124         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a91a1649b9a5237edf8c918428cfac570}{operator+=}}(difference\_type offset) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{125         \{}
-\DoxyCodeLine{126             \textcolor{keywordflow}{if} (offset < 0)}
-\DoxyCodeLine{127             \{}
-\DoxyCodeLine{128                 m\_logicalIndex -\/= abs(offset);}
-\DoxyCodeLine{129             \}}
-\DoxyCodeLine{130             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{131             \{}
-\DoxyCodeLine{132                 m\_logicalIndex += offset;}
-\DoxyCodeLine{133             \}}
-\DoxyCodeLine{134             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
-\DoxyCodeLine{135         \}}
-\DoxyCodeLine{136 }
-\DoxyCodeLine{140         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ae08a69aa7599a1d4e3020f1d10e7d1ab}{operator+}}(\textcolor{keyword}{const} difference\_type offset)\textcolor{keyword}{ const}}
-\DoxyCodeLine{141 \textcolor{keyword}{        }\{}
-\DoxyCodeLine{142             \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} temp(*\textcolor{keyword}{this});}
-\DoxyCodeLine{143             \textcolor{keywordflow}{return} (temp += offset);}
-\DoxyCodeLine{144         \}}
-\DoxyCodeLine{145 }
-\DoxyCodeLine{151         \textcolor{keyword}{friend} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_aa6403945d2c738ba4cbbc295be41d2e6}{operator+}}(\textcolor{keyword}{const} difference\_type offset, \textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& iter)}
-\DoxyCodeLine{152         \{}
-\DoxyCodeLine{153             \textcolor{keyword}{auto} temp = iter;}
-\DoxyCodeLine{154             temp += offset;}
-\DoxyCodeLine{155             \textcolor{keywordflow}{return} temp;}
+\DoxyCodeLine{104         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_afbe74e5e0100d8d9c9040f93530dc67c}{operator-\/-\/}}(\textcolor{keywordtype}{int})}
+\DoxyCodeLine{105         \{}
+\DoxyCodeLine{106             \textcolor{comment}{//TODO:    check value initialization and "{}under"{} begin() decrement.}}
+\DoxyCodeLine{107             \textcolor{keyword}{auto} temp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{108             -\/-\/m\_logicalIndex;}
+\DoxyCodeLine{109             \textcolor{keywordflow}{return} temp;}
+\DoxyCodeLine{110         \}}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{116         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_af5d7340e4a7f820af7ae86740aeaf1cc}{operator+=}}(difference\_type offset) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{117         \{}
+\DoxyCodeLine{118             \textcolor{keywordflow}{if} (offset < 0)}
+\DoxyCodeLine{119             \{}
+\DoxyCodeLine{120                 m\_logicalIndex -\/= abs(offset);}
+\DoxyCodeLine{121             \}}
+\DoxyCodeLine{122             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{123             \{}
+\DoxyCodeLine{124                 m\_logicalIndex += offset;}
+\DoxyCodeLine{125             \}}
+\DoxyCodeLine{126             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
+\DoxyCodeLine{127         \}}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{133         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a2a61122cc3b74dc3a040f0f6c980f780}{operator+}}(\textcolor{keyword}{const} difference\_type offset)\textcolor{keyword}{ const}}
+\DoxyCodeLine{134 \textcolor{keyword}{        }\{}
+\DoxyCodeLine{135             \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} temp(m\_container, m\_logicalIndex);}
+\DoxyCodeLine{136             \textcolor{keywordflow}{return} (temp += offset);}
+\DoxyCodeLine{137         \}}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{139         \textcolor{comment}{// TODO}}
+\DoxyCodeLine{142 \textcolor{comment}{}        \textcolor{keyword}{friend} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ae9784eb7c27cd79d03e037ac8c513901}{operator+}}(\textcolor{keyword}{const} difference\_type offset, \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} iter)}
+\DoxyCodeLine{143         \{}
+\DoxyCodeLine{144             \textcolor{keyword}{auto} temp = iter;}
+\DoxyCodeLine{145             temp += offset;}
+\DoxyCodeLine{146             \textcolor{keywordflow}{return} temp;}
+\DoxyCodeLine{147         \}}
+\DoxyCodeLine{148 }
+\DoxyCodeLine{153         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a393729659a366a6051531c96248f9ea5}{operator-\/=}}(\textcolor{keyword}{const} difference\_type offset) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{154         \{}
+\DoxyCodeLine{155             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this} += -\/offset);}
 \DoxyCodeLine{156         \}}
 \DoxyCodeLine{157 }
-\DoxyCodeLine{162         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a56291a1e8e8f126ce2d4ab44fb89bb92}{operator-\/=}}(\textcolor{keyword}{const} difference\_type offset) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{163         \{}
-\DoxyCodeLine{164             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this} += -\/offset);}
-\DoxyCodeLine{165         \}}
-\DoxyCodeLine{166 }
-\DoxyCodeLine{172         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ad6bc93d09f156162d78be39eac33a27d}{operator-\/}}(\textcolor{keyword}{const} difference\_type offset)\textcolor{keyword}{ const}}
-\DoxyCodeLine{173 \textcolor{keyword}{        }\{}
-\DoxyCodeLine{174             \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} temp(*\textcolor{keyword}{this});}
-\DoxyCodeLine{175             \textcolor{keywordflow}{return} (temp -\/= offset);}
+\DoxyCodeLine{163         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a7a121d238c574bb38c3d1b404852ba90}{operator-\/}}(\textcolor{keyword}{const} difference\_type offset)\textcolor{keyword}{ const}}
+\DoxyCodeLine{164 \textcolor{keyword}{        }\{}
+\DoxyCodeLine{165             \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} temp(m\_container, m\_logicalIndex);}
+\DoxyCodeLine{166             \textcolor{keywordflow}{return} (temp -\/= offset);}
+\DoxyCodeLine{167         \}}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{173         difference\_type \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a461a9192c9cb0511ef2a6161d1cfe24c}{operator-\/}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{174         \{}
+\DoxyCodeLine{175             \textcolor{keywordflow}{return} (m\_logicalIndex -\/ other.m\_logicalIndex);}
 \DoxyCodeLine{176         \}}
 \DoxyCodeLine{177 }
-\DoxyCodeLine{182         difference\_type \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ab179b9c045939a05a8cf34ebee2f63fc}{operator-\/}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{183         \{}
-\DoxyCodeLine{184             \textcolor{comment}{//TODO: compatibility check}}
-\DoxyCodeLine{185             \textcolor{keywordflow}{return} (m\_logicalIndex -\/ other.m\_logicalIndex);}
+\DoxyCodeLine{183         reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a8cbae76c8a5e690b75732199300e9eed}{operator[]}}(\textcolor{keyword}{const} difference\_type offset) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{184         \{}
+\DoxyCodeLine{185             \textcolor{keywordflow}{return} m\_container-\/>operator[](m\_logicalIndex + offset);}
 \DoxyCodeLine{186         \}}
 \DoxyCodeLine{187 }
-\DoxyCodeLine{193         reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a8f062962ad5941a523a2bf51ff2b8950}{operator[]}}(\textcolor{keyword}{const} difference\_type offset) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{194         \{}
-\DoxyCodeLine{195             \textcolor{keywordflow}{return} \textcolor{keyword}{const\_cast<}reference\textcolor{keyword}{>}(m\_container-\/>operator[](offset));}
-\DoxyCodeLine{196         \}}
-\DoxyCodeLine{197 }
-\DoxyCodeLine{202         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_aa0ac94213e0757364087f9756479ad67}{operator<}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{203         \{}
-\DoxyCodeLine{204             \textcolor{comment}{//TODO:compatibility check}}
-\DoxyCodeLine{205             \textcolor{keywordflow}{return} (m\_logicalIndex < other.m\_logicalIndex);}
-\DoxyCodeLine{206         \}}
-\DoxyCodeLine{207 }
-\DoxyCodeLine{212         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_afd950fda404a5fef7c1a2c8a7eb110a8}{operator>}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{213         \{}
-\DoxyCodeLine{214             \textcolor{comment}{//TODO:compatibility check}}
-\DoxyCodeLine{215             \textcolor{keywordflow}{return} (m\_logicalIndex > other.m\_logicalIndex);}
-\DoxyCodeLine{216         \}}
-\DoxyCodeLine{217 }
-\DoxyCodeLine{222         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a21ae68f26b785424d24293f8785263b0}{operator<=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{223         \{}
-\DoxyCodeLine{224             \textcolor{comment}{//TODO:compatibility check}}
-\DoxyCodeLine{225             \textcolor{keywordflow}{return} (m\_logicalIndex <= other.m\_logicalIndex);}
-\DoxyCodeLine{226         \}}
-\DoxyCodeLine{227 }
-\DoxyCodeLine{232         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ac1d11b1c4e98a872dc76586b73fefbbc}{operator>=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{233         \{}
-\DoxyCodeLine{234             \textcolor{keywordflow}{return} (m\_logicalIndex >= other.m\_logicalIndex);}
-\DoxyCodeLine{235         \}}
-\DoxyCodeLine{236 }
-\DoxyCodeLine{241         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a599007da067928ecf266e8a561c36c78}{operator=}}(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} index) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{242         \{}
-\DoxyCodeLine{243             m\_logicalIndex = index;}
-\DoxyCodeLine{244             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
-\DoxyCodeLine{245         \};}
-\DoxyCodeLine{246 }
-\DoxyCodeLine{250         difference\_type \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_af95aa4bb7012c0cbe828ae046da2928e}{getIndex}}() noexcept}
-\DoxyCodeLine{251         \{}
-\DoxyCodeLine{252             \textcolor{keywordflow}{return} m\_logicalIndex;}
-\DoxyCodeLine{253         \}}
-\DoxyCodeLine{254     \};}
-\DoxyCodeLine{255 }
-\DoxyCodeLine{258     \textcolor{keyword}{template}<\textcolor{keyword}{class} \_rBuf>}
-\DoxyCodeLine{259     \textcolor{keyword}{class }\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}}
-\DoxyCodeLine{260     \{}
-\DoxyCodeLine{261 }
-\DoxyCodeLine{262     \textcolor{keyword}{public}:}
-\DoxyCodeLine{263         \textcolor{keyword}{using }iterator\_category = std::random\_access\_iterator\_tag;}
-\DoxyCodeLine{264 }
-\DoxyCodeLine{265         \textcolor{keyword}{using }value\_type = \textcolor{keyword}{typename} \_rBuf::value\_type;}
-\DoxyCodeLine{266         \textcolor{keyword}{using }difference\_type = \textcolor{keyword}{typename} \_rBuf::difference\_type;}
-\DoxyCodeLine{267         \textcolor{keyword}{using }pointer = \textcolor{keyword}{typename} \_rBuf::const\_pointer;}
-\DoxyCodeLine{268         \textcolor{keyword}{using }reference = \textcolor{keyword}{const} value\_type\&;}
-\DoxyCodeLine{269 }
-\DoxyCodeLine{270     \textcolor{keyword}{public}:}
-\DoxyCodeLine{271         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}() : m\_container(\textcolor{keyword}{nullptr}), m\_logicalIndex(0) \{\}}
+\DoxyCodeLine{192         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_afab61a8b0bd26fb977cc0e7e5df62df8}{operator==}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{193         \{}
+\DoxyCodeLine{194             \textcolor{keywordflow}{return} (m\_logicalIndex == other.m\_logicalIndex) \&\& (m\_container == other.m\_container);}
+\DoxyCodeLine{195         \}}
+\DoxyCodeLine{196 }
+\DoxyCodeLine{201         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a929de86bc7edffe208bbd49491c58b88}{operator!=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{202         \{}
+\DoxyCodeLine{203             \textcolor{keywordflow}{return} !(m\_logicalIndex == other.m\_logicalIndex \&\& m\_container == other.m\_container);}
+\DoxyCodeLine{204         \}}
+\DoxyCodeLine{205 }
+\DoxyCodeLine{210         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a21c3dd35be1cea6182d7b5432cf7ed11}{operator<}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{211         \{}
+\DoxyCodeLine{212             \textcolor{keywordflow}{return} (m\_logicalIndex < other.m\_logicalIndex);}
+\DoxyCodeLine{213         \}}
+\DoxyCodeLine{214 }
+\DoxyCodeLine{219         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a17d7116b08ad624451e1a9a1ef8760b7}{operator>}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{220         \{}
+\DoxyCodeLine{221             \textcolor{comment}{//TODO:compatibility check}}
+\DoxyCodeLine{222             \textcolor{keywordflow}{return} (other.m\_logicalIndex < m\_logicalIndex);}
+\DoxyCodeLine{223         \}}
+\DoxyCodeLine{224 }
+\DoxyCodeLine{227         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aa3726bfd128564ae621bdb7f93b12eaf}{operator<=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{228         \{}
+\DoxyCodeLine{229             \textcolor{comment}{//TODO:compatibility check}}
+\DoxyCodeLine{230             \textcolor{keywordflow}{return} (!(other < m\_logicalIndex));}
+\DoxyCodeLine{231         \}}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{235         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a98155743ed2e16c39cb797b68de1895e}{operator>=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{236         \{}
+\DoxyCodeLine{237             \textcolor{keywordflow}{return} (!(m\_logicalIndex < other.m\_logicalIndex));}
+\DoxyCodeLine{238         \}}
+\DoxyCodeLine{239 }
+\DoxyCodeLine{243         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a355600e1a031d2263c6f4cf44cd275d4}{operator=}}(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} index) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{244         \{}
+\DoxyCodeLine{245             m\_logicalIndex = index;}
+\DoxyCodeLine{246             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
+\DoxyCodeLine{247         \};}
+\DoxyCodeLine{248 }
+\DoxyCodeLine{252         reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aab40614225addf5854e7cf348ca7ba6b}{operator*}}() const noexcept}
+\DoxyCodeLine{253         \{}
+\DoxyCodeLine{254             \textcolor{keywordflow}{return} (*m\_container)[m\_logicalIndex];}
+\DoxyCodeLine{255         \}}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{259         difference\_type \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}{getIndex}}() const noexcept}
+\DoxyCodeLine{260         \{}
+\DoxyCodeLine{261             \textcolor{keywordflow}{return} m\_logicalIndex;}
+\DoxyCodeLine{262         \}}
+\DoxyCodeLine{263 }
+\DoxyCodeLine{264     \textcolor{keyword}{protected}:}
+\DoxyCodeLine{265         \textcolor{comment}{// The parent container.}}
+\DoxyCodeLine{266         \textcolor{keyword}{const} \_rBuf* m\_container;}
+\DoxyCodeLine{267 }
+\DoxyCodeLine{268         \textcolor{comment}{// The iterator does not point to any memory location, but is interfaced to the Ring Buffer via an index which is the logical index}}
+\DoxyCodeLine{269         \textcolor{comment}{// to an element. Logical index 0 is the first element in the buffer and last is size -\/ 1.}}
+\DoxyCodeLine{270         difference\_type m\_logicalIndex;}
+\DoxyCodeLine{271     \};}
 \DoxyCodeLine{272 }
-\DoxyCodeLine{275         \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a39ffb0997dbbee53fec425e61209b30b}{\_rBuf\_const\_iterator}}(\textcolor{keyword}{const} \_rBuf* container, difference\_type index) : m\_container(container), m\_logicalIndex(index) \{\}}
-\DoxyCodeLine{276 }
-\DoxyCodeLine{280         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_adfbe465de2e4529a430305af5470d8ed}{operator=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator<\_rBuf>}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}})}
-\DoxyCodeLine{281         \{}
-\DoxyCodeLine{282             \textcolor{keywordflow}{if} (m\_logicalIndex == \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}}.m\_logicalIndex \&\& m\_container == \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}}.m\_container)}
-\DoxyCodeLine{283             \{}
-\DoxyCodeLine{284                 \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
-\DoxyCodeLine{285             \}}
-\DoxyCodeLine{286             }
-\DoxyCodeLine{287             m\_logicalIndex = \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}}.m\_logicalIndex;}
-\DoxyCodeLine{288             m\_container = \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}}.m\_container;}
-\DoxyCodeLine{289             \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
-\DoxyCodeLine{290         \}}
+\DoxyCodeLine{275     \textcolor{keyword}{template}<\textcolor{keyword}{class} \_rBuf>}
+\DoxyCodeLine{276     \textcolor{keyword}{class }\mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} : \textcolor{keyword}{public} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}<\_rBuf>}
+\DoxyCodeLine{277     \{}
+\DoxyCodeLine{278 }
+\DoxyCodeLine{279     \textcolor{keyword}{public}:}
+\DoxyCodeLine{280         \textcolor{keyword}{using }iterator\_category = std::random\_access\_iterator\_tag;}
+\DoxyCodeLine{281 }
+\DoxyCodeLine{282         \textcolor{keyword}{using }value\_type = \textcolor{keyword}{typename} \_rBuf::value\_type;}
+\DoxyCodeLine{283         \textcolor{keyword}{using }difference\_type = \textcolor{keyword}{typename} \_rBuf::difference\_type;}
+\DoxyCodeLine{284         \textcolor{keyword}{using }pointer = \textcolor{keyword}{typename} \_rBuf::pointer;}
+\DoxyCodeLine{285         \textcolor{keyword}{using }reference = value\_type\&;}
+\DoxyCodeLine{286 }
+\DoxyCodeLine{287     \textcolor{keyword}{public}:}
+\DoxyCodeLine{288 }
+\DoxyCodeLine{290         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a03bac114e2387843a4eab228fa8b72d1}{\_rBuf\_iterator}}() = \textcolor{keywordflow}{default};}
 \DoxyCodeLine{291 }
-\DoxyCodeLine{295         pointer \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab14417fd24a7bfabdb6dd52b03862fca}{operator-\/>}}()\textcolor{keyword}{ const}}
-\DoxyCodeLine{296 \textcolor{keyword}{        }\{}
-\DoxyCodeLine{297             \textcolor{comment}{//TODO: check value initialization and bounds. Shhhh......}}
-\DoxyCodeLine{298             \textcolor{keywordflow}{return} \&(*m\_container)[m\_logicalIndex];}
-\DoxyCodeLine{299         \}}
-\DoxyCodeLine{300 }
-\DoxyCodeLine{304         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aca7cee193e987b2ce4d5fdba535abae3}{operator++}}() noexcept}
-\DoxyCodeLine{305         \{}
-\DoxyCodeLine{306             m\_logicalIndex++;}
-\DoxyCodeLine{307 }
-\DoxyCodeLine{308             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
-\DoxyCodeLine{309         \}}
-\DoxyCodeLine{310 }
-\DoxyCodeLine{315         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ad46df6886512a0c64168cec7490de198}{operator++}}(\textcolor{keywordtype}{int})}
-\DoxyCodeLine{316         \{}
-\DoxyCodeLine{317             \textcolor{keyword}{auto} temp(*\textcolor{keyword}{this});}
-\DoxyCodeLine{318             ++m\_logicalIndex;}
-\DoxyCodeLine{319 }
-\DoxyCodeLine{320             \textcolor{keywordflow}{return} temp;}
-\DoxyCodeLine{321         \}}
-\DoxyCodeLine{322 }
-\DoxyCodeLine{326         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a85141b6eb35f4dbcb02c6aed31574b64}{operator-\/-\/}}()}
-\DoxyCodeLine{327         \{}
-\DoxyCodeLine{328             -\/-\/m\_logicalIndex;}
-\DoxyCodeLine{329             \textcolor{keywordflow}{return}(*\textcolor{keyword}{this});}
-\DoxyCodeLine{330         \}}
-\DoxyCodeLine{331 }
-\DoxyCodeLine{336         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_afbe74e5e0100d8d9c9040f93530dc67c}{operator-\/-\/}}(\textcolor{keywordtype}{int})}
-\DoxyCodeLine{337         \{}
-\DoxyCodeLine{338             \textcolor{comment}{//TODO:    check value initialization and "{}under"{} begin() decrement.}}
-\DoxyCodeLine{339             \textcolor{keyword}{auto} temp(*\textcolor{keyword}{this});}
-\DoxyCodeLine{340             -\/-\/m\_logicalIndex;}
-\DoxyCodeLine{341             \textcolor{keywordflow}{return} temp;}
-\DoxyCodeLine{342         \}}
-\DoxyCodeLine{343 }
-\DoxyCodeLine{348         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_af5d7340e4a7f820af7ae86740aeaf1cc}{operator+=}}(difference\_type offset) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{349         \{}
-\DoxyCodeLine{350             \textcolor{keywordflow}{if} (offset < 0)}
-\DoxyCodeLine{351             \{}
-\DoxyCodeLine{352                 m\_logicalIndex -\/= abs(offset);}
-\DoxyCodeLine{353             \}}
-\DoxyCodeLine{354             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{355             \{}
-\DoxyCodeLine{356                 m\_logicalIndex += offset;}
-\DoxyCodeLine{357             \}}
-\DoxyCodeLine{358             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
-\DoxyCodeLine{359         \}}
-\DoxyCodeLine{360 }
-\DoxyCodeLine{365         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a2a61122cc3b74dc3a040f0f6c980f780}{operator+}}(\textcolor{keyword}{const} difference\_type offset)\textcolor{keyword}{ const}}
-\DoxyCodeLine{366 \textcolor{keyword}{        }\{}
-\DoxyCodeLine{367             \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} temp(m\_container, m\_logicalIndex);}
-\DoxyCodeLine{368             \textcolor{keywordflow}{return} (temp += offset);}
-\DoxyCodeLine{369         \}}
-\DoxyCodeLine{370 }
-\DoxyCodeLine{371         \textcolor{comment}{// TODO}}
-\DoxyCodeLine{374 \textcolor{comment}{}        \textcolor{keyword}{friend} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ae9784eb7c27cd79d03e037ac8c513901}{operator+}}(\textcolor{keyword}{const} difference\_type offset, \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} iter)}
-\DoxyCodeLine{375         \{}
-\DoxyCodeLine{376             \textcolor{keyword}{auto} temp = iter;}
-\DoxyCodeLine{377             temp += offset;}
-\DoxyCodeLine{378             \textcolor{keywordflow}{return} temp;}
-\DoxyCodeLine{379         \}}
-\DoxyCodeLine{380 }
-\DoxyCodeLine{385         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a393729659a366a6051531c96248f9ea5}{operator-\/=}}(\textcolor{keyword}{const} difference\_type offset) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{386         \{}
-\DoxyCodeLine{387             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this} += -\/offset);}
-\DoxyCodeLine{388         \}}
-\DoxyCodeLine{389 }
-\DoxyCodeLine{395         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a7a121d238c574bb38c3d1b404852ba90}{operator-\/}}(\textcolor{keyword}{const} difference\_type offset)\textcolor{keyword}{ const}}
-\DoxyCodeLine{396 \textcolor{keyword}{        }\{}
-\DoxyCodeLine{397             \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}} temp(m\_container, m\_logicalIndex);}
-\DoxyCodeLine{398             \textcolor{keywordflow}{return} (temp -\/= offset);}
-\DoxyCodeLine{399         \}}
-\DoxyCodeLine{400 }
-\DoxyCodeLine{405         difference\_type \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a461a9192c9cb0511ef2a6161d1cfe24c}{operator-\/}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{406         \{}
-\DoxyCodeLine{407             \textcolor{keywordflow}{return} (m\_logicalIndex -\/ other.m\_logicalIndex);}
-\DoxyCodeLine{408         \}}
-\DoxyCodeLine{409 }
-\DoxyCodeLine{415         reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a8cbae76c8a5e690b75732199300e9eed}{operator[]}}(\textcolor{keyword}{const} difference\_type offset) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{416         \{}
-\DoxyCodeLine{417             \textcolor{keywordflow}{return} m\_container-\/>operator[](m\_logicalIndex + offset);}
-\DoxyCodeLine{418         \}}
-\DoxyCodeLine{419 }
-\DoxyCodeLine{424         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_afab61a8b0bd26fb977cc0e7e5df62df8}{operator==}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{425         \{}
-\DoxyCodeLine{426             \textcolor{keywordflow}{return} (m\_logicalIndex == other.m\_logicalIndex) \&\& (m\_container == other.m\_container);}
-\DoxyCodeLine{427         \}}
-\DoxyCodeLine{428 }
-\DoxyCodeLine{433         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a929de86bc7edffe208bbd49491c58b88}{operator!=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{434         \{}
-\DoxyCodeLine{435             \textcolor{keywordflow}{return} !(m\_logicalIndex == other.m\_logicalIndex \&\& m\_container == other.m\_container);}
-\DoxyCodeLine{436         \}}
-\DoxyCodeLine{437 }
-\DoxyCodeLine{442         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a21c3dd35be1cea6182d7b5432cf7ed11}{operator<}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{443         \{}
-\DoxyCodeLine{444             \textcolor{keywordflow}{return} (m\_logicalIndex < other.m\_logicalIndex);}
-\DoxyCodeLine{445         \}}
-\DoxyCodeLine{446 }
-\DoxyCodeLine{451         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a17d7116b08ad624451e1a9a1ef8760b7}{operator>}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{452         \{}
-\DoxyCodeLine{453             \textcolor{comment}{//TODO:compatibility check}}
-\DoxyCodeLine{454             \textcolor{keywordflow}{return} (other.m\_logicalIndex < m\_logicalIndex);}
-\DoxyCodeLine{455         \}}
-\DoxyCodeLine{456 }
-\DoxyCodeLine{459         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aa3726bfd128564ae621bdb7f93b12eaf}{operator<=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{460         \{}
-\DoxyCodeLine{461             \textcolor{comment}{//TODO:compatibility check}}
-\DoxyCodeLine{462             \textcolor{keywordflow}{return}: (!(other < m\_logicalIndex));}
-\DoxyCodeLine{463         \}}
-\DoxyCodeLine{464 }
-\DoxyCodeLine{467         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a98155743ed2e16c39cb797b68de1895e}{operator>=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{468         \{}
-\DoxyCodeLine{469             \textcolor{keywordflow}{return} (!(m\_logicalIndex < other.m\_logicalIndex));}
-\DoxyCodeLine{470         \}}
-\DoxyCodeLine{471 }
-\DoxyCodeLine{475         \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_a355600e1a031d2263c6f4cf44cd275d4}{operator=}}(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} index) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{476         \{}
-\DoxyCodeLine{477             m\_logicalIndex = index;}
-\DoxyCodeLine{478             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
-\DoxyCodeLine{479         \};}
-\DoxyCodeLine{480 }
-\DoxyCodeLine{484         reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aab40614225addf5854e7cf348ca7ba6b}{operator*}}() const noexcept}
-\DoxyCodeLine{485         \{}
-\DoxyCodeLine{486             \textcolor{keywordflow}{return} (*m\_container)[m\_logicalIndex];}
-\DoxyCodeLine{487         \}}
-\DoxyCodeLine{488 }
-\DoxyCodeLine{491         difference\_type \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}{getIndex}}() const noexcept}
-\DoxyCodeLine{492         \{}
-\DoxyCodeLine{493             \textcolor{keywordflow}{return} m\_logicalIndex;}
-\DoxyCodeLine{494         \}}
+\DoxyCodeLine{296         \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ad4e3b070b89ff17f3ca53fe89c710f1f}{\_rBuf\_iterator}}(\_rBuf* container, size\_type index) : \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator}}<\_rBuf>(container, index) \{\}}
+\DoxyCodeLine{297 }
+\DoxyCodeLine{301         reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a981a9240fa460ca2bdac31a950810fc9}{operator*}}() const noexcept}
+\DoxyCodeLine{302         \{}
+\DoxyCodeLine{303             \textcolor{comment}{//TODO: bounds checking and value-\/initialization.}}
+\DoxyCodeLine{304             \textcolor{keywordflow}{return} \textcolor{keyword}{const\_cast<}reference\textcolor{keyword}{>}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_aab40614225addf5854e7cf348ca7ba6b}{\_rBuf\_const\_iterator<\_rBuf>::operator*}}());}
+\DoxyCodeLine{305         \}}
+\DoxyCodeLine{306 }
+\DoxyCodeLine{310         pointer \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ab1ef05bf53b0e7fa0f527749b1d3d402}{operator-\/>}}() const noexcept}
+\DoxyCodeLine{311         \{}
+\DoxyCodeLine{312             \textcolor{comment}{//TODO: check value initialization and bounds.}}
+\DoxyCodeLine{313             \textcolor{keywordflow}{return} \textcolor{keyword}{const\_cast<}pointer\textcolor{keyword}{>}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab14417fd24a7bfabdb6dd52b03862fca}{\_rBuf\_const\_iterator<\_rBuf>::operator-\/>}}());}
+\DoxyCodeLine{314         \}}
+\DoxyCodeLine{315 }
+\DoxyCodeLine{319         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_aa9574aeb5d61c9affe0648f6e96b6e28}{operator++}}() noexcept}
+\DoxyCodeLine{320         \{}
+\DoxyCodeLine{321             ++\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}};}
+\DoxyCodeLine{322             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
+\DoxyCodeLine{323         \}}
+\DoxyCodeLine{324 }
+\DoxyCodeLine{329         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_afbdb52730a48f02dcb654f07b247b037}{operator++}}(\textcolor{keywordtype}{int})}
+\DoxyCodeLine{330         \{}
+\DoxyCodeLine{331             \textcolor{keyword}{auto} temp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{332             ++\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}};}
+\DoxyCodeLine{333             \textcolor{keywordflow}{return} temp;}
+\DoxyCodeLine{334         \}}
+\DoxyCodeLine{335 }
+\DoxyCodeLine{339         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ae781569223b5080635152a6e7b8323d2}{operator-\/-\/}}() noexcept}
+\DoxyCodeLine{340         \{}
+\DoxyCodeLine{341             -\/-\/\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}};}
+\DoxyCodeLine{342             \textcolor{keywordflow}{return}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{343         \}}
+\DoxyCodeLine{344 }
+\DoxyCodeLine{349         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a409a93766429c19e16455a9af2c6568b}{operator-\/-\/}}(\textcolor{keywordtype}{int})}
+\DoxyCodeLine{350         \{}
+\DoxyCodeLine{351             \textcolor{keyword}{auto} temp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{352             -\/-\/\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}};}
+\DoxyCodeLine{353             \textcolor{keywordflow}{return} temp;}
+\DoxyCodeLine{354         \}}
+\DoxyCodeLine{355 }
+\DoxyCodeLine{360         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a91a1649b9a5237edf8c918428cfac570}{operator+=}}(difference\_type offset) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{361         \{}
+\DoxyCodeLine{362             \textcolor{keywordflow}{if} (offset < 0)}
+\DoxyCodeLine{363             \{}
+\DoxyCodeLine{364                 \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}} -\/= abs(offset);}
+\DoxyCodeLine{365             \}}
+\DoxyCodeLine{366             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{367             \{}
+\DoxyCodeLine{368                 \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}} += offset;}
+\DoxyCodeLine{369             \}}
+\DoxyCodeLine{370             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
+\DoxyCodeLine{371         \}}
+\DoxyCodeLine{372 }
+\DoxyCodeLine{376         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ae08a69aa7599a1d4e3020f1d10e7d1ab}{operator+}}(\textcolor{keyword}{const} difference\_type offset)\textcolor{keyword}{ const}}
+\DoxyCodeLine{377 \textcolor{keyword}{        }\{}
+\DoxyCodeLine{378             \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} temp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{379             \textcolor{keywordflow}{return} (temp += offset);}
+\DoxyCodeLine{380         \}}
+\DoxyCodeLine{381 }
+\DoxyCodeLine{387         \textcolor{keyword}{friend} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_aa6403945d2c738ba4cbbc295be41d2e6}{operator+}}(\textcolor{keyword}{const} difference\_type offset, \textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& iter)}
+\DoxyCodeLine{388         \{}
+\DoxyCodeLine{389             \textcolor{keyword}{auto} temp = iter;}
+\DoxyCodeLine{390             temp += offset;}
+\DoxyCodeLine{391             \textcolor{keywordflow}{return} temp;}
+\DoxyCodeLine{392         \}}
+\DoxyCodeLine{393 }
+\DoxyCodeLine{398         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a56291a1e8e8f126ce2d4ab44fb89bb92}{operator-\/=}}(\textcolor{keyword}{const} difference\_type offset) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{399         \{}
+\DoxyCodeLine{400             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this} += -\/offset);}
+\DoxyCodeLine{401         \}}
+\DoxyCodeLine{402 }
+\DoxyCodeLine{408         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ad6bc93d09f156162d78be39eac33a27d}{operator-\/}}(\textcolor{keyword}{const} difference\_type offset)\textcolor{keyword}{ const}}
+\DoxyCodeLine{409 \textcolor{keyword}{        }\{}
+\DoxyCodeLine{410             \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}} temp(*\textcolor{keyword}{this});}
+\DoxyCodeLine{411             \textcolor{keywordflow}{return} (temp -\/= offset);}
+\DoxyCodeLine{412         \}}
+\DoxyCodeLine{413 }
+\DoxyCodeLine{418         difference\_type \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ab179b9c045939a05a8cf34ebee2f63fc}{operator-\/}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{419         \{}
+\DoxyCodeLine{420             \textcolor{comment}{//TODO: compatibility check}}
+\DoxyCodeLine{421             \textcolor{keywordflow}{return} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}} -\/ other.\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex);}
+\DoxyCodeLine{422         \}}
+\DoxyCodeLine{423 }
+\DoxyCodeLine{429         reference \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a8f062962ad5941a523a2bf51ff2b8950}{operator[]}}(\textcolor{keyword}{const} difference\_type offset) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{430         \{}
+\DoxyCodeLine{431             \textcolor{keywordflow}{return} \textcolor{keyword}{const\_cast<}reference\textcolor{keyword}{>}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_container}}-\/>operator[](offset));}
+\DoxyCodeLine{432         \}}
+\DoxyCodeLine{433 }
+\DoxyCodeLine{438         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_aa0ac94213e0757364087f9756479ad67}{operator<}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{439         \{}
+\DoxyCodeLine{440             \textcolor{comment}{//TODO:compatibility check}}
+\DoxyCodeLine{441             \textcolor{keywordflow}{return} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}} < other.\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex);}
+\DoxyCodeLine{442         \}}
+\DoxyCodeLine{443 }
+\DoxyCodeLine{448         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_afd950fda404a5fef7c1a2c8a7eb110a8}{operator>}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{449         \{}
+\DoxyCodeLine{450             \textcolor{comment}{//TODO:compatibility check}}
+\DoxyCodeLine{451             \textcolor{keywordflow}{return} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}} > other.\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex);}
+\DoxyCodeLine{452         \}}
+\DoxyCodeLine{453 }
+\DoxyCodeLine{458         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a21ae68f26b785424d24293f8785263b0}{operator<=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{459         \{}
+\DoxyCodeLine{460             \textcolor{comment}{//TODO:compatibility check}}
+\DoxyCodeLine{461             \textcolor{keywordflow}{return} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}} <= other.\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex);}
+\DoxyCodeLine{462         \}}
+\DoxyCodeLine{463 }
+\DoxyCodeLine{468         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_ac1d11b1c4e98a872dc76586b73fefbbc}{operator>=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& other) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{469         \{}
+\DoxyCodeLine{470             \textcolor{keywordflow}{return} (\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}} >= other.\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex);}
+\DoxyCodeLine{471         \}}
+\DoxyCodeLine{472 }
+\DoxyCodeLine{477         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{\_rBuf\_iterator}}\& \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_a599007da067928ecf266e8a561c36c78}{operator=}}(\textcolor{keyword}{const} \textcolor{keywordtype}{size\_t} index) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{478         \{}
+\DoxyCodeLine{479             \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}} = index;}
+\DoxyCodeLine{480             \textcolor{keywordflow}{return} (*\textcolor{keyword}{this});}
+\DoxyCodeLine{481         \};}
+\DoxyCodeLine{482 }
+\DoxyCodeLine{486         difference\_type \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator_af95aa4bb7012c0cbe828ae046da2928e}{getIndex}}() noexcept}
+\DoxyCodeLine{487         \{}
+\DoxyCodeLine{488             \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{\_rBuf\_const\_iterator<\_rBuf>::m\_logicalIndex}};}
+\DoxyCodeLine{489         \}}
+\DoxyCodeLine{490     \};}
+\DoxyCodeLine{491 }
+\DoxyCodeLine{492 }
+\DoxyCodeLine{493     \textcolor{keyword}{using }iterator = \_rBuf\_iterator<ring\_buffer<T>>;}
+\DoxyCodeLine{494     \textcolor{keyword}{using }const\_iterator = \mbox{\hyperlink{class__r_buf__const__iterator}{\_rBuf\_const\_iterator<ring\_buffer<T>}}>;}
 \DoxyCodeLine{495 }
-\DoxyCodeLine{496     \textcolor{keyword}{protected}:}
-\DoxyCodeLine{497         \textcolor{comment}{// The parent container.}}
-\DoxyCodeLine{498         \textcolor{keyword}{const} \_rBuf* m\_container;}
-\DoxyCodeLine{499 }
-\DoxyCodeLine{500         \textcolor{comment}{// The iterator does not point to any memory location, but is interfaced to the Ring Buffer via an index which is the logical index}}
-\DoxyCodeLine{501         \textcolor{comment}{// to an element. Logical index 0 is the first element in the buffer and last is size -\/ 1.}}
-\DoxyCodeLine{502         difference\_type m\_logicalIndex;}
-\DoxyCodeLine{503     \};}
-\DoxyCodeLine{504 }
-\DoxyCodeLine{505 }
-\DoxyCodeLine{506     \textcolor{keyword}{using }iterator = \_rBuf\_iterator<ring\_buffer<T>>;}
-\DoxyCodeLine{507     \textcolor{keyword}{using }const\_iterator = \mbox{\hyperlink{class__r_buf__const__iterator}{\_rBuf\_const\_iterator<ring\_buffer<T>}}>;}
-\DoxyCodeLine{508 }
-\DoxyCodeLine{509     \textcolor{keyword}{using }reverse\_iterator = std::reverse\_iterator<iterator>;}
-\DoxyCodeLine{510     \textcolor{keyword}{using }const\_reverse\_iterator = std::reverse\_iterator<const\_iterator>;}
-\DoxyCodeLine{511 }
-\DoxyCodeLine{512 \textcolor{comment}{//============================}}
-\DoxyCodeLine{513 \textcolor{comment}{// End of iterators}}
-\DoxyCodeLine{514 \textcolor{comment}{//============================}}
-\DoxyCodeLine{515 }
-\DoxyCodeLine{516 }
-\DoxyCodeLine{522     \mbox{\hyperlink{classring__buffer_a3f9101235ae01592332386c047e17d0d}{ring\_buffer}}() : \mbox{\hyperlink{classring__buffer}{ring\_buffer}}(0, allocator\_type())}
-\DoxyCodeLine{523     \{}
-\DoxyCodeLine{524     \}}
-\DoxyCodeLine{525 }
-\DoxyCodeLine{532     \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_a4995dd6a70c19f3fb90e17a3c0d2daa4}{ring\_buffer}}(\textcolor{keyword}{const} allocator\_type\& alloc) : \mbox{\hyperlink{classring__buffer}{ring\_buffer}}(0, alloc)}
-\DoxyCodeLine{533     \{}
-\DoxyCodeLine{534     \}}
-\DoxyCodeLine{535 }
-\DoxyCodeLine{546     \mbox{\hyperlink{classring__buffer_a2449de34e9c4a70e81c5c76a1a75e71f}{ring\_buffer}}(size\_type count, const\_reference val, \textcolor{keyword}{const} allocator\_type\& alloc = allocator\_type()) : m\_headIndex(0), m\_tailIndex(0), m\_allocator(alloc)}
-\DoxyCodeLine{547     \{}
-\DoxyCodeLine{548         m\_data = m\_allocator.allocate(count + 2);}
-\DoxyCodeLine{549         m\_capacity = count + 2;}
-\DoxyCodeLine{550 }
-\DoxyCodeLine{551         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < count; i++)}
-\DoxyCodeLine{552         \{}
-\DoxyCodeLine{553             \mbox{\hyperlink{classring__buffer_a3de0c8df71d288b2948d618bdd930250}{push\_back}}(val);}
-\DoxyCodeLine{554         \}}
-\DoxyCodeLine{555     \}}
-\DoxyCodeLine{556 }
-\DoxyCodeLine{563     \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_a2648ee9dbe34781862260df46ac0d1e5}{ring\_buffer}}(size\_type count, \textcolor{keyword}{const} allocator\_type\& alloc = allocator\_type()) : m\_headIndex(0), m\_tailIndex(0), m\_allocator(alloc)}
-\DoxyCodeLine{564     \{}
-\DoxyCodeLine{565         m\_data = m\_allocator.allocate(count + 2);}
-\DoxyCodeLine{566         m\_capacity = count + 2;}
-\DoxyCodeLine{567 }
-\DoxyCodeLine{568         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < count; i++)}
-\DoxyCodeLine{569         \{}
-\DoxyCodeLine{570             m\_allocator.construct(m\_data + i);}
-\DoxyCodeLine{571             increment(m\_headIndex);}
-\DoxyCodeLine{572         \}}
-\DoxyCodeLine{573     \}}
+\DoxyCodeLine{496     \textcolor{keyword}{using }reverse\_iterator = std::reverse\_iterator<iterator>;}
+\DoxyCodeLine{497     \textcolor{keyword}{using }const\_reverse\_iterator = std::reverse\_iterator<const\_iterator>;}
+\DoxyCodeLine{498 }
+\DoxyCodeLine{499 \textcolor{comment}{//============================}}
+\DoxyCodeLine{500 \textcolor{comment}{// End of iterators}}
+\DoxyCodeLine{501 \textcolor{comment}{//============================}}
+\DoxyCodeLine{502 }
+\DoxyCodeLine{503 }
+\DoxyCodeLine{509     \mbox{\hyperlink{classring__buffer_a3f9101235ae01592332386c047e17d0d}{ring\_buffer}}() : \mbox{\hyperlink{classring__buffer}{ring\_buffer}}(0, allocator\_type())}
+\DoxyCodeLine{510     \{}
+\DoxyCodeLine{511     \}}
+\DoxyCodeLine{512 }
+\DoxyCodeLine{519     \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_a4995dd6a70c19f3fb90e17a3c0d2daa4}{ring\_buffer}}(\textcolor{keyword}{const} allocator\_type\& alloc) : \mbox{\hyperlink{classring__buffer}{ring\_buffer}}(0, alloc)}
+\DoxyCodeLine{520     \{}
+\DoxyCodeLine{521     \}}
+\DoxyCodeLine{522 }
+\DoxyCodeLine{533     \mbox{\hyperlink{classring__buffer_a2449de34e9c4a70e81c5c76a1a75e71f}{ring\_buffer}}(size\_type count, const\_reference val, \textcolor{keyword}{const} allocator\_type\& alloc = allocator\_type()) : m\_headIndex(0), m\_tailIndex(0), m\_allocator(alloc)}
+\DoxyCodeLine{534     \{}
+\DoxyCodeLine{535         m\_data = m\_allocator.allocate(count + 2);}
+\DoxyCodeLine{536         m\_capacity = count + 2;}
+\DoxyCodeLine{537 }
+\DoxyCodeLine{538         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < count; i++)}
+\DoxyCodeLine{539         \{}
+\DoxyCodeLine{540             \mbox{\hyperlink{classring__buffer_a3de0c8df71d288b2948d618bdd930250}{push\_back}}(val);}
+\DoxyCodeLine{541         \}}
+\DoxyCodeLine{542     \}}
+\DoxyCodeLine{543 }
+\DoxyCodeLine{550     \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_a2648ee9dbe34781862260df46ac0d1e5}{ring\_buffer}}(size\_type count, \textcolor{keyword}{const} allocator\_type\& alloc = allocator\_type()) : m\_headIndex(0), m\_tailIndex(0), m\_allocator(alloc)}
+\DoxyCodeLine{551     \{}
+\DoxyCodeLine{552         m\_data = m\_allocator.allocate(count + 2);}
+\DoxyCodeLine{553         m\_capacity = count + 2;}
+\DoxyCodeLine{554 }
+\DoxyCodeLine{555         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < count; i++)}
+\DoxyCodeLine{556         \{}
+\DoxyCodeLine{557             m\_allocator.construct(m\_data + i);}
+\DoxyCodeLine{558             increment(m\_headIndex);}
+\DoxyCodeLine{559         \}}
+\DoxyCodeLine{560     \}}
+\DoxyCodeLine{561 }
+\DoxyCodeLine{570     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputIt>}
+\DoxyCodeLine{571     \mbox{\hyperlink{classring__buffer_a558ef45f751987abbdd4f458d0efb9a3}{ring\_buffer}}(InputIt beginIt, InputIt endIt) : m\_headIndex(0) , m\_tailIndex(0)}
+\DoxyCodeLine{572     \{}
+\DoxyCodeLine{573         \textcolor{keyword}{const} \textcolor{keyword}{auto} \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}} = std::distance<InputIt>(beginIt , endIt);}
 \DoxyCodeLine{574 }
-\DoxyCodeLine{583     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputIt>}
-\DoxyCodeLine{584     \mbox{\hyperlink{classring__buffer_a558ef45f751987abbdd4f458d0efb9a3}{ring\_buffer}}(InputIt beginIt, InputIt endIt) : m\_tailIndex(0) , m\_headIndex(0)}
-\DoxyCodeLine{585     \{}
-\DoxyCodeLine{586         \textcolor{keyword}{const} \textcolor{keyword}{auto} \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}} = std::distance<InputIt>(beginIt , endIt);}
-\DoxyCodeLine{587 }
-\DoxyCodeLine{588         m\_data = m\_allocator.allocate(\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}} + 2);}
-\DoxyCodeLine{589         m\_capacity = \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}} + 2;}
-\DoxyCodeLine{590 }
-\DoxyCodeLine{591         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}; i++)}
-\DoxyCodeLine{592         \{}
-\DoxyCodeLine{593             m\_allocator.construct(m\_data + i, *(beginIt + i));}
-\DoxyCodeLine{594             increment(m\_headIndex);}
-\DoxyCodeLine{595         \}}
-\DoxyCodeLine{596     \}}
-\DoxyCodeLine{597 }
-\DoxyCodeLine{604     \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_a37abccd052de210c36f6f397cd841a93}{ring\_buffer}}(std::initializer\_list<T> init) : \mbox{\hyperlink{classring__buffer}{ring\_buffer}}(init.\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}(),init.\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}())}
-\DoxyCodeLine{605     \{}
-\DoxyCodeLine{606     \}}
-\DoxyCodeLine{607 }
-\DoxyCodeLine{615     \mbox{\hyperlink{classring__buffer_ad8925b041c137104b31c975169dd05b0}{ring\_buffer}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& rhs) : m\_headIndex(rhs.m\_tailIndex), m\_tailIndex(rhs.m\_tailIndex)}
-\DoxyCodeLine{616     \{}
-\DoxyCodeLine{617         m\_data = m\_allocator.allocate(rhs.\mbox{\hyperlink{classring__buffer_aeb98388fa6ae8a7a86e968d95534c8fd}{capacity}}());}
-\DoxyCodeLine{618         m\_capacity = rhs.\mbox{\hyperlink{classring__buffer_aeb98388fa6ae8a7a86e968d95534c8fd}{capacity}}();}
-\DoxyCodeLine{619 }
-\DoxyCodeLine{620         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < rhs.\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}(); i++)}
-\DoxyCodeLine{621         \{}
-\DoxyCodeLine{622             m\_allocator.construct(\&this-\/>\textcolor{keyword}{operator}[](i), rhs[i]);}
-\DoxyCodeLine{623             increment(m\_headIndex);}
-\DoxyCodeLine{624         \}}
-\DoxyCodeLine{625     \}}
-\DoxyCodeLine{626 }
-\DoxyCodeLine{631     \mbox{\hyperlink{classring__buffer_a232425cc3a36aeb1a844956fd93623f0}{ring\_buffer}}(\mbox{\hyperlink{classring__buffer}{ring\_buffer}}\&\& other) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{632     \{}
-\DoxyCodeLine{633         \textcolor{keywordflow}{if} (!std::is\_nothrow\_move\_constructible<value\_type>::value) \textcolor{keywordflow}{return};}
-\DoxyCodeLine{634 }
-\DoxyCodeLine{635         \textcolor{keywordflow}{if} (std::allocator\_traits<allocator\_type>::propagate\_on\_container\_move\_assignment::value)}
-\DoxyCodeLine{636         \{}
-\DoxyCodeLine{637             m\_allocator = other.get\_allocator();}
-\DoxyCodeLine{638             m\_data = std::exchange(other.m\_data, \textcolor{keyword}{nullptr});}
-\DoxyCodeLine{639         \}}
-\DoxyCodeLine{640         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (m\_allocator == other.get\_allocator())}
-\DoxyCodeLine{641         \{}
-\DoxyCodeLine{642             m\_data = std::exchange(other.m\_data, \textcolor{keyword}{nullptr});}
-\DoxyCodeLine{643         \}}
-\DoxyCodeLine{644         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{645         \{}
-\DoxyCodeLine{646             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < other.size(); i++)}
-\DoxyCodeLine{647             \{}
-\DoxyCodeLine{648                 m\_allocator.construct(\&this-\/>\textcolor{keyword}{operator}[](other.begin().getIndex() + i), std::move(other[i]));}
-\DoxyCodeLine{649             \}}
-\DoxyCodeLine{650         \}}
-\DoxyCodeLine{651 }
-\DoxyCodeLine{652         m\_capacity = std::exchange(other.m\_capacity, 0);}
-\DoxyCodeLine{653         m\_headIndex = std::exchange(other.m\_headIndex, 0);}
-\DoxyCodeLine{654         m\_tailIndex = std::exchange(other.m\_tailIndex, 0);}
-\DoxyCodeLine{655 }
-\DoxyCodeLine{656     \}}
-\DoxyCodeLine{657 }
-\DoxyCodeLine{659     \mbox{\hyperlink{classring__buffer_adba67a9f961ab436428b0710cd1af773}{\string~ring\_buffer}}()}
-\DoxyCodeLine{660     \{}
-\DoxyCodeLine{661         \textcolor{comment}{// Calls destructor for each element in the buffer.}}
-\DoxyCodeLine{662         for\_each(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}(),\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(),[\textcolor{keyword}{this}](T\& elem) \{ m\_allocator.destroy(\&elem); \});}
-\DoxyCodeLine{663 }
-\DoxyCodeLine{664         \textcolor{comment}{// After destruction deallocate the memory.}}
-\DoxyCodeLine{665         m\_allocator.deallocate(m\_data, m\_capacity);}
+\DoxyCodeLine{575         m\_data = m\_allocator.allocate(\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}} + 2);}
+\DoxyCodeLine{576         m\_capacity = \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}} + 2;}
+\DoxyCodeLine{577 }
+\DoxyCodeLine{578         \textcolor{keywordflow}{for} (difference\_type i = 0; i < \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}; i++)}
+\DoxyCodeLine{579         \{}
+\DoxyCodeLine{580             m\_allocator.construct(m\_data + i, *(beginIt + i));}
+\DoxyCodeLine{581             increment(m\_headIndex);}
+\DoxyCodeLine{582         \}}
+\DoxyCodeLine{583     \}}
+\DoxyCodeLine{584 }
+\DoxyCodeLine{591     \textcolor{keyword}{explicit} \mbox{\hyperlink{classring__buffer_a37abccd052de210c36f6f397cd841a93}{ring\_buffer}}(std::initializer\_list<T> init) : \mbox{\hyperlink{classring__buffer}{ring\_buffer}}(init.\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}(),init.\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}())}
+\DoxyCodeLine{592     \{}
+\DoxyCodeLine{593     \}}
+\DoxyCodeLine{594 }
+\DoxyCodeLine{602     \mbox{\hyperlink{classring__buffer_ad8925b041c137104b31c975169dd05b0}{ring\_buffer}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& rhs) : m\_headIndex(rhs.m\_tailIndex), m\_tailIndex(rhs.m\_tailIndex)}
+\DoxyCodeLine{603     \{}
+\DoxyCodeLine{604         m\_data = m\_allocator.allocate(rhs.\mbox{\hyperlink{classring__buffer_aeb98388fa6ae8a7a86e968d95534c8fd}{capacity}}());}
+\DoxyCodeLine{605         m\_capacity = rhs.\mbox{\hyperlink{classring__buffer_aeb98388fa6ae8a7a86e968d95534c8fd}{capacity}}();}
+\DoxyCodeLine{606 }
+\DoxyCodeLine{607         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < rhs.\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}(); i++)}
+\DoxyCodeLine{608         \{}
+\DoxyCodeLine{609             m\_allocator.construct(\&this-\/>\textcolor{keyword}{operator}[](i), rhs[i]);}
+\DoxyCodeLine{610             increment(m\_headIndex);}
+\DoxyCodeLine{611         \}}
+\DoxyCodeLine{612     \}}
+\DoxyCodeLine{613 }
+\DoxyCodeLine{618     \mbox{\hyperlink{classring__buffer_a232425cc3a36aeb1a844956fd93623f0}{ring\_buffer}}(\mbox{\hyperlink{classring__buffer}{ring\_buffer}}\&\& other) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{619     \{}
+\DoxyCodeLine{620         \textcolor{keywordflow}{if} (!std::is\_nothrow\_move\_constructible<value\_type>::value) \textcolor{keywordflow}{return};}
+\DoxyCodeLine{621 }
+\DoxyCodeLine{622         \textcolor{keywordflow}{if} (std::allocator\_traits<allocator\_type>::propagate\_on\_container\_move\_assignment::value)}
+\DoxyCodeLine{623         \{}
+\DoxyCodeLine{624             m\_allocator = other.get\_allocator();}
+\DoxyCodeLine{625             m\_data = std::exchange(other.m\_data, \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{626         \}}
+\DoxyCodeLine{627         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (m\_allocator == other.get\_allocator())}
+\DoxyCodeLine{628         \{}
+\DoxyCodeLine{629             m\_data = std::exchange(other.m\_data, \textcolor{keyword}{nullptr});}
+\DoxyCodeLine{630         \}}
+\DoxyCodeLine{631         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{632         \{}
+\DoxyCodeLine{633             \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < other.size(); i++)}
+\DoxyCodeLine{634             \{}
+\DoxyCodeLine{635                 m\_allocator.construct(\&this-\/>\textcolor{keyword}{operator}[](other.begin().getIndex() + i), std::move(other[i]));}
+\DoxyCodeLine{636             \}}
+\DoxyCodeLine{637         \}}
+\DoxyCodeLine{638 }
+\DoxyCodeLine{639         m\_capacity = std::exchange(other.m\_capacity, 0);}
+\DoxyCodeLine{640         m\_headIndex = std::exchange(other.m\_headIndex, 0);}
+\DoxyCodeLine{641         m\_tailIndex = std::exchange(other.m\_tailIndex, 0);}
+\DoxyCodeLine{642 }
+\DoxyCodeLine{643     \}}
+\DoxyCodeLine{644 }
+\DoxyCodeLine{646     \mbox{\hyperlink{classring__buffer_adba67a9f961ab436428b0710cd1af773}{\string~ring\_buffer}}()}
+\DoxyCodeLine{647     \{}
+\DoxyCodeLine{648         \textcolor{comment}{// Calls destructor for each element in the buffer.}}
+\DoxyCodeLine{649         for\_each(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}(),\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(),[\textcolor{keyword}{this}](T\& elem) \{ m\_allocator.destroy(\&elem); \});}
+\DoxyCodeLine{650 }
+\DoxyCodeLine{651         \textcolor{comment}{// After destruction deallocate the memory.}}
+\DoxyCodeLine{652         m\_allocator.deallocate(m\_data, m\_capacity);}
+\DoxyCodeLine{653     \}}
+\DoxyCodeLine{654 }
+\DoxyCodeLine{663     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a6e9bf60beea284ff8ec7288526fbe95f}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, \textcolor{keyword}{const} value\_type\& value)}
+\DoxyCodeLine{664     \{}
+\DoxyCodeLine{665         \textcolor{keywordflow}{return} insertBase(pos, 1, value);}
 \DoxyCodeLine{666     \}}
 \DoxyCodeLine{667 }
-\DoxyCodeLine{676     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a6e9bf60beea284ff8ec7288526fbe95f}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, \textcolor{keyword}{const} value\_type\& value)}
+\DoxyCodeLine{676     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_af647fe55fa023f8b9b6e948350c09ffe}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, value\_type\&\& value)}
 \DoxyCodeLine{677     \{}
-\DoxyCodeLine{678         \textcolor{keywordflow}{return} insertBase(pos, 1, value);}
+\DoxyCodeLine{678         \textcolor{keywordflow}{return} insertBase(pos, 1, std::move(value));}
 \DoxyCodeLine{679     \}}
 \DoxyCodeLine{680 }
-\DoxyCodeLine{689     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_af647fe55fa023f8b9b6e948350c09ffe}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, value\_type\&\& value)}
+\DoxyCodeLine{689     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a36dccabe03199fe8f651cdeb92ec36aa}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, \textcolor{keyword}{const} size\_type amount, \textcolor{keyword}{const} value\_type\& value)}
 \DoxyCodeLine{690     \{}
-\DoxyCodeLine{691         \textcolor{keywordflow}{return} insertBase(pos, 1, std::move(value));}
+\DoxyCodeLine{691         \textcolor{keywordflow}{return} insertBase(pos, amount, value);}
 \DoxyCodeLine{692     \}}
 \DoxyCodeLine{693 }
-\DoxyCodeLine{702     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a36dccabe03199fe8f651cdeb92ec36aa}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, \textcolor{keyword}{const} size\_type amount, \textcolor{keyword}{const} value\_type\& value)}
-\DoxyCodeLine{703     \{}
-\DoxyCodeLine{704         \textcolor{keywordflow}{return} insertBase(pos, amount, value);}
-\DoxyCodeLine{705     \}}
-\DoxyCodeLine{706 }
-\DoxyCodeLine{717     \textcolor{keyword}{template} <\textcolor{keyword}{typename} InputIt>}
-\DoxyCodeLine{718     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_ab68cc324f43afbaef53a5f6dec8e8f79}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, InputIt sourceBegin, InputIt sourceEnd)}
+\DoxyCodeLine{704     \textcolor{keyword}{template} <\textcolor{keyword}{typename} InputIt>}
+\DoxyCodeLine{705     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_ab68cc324f43afbaef53a5f6dec8e8f79}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, InputIt sourceBegin, InputIt sourceEnd)}
+\DoxyCodeLine{706     \{}
+\DoxyCodeLine{707         \textcolor{keywordflow}{return} insertRangeBase(pos, sourceBegin, sourceEnd);}
+\DoxyCodeLine{708     \}}
+\DoxyCodeLine{709 }
+\DoxyCodeLine{718     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_acd0d87d9c657e5356151da13ab78e444}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, std::initializer\_list<T> list)}
 \DoxyCodeLine{719     \{}
-\DoxyCodeLine{720         \textcolor{keywordflow}{return} insertRangeBase(pos, sourceBegin, sourceEnd);}
+\DoxyCodeLine{720         \textcolor{keywordflow}{return} insertRangeBase(pos, list.begin(), list.end());}
 \DoxyCodeLine{721     \}}
 \DoxyCodeLine{722 }
-\DoxyCodeLine{731     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_acd0d87d9c657e5356151da13ab78e444}{insert}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, std::initializer\_list<T> list)}
-\DoxyCodeLine{732     \{}
-\DoxyCodeLine{733         \textcolor{keywordflow}{return} insertRangeBase(pos, list.begin(), list.end());}
-\DoxyCodeLine{734     \}}
-\DoxyCodeLine{735 }
-\DoxyCodeLine{745     \textcolor{keyword}{template}<\textcolor{keyword}{class}... Args>}
-\DoxyCodeLine{746     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_acefe57c42e075e935c20a4da038b7df7}{emplace}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, Args\&\&... args)}
-\DoxyCodeLine{747     \{}
-\DoxyCodeLine{748         validateCapacity(1);}
-\DoxyCodeLine{749 }
-\DoxyCodeLine{750         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} it(\textcolor{keyword}{this}, pos.\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}{getIndex}}());}
-\DoxyCodeLine{751         m\_allocator.construct(\&*\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(), std::forward<Args>(args)...);}
-\DoxyCodeLine{752         increment(m\_headIndex);}
-\DoxyCodeLine{753         std::rotate(it, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ 1, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
-\DoxyCodeLine{754 }
-\DoxyCodeLine{755         \textcolor{keywordflow}{return} it;}
-\DoxyCodeLine{756     \}}
-\DoxyCodeLine{757 }
-\DoxyCodeLine{763     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_ad68227da7f12db1402a6bce1cc8b834a}{erase}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos)}
-\DoxyCodeLine{764     \{}
-\DoxyCodeLine{765         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} returnIt(\textcolor{keyword}{this}, pos.\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}{getIndex}}());}
-\DoxyCodeLine{766 }
-\DoxyCodeLine{767         \textcolor{keywordflow}{if} (pos != \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ 1)}
-\DoxyCodeLine{768         \{}
-\DoxyCodeLine{769             \textcolor{comment}{// Move assign elements effectively overwriting the }}
-\DoxyCodeLine{770             \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} it = returnIt; it < \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ 1; it++)}
-\DoxyCodeLine{771             \{}
-\DoxyCodeLine{772                 *it = std::move(*(it + 1));}
-\DoxyCodeLine{773             \}}
-\DoxyCodeLine{774             ++returnIt;}
-\DoxyCodeLine{775         \}}
-\DoxyCodeLine{776 }
+\DoxyCodeLine{732     \textcolor{keyword}{template}<\textcolor{keyword}{class}... Args>}
+\DoxyCodeLine{733     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_acefe57c42e075e935c20a4da038b7df7}{emplace}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos, Args\&\&... args)}
+\DoxyCodeLine{734     \{}
+\DoxyCodeLine{735         validateCapacity(1);}
+\DoxyCodeLine{736 }
+\DoxyCodeLine{737         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} it(\textcolor{keyword}{this}, pos.\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}{getIndex}}());}
+\DoxyCodeLine{738         m\_allocator.construct(\&*\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(), std::forward<Args>(args)...);}
+\DoxyCodeLine{739         increment(m\_headIndex);}
+\DoxyCodeLine{740         std::rotate(it, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ 1, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
+\DoxyCodeLine{741 }
+\DoxyCodeLine{742         \textcolor{keywordflow}{return} it;}
+\DoxyCodeLine{743     \}}
+\DoxyCodeLine{744 }
+\DoxyCodeLine{751     \textcolor{keyword}{template}<\textcolor{keyword}{class}... Args>}
+\DoxyCodeLine{752     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a4a7e65ec20452b89d10f1a587fa39222}{emplace\_front}}(Args\&\&... args)}
+\DoxyCodeLine{753     \{}
+\DoxyCodeLine{754         validateCapacity(1);}
+\DoxyCodeLine{755 }
+\DoxyCodeLine{756         \textcolor{keyword}{auto} tempIndex = m\_tailIndex;}
+\DoxyCodeLine{757         decrement(tempIndex);}
+\DoxyCodeLine{758         }
+\DoxyCodeLine{759         m\_allocator.construct(\&m\_data[tempIndex], std::forward<Args>(args)...);}
+\DoxyCodeLine{760         m\_tailIndex = tempIndex;}
+\DoxyCodeLine{761     \}}
+\DoxyCodeLine{762 }
+\DoxyCodeLine{769     \textcolor{keyword}{template}<\textcolor{keyword}{class}... Args>}
+\DoxyCodeLine{770     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_aed98662b3760dac1c9ea6c98d0106068}{emplace\_back}}(Args\&\&... args)}
+\DoxyCodeLine{771     \{}
+\DoxyCodeLine{772         validateCapacity(1);}
+\DoxyCodeLine{773 }
+\DoxyCodeLine{774         m\_allocator.construct(\&*\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(), std::forward<Args>(args)...);}
+\DoxyCodeLine{775         increment(m\_headIndex);}
+\DoxyCodeLine{776     \}}
 \DoxyCodeLine{777 }
-\DoxyCodeLine{778         \textcolor{comment}{// Last element is always destroyed.}}
-\DoxyCodeLine{779         m\_allocator.destroy(\&*(\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ 1));}
-\DoxyCodeLine{780         decrement(m\_headIndex);}
-\DoxyCodeLine{781 }
-\DoxyCodeLine{782         \textcolor{keywordflow}{return} returnIt;}
-\DoxyCodeLine{783     \}}
-\DoxyCodeLine{784 }
-\DoxyCodeLine{793     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a36c5e76881f854c9083ae3ea0083a3ea}{erase}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} first, \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} last)}
-\DoxyCodeLine{794     \{}
-\DoxyCodeLine{795         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} returnIt(\textcolor{keyword}{this}, first.\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}{getIndex}}());}
+\DoxyCodeLine{783     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_ad68227da7f12db1402a6bce1cc8b834a}{erase}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} pos)}
+\DoxyCodeLine{784     \{}
+\DoxyCodeLine{785         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} returnIt(\textcolor{keyword}{this}, pos.\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}{getIndex}}());}
+\DoxyCodeLine{786 }
+\DoxyCodeLine{787         \textcolor{keywordflow}{if} (pos != \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ 1)}
+\DoxyCodeLine{788         \{}
+\DoxyCodeLine{789             \textcolor{comment}{// Move assign elements effectively overwriting the }}
+\DoxyCodeLine{790             \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} it = returnIt; it < \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ 1; it++)}
+\DoxyCodeLine{791             \{}
+\DoxyCodeLine{792                 *it = std::move(*(it + 1));}
+\DoxyCodeLine{793             \}}
+\DoxyCodeLine{794             ++returnIt;}
+\DoxyCodeLine{795         \}}
 \DoxyCodeLine{796 }
-\DoxyCodeLine{797         \textcolor{keyword}{const} \textcolor{keyword}{auto} diff = std::distance(first, last);}
-\DoxyCodeLine{798  }
-\DoxyCodeLine{799         \textcolor{comment}{// If the range does not reach the end, move elements.}}
-\DoxyCodeLine{800         \textcolor{keywordflow}{if} (last != \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}())}
-\DoxyCodeLine{801         \{}
-\DoxyCodeLine{802             \textcolor{keyword}{auto} tempIt = returnIt;}
-\DoxyCodeLine{803             \textcolor{comment}{// Move elements effectively overwriting the elements to be erased.}}
-\DoxyCodeLine{804             \textcolor{keywordflow}{for} (; tempIt + diff !=  \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(); ++tempIt)}
-\DoxyCodeLine{805             \{}
-\DoxyCodeLine{806                 *tempIt = std::move(*(tempIt + diff));}
-\DoxyCodeLine{807             \}}
-\DoxyCodeLine{808 }
-\DoxyCodeLine{809             \textcolor{keywordflow}{for} (; tempIt != \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(); ++tempIt)}
-\DoxyCodeLine{810             \{}
-\DoxyCodeLine{811                 m\_allocator.destroy(\&*tempIt);}
-\DoxyCodeLine{812             \}}
-\DoxyCodeLine{813         \}}
-\DoxyCodeLine{814         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{815         \{}
-\DoxyCodeLine{816             \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} it = \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ diff; it != \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(); it++)}
-\DoxyCodeLine{817             \{}
-\DoxyCodeLine{818                 m\_allocator.destroy(\&*(it));}
-\DoxyCodeLine{819             \}}
-\DoxyCodeLine{820         \}}
-\DoxyCodeLine{821 }
-\DoxyCodeLine{822         decrement(m\_headIndex, diff);}
-\DoxyCodeLine{823         \textcolor{keywordflow}{return} returnIt;}
-\DoxyCodeLine{824     \}}
-\DoxyCodeLine{825 }
-\DoxyCodeLine{829     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a69a41fdbb783e1acf736ab5b3d154472}{clear}}() noexcept}
-\DoxyCodeLine{830     \{}
-\DoxyCodeLine{831         \textcolor{keywordflow}{for}(; m\_tailIndex < m\_headIndex ; ++m\_tailIndex)}
-\DoxyCodeLine{832         \{}
-\DoxyCodeLine{833             m\_allocator.destroy(\&m\_data[m\_tailIndex]);}
-\DoxyCodeLine{834         \}}
-\DoxyCodeLine{835 }
-\DoxyCodeLine{836         m\_headIndex = 0;}
-\DoxyCodeLine{837         m\_tailIndex = 0;}
-\DoxyCodeLine{838     \}}
-\DoxyCodeLine{839 }
-\DoxyCodeLine{849     \textcolor{keyword}{template} <\textcolor{keyword}{typename} InputIt>}
-\DoxyCodeLine{850     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}{assign}}(InputIt sourceBegin, InputIt sourceEnd)}
-\DoxyCodeLine{851     \{}
-\DoxyCodeLine{852         \mbox{\hyperlink{classring__buffer_a69a41fdbb783e1acf736ab5b3d154472}{clear}}();}
-\DoxyCodeLine{853         \textcolor{keywordflow}{for} (; sourceBegin != sourceEnd; ++sourceBegin)}
-\DoxyCodeLine{854         \{}
-\DoxyCodeLine{855             \mbox{\hyperlink{classring__buffer_a3de0c8df71d288b2948d618bdd930250}{push\_back}}(*sourceBegin);}
-\DoxyCodeLine{856         \}}
-\DoxyCodeLine{857     \}}
-\DoxyCodeLine{858 }
-\DoxyCodeLine{867     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_acf5e7138c98dc161fad55891ec10a35b}{assign}}(std::initializer\_list<T> list)}
-\DoxyCodeLine{868     \{}
-\DoxyCodeLine{869         \mbox{\hyperlink{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}{assign}}(list.begin(), list.end());}
-\DoxyCodeLine{870     \}}
-\DoxyCodeLine{871 }
-\DoxyCodeLine{881     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_aacccdd4522868dc3549ac9c7c0bed128}{assign}}(\textcolor{keyword}{const} size\_type amount, value\_type value)}
-\DoxyCodeLine{882     \{}
-\DoxyCodeLine{883         \mbox{\hyperlink{classring__buffer_a69a41fdbb783e1acf736ab5b3d154472}{clear}}();}
-\DoxyCodeLine{884         \textcolor{keywordflow}{for}(\textcolor{keyword}{auto} i = 0; i < amount; i++)}
-\DoxyCodeLine{885         \{}
-\DoxyCodeLine{886             \mbox{\hyperlink{classring__buffer_a3de0c8df71d288b2948d618bdd930250}{push\_back}}(value);}
-\DoxyCodeLine{887         \}}
-\DoxyCodeLine{888     \}}
-\DoxyCodeLine{889 }
-\DoxyCodeLine{898     \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& \mbox{\hyperlink{classring__buffer_abff7619acabb085c8a582dd02c0737cb}{operator=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& other)}
-\DoxyCodeLine{899     \{}
-\DoxyCodeLine{900         \mbox{\hyperlink{classring__buffer}{ring\_buffer}} copy(other);}
-\DoxyCodeLine{901         copy.\mbox{\hyperlink{classring__buffer_aa53ef9bfdabd3a5e613413b27c66de61}{swap}}(*\textcolor{keyword}{this});}
-\DoxyCodeLine{902         \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
-\DoxyCodeLine{903     \}}
-\DoxyCodeLine{904 }
-\DoxyCodeLine{912     \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& \mbox{\hyperlink{classring__buffer_a3e98268d8b4fc82a786f32c000b78018}{operator=}}(\mbox{\hyperlink{classring__buffer}{ring\_buffer}}\&\& other) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{913     \{}
-\DoxyCodeLine{914         \mbox{\hyperlink{classring__buffer}{ring\_buffer}} copy(std::move(other));}
-\DoxyCodeLine{915         copy.\mbox{\hyperlink{classring__buffer_aa53ef9bfdabd3a5e613413b27c66de61}{swap}}(*\textcolor{keyword}{this});}
-\DoxyCodeLine{916         \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
-\DoxyCodeLine{917     \}}
-\DoxyCodeLine{918 }
-\DoxyCodeLine{926     \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& \mbox{\hyperlink{classring__buffer_ac8b1641644c85ff869a2458ee6e2912f}{operator=}}(std::initializer\_list<T> init)}
-\DoxyCodeLine{927     \{}
-\DoxyCodeLine{928         \mbox{\hyperlink{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}{assign}}(init);}
-\DoxyCodeLine{929         \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
-\DoxyCodeLine{930     \}}
-\DoxyCodeLine{931 }
-\DoxyCodeLine{937     reference \mbox{\hyperlink{classring__buffer_a7c14c9afba67aad502b36653d1bbc2ca}{operator[]}}(\textcolor{keyword}{const} size\_type logicalIndex) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{938     \{}
-\DoxyCodeLine{939         \textcolor{comment}{// If sum of tailIndex (physical first element) and logical index(logical element) is larger than vector capacity, }}
-\DoxyCodeLine{940         \textcolor{comment}{// wrap index around to begin.}}
-\DoxyCodeLine{941         \textcolor{keyword}{auto} index(m\_tailIndex + logicalIndex);}
-\DoxyCodeLine{942 }
-\DoxyCodeLine{943         \textcolor{keywordflow}{if}(m\_capacity <= index)}
-\DoxyCodeLine{944         \{}
-\DoxyCodeLine{945             index = index \% m\_capacity;}
-\DoxyCodeLine{946         \}}
-\DoxyCodeLine{947 }
-\DoxyCodeLine{948         \textcolor{keywordflow}{return} m\_data[index];}
-\DoxyCodeLine{949     \}}
-\DoxyCodeLine{950 }
-\DoxyCodeLine{956     const\_reference \mbox{\hyperlink{classring__buffer_a3bbae1471c094bf84d8f1950a525e513}{operator[]}}(\textcolor{keyword}{const} size\_type logicalIndex) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{957     \{}
-\DoxyCodeLine{958         \textcolor{keyword}{auto} index(m\_tailIndex + logicalIndex);}
-\DoxyCodeLine{959 }
-\DoxyCodeLine{960         \textcolor{comment}{// Adjust real index if buffer has wrapped around the allocated physical memory (head is "{}lower"{} than tail)}}
-\DoxyCodeLine{961         \textcolor{keywordflow}{if}(m\_capacity <= index)}
-\DoxyCodeLine{962         \{}
-\DoxyCodeLine{963             index -\/= m\_capacity;}
-\DoxyCodeLine{964         \}}
-\DoxyCodeLine{965 }
-\DoxyCodeLine{966         \textcolor{keywordflow}{return} m\_data[index];}
-\DoxyCodeLine{967     \}}
-\DoxyCodeLine{968 }
-\DoxyCodeLine{975     reference \mbox{\hyperlink{classring__buffer_a15eb085b3f95fdedb1906f4fb9f22c8f}{at}}(size\_type logicalIndex)}
-\DoxyCodeLine{976     \{}
-\DoxyCodeLine{977         \textcolor{keywordflow}{if}(logicalIndex >= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}())}
-\DoxyCodeLine{978         \{}
-\DoxyCodeLine{979             \textcolor{keywordflow}{throw} std::out\_of\_range(\textcolor{stringliteral}{"{}Index is out of range"{}});}
-\DoxyCodeLine{980         \}}
-\DoxyCodeLine{981 }
-\DoxyCodeLine{982         \textcolor{keyword}{auto} index = m\_tailIndex + logicalIndex;}
-\DoxyCodeLine{983 }
-\DoxyCodeLine{984         \textcolor{keywordflow}{if}(m\_capacity <= index)}
-\DoxyCodeLine{985         \{}
-\DoxyCodeLine{986             index -\/= m\_capacity;}
-\DoxyCodeLine{987         \}}
-\DoxyCodeLine{988         \textcolor{keywordflow}{return} m\_data[index];}
-\DoxyCodeLine{989     \}}
-\DoxyCodeLine{990 }
-\DoxyCodeLine{997     const\_reference \mbox{\hyperlink{classring__buffer_a988f02984769a27167341843f36060a4}{at}}(size\_type logicalIndex)\textcolor{keyword}{ const}}
-\DoxyCodeLine{998 \textcolor{keyword}{    }\{}
-\DoxyCodeLine{999         \textcolor{keywordflow}{if}(logicalIndex >= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}())}
-\DoxyCodeLine{1000         \{}
-\DoxyCodeLine{1001             \textcolor{keywordflow}{throw} std::out\_of\_range(\textcolor{stringliteral}{"{}Index is out of range."{}});}
-\DoxyCodeLine{1002         \}}
+\DoxyCodeLine{797 }
+\DoxyCodeLine{798         \textcolor{comment}{// Last element is always destroyed.}}
+\DoxyCodeLine{799         m\_allocator.destroy(\&*(\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ 1));}
+\DoxyCodeLine{800         decrement(m\_headIndex);}
+\DoxyCodeLine{801 }
+\DoxyCodeLine{802         \textcolor{keywordflow}{return} returnIt;}
+\DoxyCodeLine{803     \}}
+\DoxyCodeLine{804 }
+\DoxyCodeLine{813     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a36c5e76881f854c9083ae3ea0083a3ea}{erase}}(\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} first, \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} last)}
+\DoxyCodeLine{814     \{}
+\DoxyCodeLine{815         \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} returnIt(\textcolor{keyword}{this}, first.\mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator_ab0f1a501ae692d6dd7891bf73d1e2a8f}{getIndex}}());}
+\DoxyCodeLine{816 }
+\DoxyCodeLine{817         \textcolor{keyword}{const} \textcolor{keyword}{auto} diff = std::distance(first, last);}
+\DoxyCodeLine{818  }
+\DoxyCodeLine{819         \textcolor{comment}{// If the range does not reach the end, move elements.}}
+\DoxyCodeLine{820         \textcolor{keywordflow}{if} (last != \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}())}
+\DoxyCodeLine{821         \{}
+\DoxyCodeLine{822             \textcolor{keyword}{auto} tempIt = returnIt;}
+\DoxyCodeLine{823             \textcolor{comment}{// Move elements effectively overwriting the elements to be erased.}}
+\DoxyCodeLine{824             \textcolor{keywordflow}{for} (; tempIt + diff !=  \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(); ++tempIt)}
+\DoxyCodeLine{825             \{}
+\DoxyCodeLine{826                 *tempIt = std::move(*(tempIt + diff));}
+\DoxyCodeLine{827             \}}
+\DoxyCodeLine{828 }
+\DoxyCodeLine{829             \textcolor{keywordflow}{for} (; tempIt != \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(); ++tempIt)}
+\DoxyCodeLine{830             \{}
+\DoxyCodeLine{831                 m\_allocator.destroy(\&*tempIt);}
+\DoxyCodeLine{832             \}}
+\DoxyCodeLine{833         \}}
+\DoxyCodeLine{834         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{835         \{}
+\DoxyCodeLine{836             \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} it = \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ diff; it != \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(); it++)}
+\DoxyCodeLine{837             \{}
+\DoxyCodeLine{838                 m\_allocator.destroy(\&*(it));}
+\DoxyCodeLine{839             \}}
+\DoxyCodeLine{840         \}}
+\DoxyCodeLine{841 }
+\DoxyCodeLine{842         decrement(m\_headIndex, diff);}
+\DoxyCodeLine{843         \textcolor{keywordflow}{return} returnIt;}
+\DoxyCodeLine{844     \}}
+\DoxyCodeLine{845 }
+\DoxyCodeLine{849     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a69a41fdbb783e1acf736ab5b3d154472}{clear}}() noexcept}
+\DoxyCodeLine{850     \{}
+\DoxyCodeLine{851         \textcolor{keywordflow}{for}(; m\_tailIndex < m\_headIndex ; ++m\_tailIndex)}
+\DoxyCodeLine{852         \{}
+\DoxyCodeLine{853             m\_allocator.destroy(\&m\_data[m\_tailIndex]);}
+\DoxyCodeLine{854         \}}
+\DoxyCodeLine{855 }
+\DoxyCodeLine{856         m\_headIndex = 0;}
+\DoxyCodeLine{857         m\_tailIndex = 0;}
+\DoxyCodeLine{858     \}}
+\DoxyCodeLine{859 }
+\DoxyCodeLine{869     \textcolor{keyword}{template} <\textcolor{keyword}{typename} InputIt>}
+\DoxyCodeLine{870     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}{assign}}(InputIt sourceBegin, InputIt sourceEnd)}
+\DoxyCodeLine{871     \{}
+\DoxyCodeLine{872         \mbox{\hyperlink{classring__buffer_a69a41fdbb783e1acf736ab5b3d154472}{clear}}();}
+\DoxyCodeLine{873         \textcolor{keywordflow}{for} (; sourceBegin != sourceEnd; ++sourceBegin)}
+\DoxyCodeLine{874         \{}
+\DoxyCodeLine{875             \mbox{\hyperlink{classring__buffer_a3de0c8df71d288b2948d618bdd930250}{push\_back}}(*sourceBegin);}
+\DoxyCodeLine{876         \}}
+\DoxyCodeLine{877     \}}
+\DoxyCodeLine{878 }
+\DoxyCodeLine{887     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_acf5e7138c98dc161fad55891ec10a35b}{assign}}(std::initializer\_list<T> list)}
+\DoxyCodeLine{888     \{}
+\DoxyCodeLine{889         \mbox{\hyperlink{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}{assign}}(list.begin(), list.end());}
+\DoxyCodeLine{890     \}}
+\DoxyCodeLine{891 }
+\DoxyCodeLine{901     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_aacccdd4522868dc3549ac9c7c0bed128}{assign}}(\textcolor{keyword}{const} size\_type amount, value\_type value)}
+\DoxyCodeLine{902     \{}
+\DoxyCodeLine{903         \mbox{\hyperlink{classring__buffer_a69a41fdbb783e1acf736ab5b3d154472}{clear}}();}
+\DoxyCodeLine{904         \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i < amount; i++)}
+\DoxyCodeLine{905         \{}
+\DoxyCodeLine{906             \mbox{\hyperlink{classring__buffer_a3de0c8df71d288b2948d618bdd930250}{push\_back}}(value);}
+\DoxyCodeLine{907         \}}
+\DoxyCodeLine{908     \}}
+\DoxyCodeLine{909 }
+\DoxyCodeLine{918     \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& \mbox{\hyperlink{classring__buffer_abff7619acabb085c8a582dd02c0737cb}{operator=}}(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& other)}
+\DoxyCodeLine{919     \{}
+\DoxyCodeLine{920         \mbox{\hyperlink{classring__buffer}{ring\_buffer}} copy(other);}
+\DoxyCodeLine{921         copy.\mbox{\hyperlink{classring__buffer_aa53ef9bfdabd3a5e613413b27c66de61}{swap}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{922         \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{923     \}}
+\DoxyCodeLine{924 }
+\DoxyCodeLine{932     \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& \mbox{\hyperlink{classring__buffer_a3e98268d8b4fc82a786f32c000b78018}{operator=}}(\mbox{\hyperlink{classring__buffer}{ring\_buffer}}\&\& other) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{933     \{}
+\DoxyCodeLine{934         \mbox{\hyperlink{classring__buffer}{ring\_buffer}} copy(std::move(other));}
+\DoxyCodeLine{935         copy.\mbox{\hyperlink{classring__buffer_aa53ef9bfdabd3a5e613413b27c66de61}{swap}}(*\textcolor{keyword}{this});}
+\DoxyCodeLine{936         \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{937     \}}
+\DoxyCodeLine{938 }
+\DoxyCodeLine{946     \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& \mbox{\hyperlink{classring__buffer_ac8b1641644c85ff869a2458ee6e2912f}{operator=}}(std::initializer\_list<T> init)}
+\DoxyCodeLine{947     \{}
+\DoxyCodeLine{948         \mbox{\hyperlink{classring__buffer_a2ff5b379f041a4f7ff1cfc8a2a8f69c5}{assign}}(init);}
+\DoxyCodeLine{949         \textcolor{keywordflow}{return} *\textcolor{keyword}{this};}
+\DoxyCodeLine{950     \}}
+\DoxyCodeLine{951 }
+\DoxyCodeLine{957     reference \mbox{\hyperlink{classring__buffer_a7c14c9afba67aad502b36653d1bbc2ca}{operator[]}}(\textcolor{keyword}{const} size\_type logicalIndex) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{958     \{}
+\DoxyCodeLine{959         \textcolor{comment}{// If sum of tailIndex (physical first element) and logical index(logical element) is larger than vector capacity, }}
+\DoxyCodeLine{960         \textcolor{comment}{// wrap index around to begin.}}
+\DoxyCodeLine{961         \textcolor{keyword}{auto} index(m\_tailIndex + logicalIndex);}
+\DoxyCodeLine{962 }
+\DoxyCodeLine{963         \textcolor{keywordflow}{if}(m\_capacity <= index)}
+\DoxyCodeLine{964         \{}
+\DoxyCodeLine{965             index -\/= m\_capacity;}
+\DoxyCodeLine{966         \}}
+\DoxyCodeLine{967 }
+\DoxyCodeLine{968         \textcolor{keywordflow}{return} m\_data[index];}
+\DoxyCodeLine{969     \}}
+\DoxyCodeLine{970 }
+\DoxyCodeLine{976     const\_reference \mbox{\hyperlink{classring__buffer_a3bbae1471c094bf84d8f1950a525e513}{operator[]}}(\textcolor{keyword}{const} size\_type logicalIndex) \textcolor{keyword}{const} \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{977     \{}
+\DoxyCodeLine{978         \textcolor{keyword}{auto} index(m\_tailIndex + logicalIndex);}
+\DoxyCodeLine{979 }
+\DoxyCodeLine{980         \textcolor{comment}{// Adjust real index if buffer has wrapped around the allocated physical memory (head is "{}lower"{} than tail)}}
+\DoxyCodeLine{981         \textcolor{keywordflow}{if}(m\_capacity <= index)}
+\DoxyCodeLine{982         \{}
+\DoxyCodeLine{983             index -\/= m\_capacity;}
+\DoxyCodeLine{984         \}}
+\DoxyCodeLine{985 }
+\DoxyCodeLine{986         \textcolor{keywordflow}{return} m\_data[index];}
+\DoxyCodeLine{987     \}}
+\DoxyCodeLine{988 }
+\DoxyCodeLine{995     reference \mbox{\hyperlink{classring__buffer_a15eb085b3f95fdedb1906f4fb9f22c8f}{at}}(size\_type logicalIndex)}
+\DoxyCodeLine{996     \{}
+\DoxyCodeLine{997         \textcolor{keywordflow}{if}(logicalIndex >= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}())}
+\DoxyCodeLine{998         \{}
+\DoxyCodeLine{999             \textcolor{keywordflow}{throw} std::out\_of\_range(\textcolor{stringliteral}{"{}Index is out of range"{}});}
+\DoxyCodeLine{1000         \}}
+\DoxyCodeLine{1001 }
+\DoxyCodeLine{1002         \textcolor{keyword}{auto} index = m\_tailIndex + logicalIndex;}
 \DoxyCodeLine{1003 }
-\DoxyCodeLine{1004         \textcolor{keyword}{auto} index(m\_tailIndex + logicalIndex);}
-\DoxyCodeLine{1005         \textcolor{keywordflow}{if}(m\_capacity <= index)}
-\DoxyCodeLine{1006         \{}
-\DoxyCodeLine{1007             index -\/= m\_capacity;}
-\DoxyCodeLine{1008         \}}
-\DoxyCodeLine{1009         \textcolor{keywordflow}{return} m\_data[index];}
-\DoxyCodeLine{1010     \}}
-\DoxyCodeLine{1011 }
-\DoxyCodeLine{1015     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_aa53ef9bfdabd3a5e613413b27c66de61}{swap}}(\mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& other) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{1016     \{}
-\DoxyCodeLine{1017         \textcolor{keyword}{using }std::swap;}
-\DoxyCodeLine{1018         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_data, other.m\_data);}
-\DoxyCodeLine{1019         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_headIndex, other.m\_headIndex);}
-\DoxyCodeLine{1020         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_tailIndex, other.m\_tailIndex);}
-\DoxyCodeLine{1021         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_capacity, other.m\_capacity);}
-\DoxyCodeLine{1022         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_allocator, other.m\_allocator);}
+\DoxyCodeLine{1004         \textcolor{keywordflow}{if}(m\_capacity <= index)}
+\DoxyCodeLine{1005         \{}
+\DoxyCodeLine{1006             index -\/= m\_capacity;}
+\DoxyCodeLine{1007         \}}
+\DoxyCodeLine{1008         \textcolor{keywordflow}{return} m\_data[index];}
+\DoxyCodeLine{1009     \}}
+\DoxyCodeLine{1010 }
+\DoxyCodeLine{1017     const\_reference \mbox{\hyperlink{classring__buffer_a988f02984769a27167341843f36060a4}{at}}(size\_type logicalIndex)\textcolor{keyword}{ const}}
+\DoxyCodeLine{1018 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{1019         \textcolor{keywordflow}{if}(logicalIndex >= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}())}
+\DoxyCodeLine{1020         \{}
+\DoxyCodeLine{1021             \textcolor{keywordflow}{throw} std::out\_of\_range(\textcolor{stringliteral}{"{}Index is out of range."{}});}
+\DoxyCodeLine{1022         \}}
 \DoxyCodeLine{1023 }
-\DoxyCodeLine{1024     \}}
-\DoxyCodeLine{1025 }
-\DoxyCodeLine{1030     \textcolor{keyword}{friend} \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(\mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& a, \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& b) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{1031     \{}
-\DoxyCodeLine{1032         a.swap(b);}
-\DoxyCodeLine{1033     \}}
-\DoxyCodeLine{1034 }
-\DoxyCodeLine{1043     pointer \mbox{\hyperlink{classring__buffer_a5b078b39ae40a0c1bc0b4e60a81f67ac}{data}}()}
-\DoxyCodeLine{1044     \{}
-\DoxyCodeLine{1045         \textcolor{keywordflow}{if}(!\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}())}
-\DoxyCodeLine{1046         \{}
-\DoxyCodeLine{1047             \textcolor{keywordflow}{return} m\_data;}
-\DoxyCodeLine{1048         \}}
-\DoxyCodeLine{1049 }
-\DoxyCodeLine{1050         \textcolor{comment}{// Data pointer for "{}do stuff and swap"{} idiom to provide strong excepion guarantee.}}
-\DoxyCodeLine{1051         \textcolor{keyword}{auto} tempData = m\_allocator.allocate(m\_capacity);}
-\DoxyCodeLine{1052 }
-\DoxyCodeLine{1053         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}(); i++)}
-\DoxyCodeLine{1054         \{}
-\DoxyCodeLine{1055             m\_allocator.construct(tempData + i, std::move(this-\/>\textcolor{keyword}{operator}[](i)));}
-\DoxyCodeLine{1056             m\_allocator.destroy(\&this-\/>\textcolor{keyword}{operator}[](i));}
-\DoxyCodeLine{1057         \}}
-\DoxyCodeLine{1058 }
-\DoxyCodeLine{1059         m\_allocator.deallocate(m\_data, \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}());}
-\DoxyCodeLine{1060 }
-\DoxyCodeLine{1061         \textcolor{comment}{// If memory was allocated, the buffer matches beginning of physical memory.}}
-\DoxyCodeLine{1062         m\_headIndex = \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}();}
-\DoxyCodeLine{1063         m\_tailIndex = 0;}
-\DoxyCodeLine{1064 }
-\DoxyCodeLine{1065         \textcolor{comment}{// Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.}}
-\DoxyCodeLine{1066         std::swap(tempData, m\_data);}
-\DoxyCodeLine{1067 }
-\DoxyCodeLine{1068         \textcolor{keywordflow}{return} m\_data;}
-\DoxyCodeLine{1069     \}}
-\DoxyCodeLine{1070 }
-\DoxyCodeLine{1074     size\_type \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() const noexcept}
-\DoxyCodeLine{1075     \{}
-\DoxyCodeLine{1076         \textcolor{keywordflow}{if}(m\_headIndex < m\_tailIndex)}
-\DoxyCodeLine{1077         \{}
-\DoxyCodeLine{1078             \textcolor{keywordflow}{return} m\_headIndex + m\_capacity -\/ m\_tailIndex;}
-\DoxyCodeLine{1079         \}}
+\DoxyCodeLine{1024         \textcolor{keyword}{auto} index(m\_tailIndex + logicalIndex);}
+\DoxyCodeLine{1025         \textcolor{keywordflow}{if}(m\_capacity <= index)}
+\DoxyCodeLine{1026         \{}
+\DoxyCodeLine{1027             index -\/= m\_capacity;}
+\DoxyCodeLine{1028         \}}
+\DoxyCodeLine{1029         \textcolor{keywordflow}{return} m\_data[index];}
+\DoxyCodeLine{1030     \}}
+\DoxyCodeLine{1031 }
+\DoxyCodeLine{1035     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_aa53ef9bfdabd3a5e613413b27c66de61}{swap}}(\mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& other) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{1036     \{}
+\DoxyCodeLine{1037         \textcolor{keyword}{using }std::swap;}
+\DoxyCodeLine{1038         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_data, other.m\_data);}
+\DoxyCodeLine{1039         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_headIndex, other.m\_headIndex);}
+\DoxyCodeLine{1040         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_tailIndex, other.m\_tailIndex);}
+\DoxyCodeLine{1041         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_capacity, other.m\_capacity);}
+\DoxyCodeLine{1042         \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(m\_allocator, other.m\_allocator);}
+\DoxyCodeLine{1043 }
+\DoxyCodeLine{1044     \}}
+\DoxyCodeLine{1045 }
+\DoxyCodeLine{1050     \textcolor{keyword}{friend} \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(\mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& a, \mbox{\hyperlink{classring__buffer}{ring\_buffer}}\& b) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{1051     \{}
+\DoxyCodeLine{1052         a.swap(b);}
+\DoxyCodeLine{1053     \}}
+\DoxyCodeLine{1054 }
+\DoxyCodeLine{1063     pointer \mbox{\hyperlink{classring__buffer_a5b078b39ae40a0c1bc0b4e60a81f67ac}{data}}()}
+\DoxyCodeLine{1064     \{}
+\DoxyCodeLine{1065         \textcolor{keywordflow}{if}(!\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}())}
+\DoxyCodeLine{1066         \{}
+\DoxyCodeLine{1067             \textcolor{keywordflow}{return} m\_data;}
+\DoxyCodeLine{1068         \}}
+\DoxyCodeLine{1069 }
+\DoxyCodeLine{1070         \textcolor{comment}{// Data pointer for "{}do stuff and swap"{} idiom to provide strong excepion guarantee.}}
+\DoxyCodeLine{1071         \textcolor{keyword}{auto} tempData = m\_allocator.allocate(m\_capacity);}
+\DoxyCodeLine{1072 }
+\DoxyCodeLine{1073         \textcolor{keywordflow}{for} (\textcolor{keywordtype}{size\_t} i = 0; i < \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}(); i++)}
+\DoxyCodeLine{1074         \{}
+\DoxyCodeLine{1075             m\_allocator.construct(tempData + i, std::move(this-\/>\textcolor{keyword}{operator}[](i)));}
+\DoxyCodeLine{1076             m\_allocator.destroy(\&this-\/>\textcolor{keyword}{operator}[](i));}
+\DoxyCodeLine{1077         \}}
+\DoxyCodeLine{1078 }
+\DoxyCodeLine{1079         m\_allocator.deallocate(m\_data, \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}());}
 \DoxyCodeLine{1080 }
-\DoxyCodeLine{1081         \textcolor{keywordflow}{return} m\_headIndex -\/ m\_tailIndex;}
-\DoxyCodeLine{1082     \}}
-\DoxyCodeLine{1083 }
-\DoxyCodeLine{1085     size\_type \mbox{\hyperlink{classring__buffer_a09435a2152f9b680154e1e51e4472787}{max\_size}}() const noexcept}
-\DoxyCodeLine{1086     \{}
-\DoxyCodeLine{1087         \textcolor{keyword}{constexpr} \textcolor{keyword}{auto} maxSize = std::numeric\_limits<std::size\_t>::max();}
-\DoxyCodeLine{1088         \textcolor{keywordflow}{return} maxSize / \textcolor{keyword}{sizeof}(T);}
+\DoxyCodeLine{1081         \textcolor{comment}{// If memory was allocated, the buffer matches beginning of physical memory.}}
+\DoxyCodeLine{1082         m\_headIndex = \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}();}
+\DoxyCodeLine{1083         m\_tailIndex = 0;}
+\DoxyCodeLine{1084 }
+\DoxyCodeLine{1085         \textcolor{comment}{// Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.}}
+\DoxyCodeLine{1086         std::swap(tempData, m\_data);}
+\DoxyCodeLine{1087 }
+\DoxyCodeLine{1088         \textcolor{keywordflow}{return} m\_data;}
 \DoxyCodeLine{1089     \}}
 \DoxyCodeLine{1090 }
-\DoxyCodeLine{1094     size\_type \mbox{\hyperlink{classring__buffer_aeb98388fa6ae8a7a86e968d95534c8fd}{capacity}}() const noexcept}
+\DoxyCodeLine{1094     size\_type \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() const noexcept}
 \DoxyCodeLine{1095     \{}
-\DoxyCodeLine{1096         \textcolor{keywordflow}{return} m\_capacity;}
-\DoxyCodeLine{1097     \}}
-\DoxyCodeLine{1098 }
-\DoxyCodeLine{1102     allocator\_type \mbox{\hyperlink{classring__buffer_a527ba7169a95db0c12da90173963c2f9}{get\_allocator}}() const noexcept}
-\DoxyCodeLine{1103     \{}
-\DoxyCodeLine{1104         \textcolor{keywordflow}{return} m\_allocator;}
-\DoxyCodeLine{1105     \}}
-\DoxyCodeLine{1106 }
-\DoxyCodeLine{1110     \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_aa8e1113807a6554022cee5af36d3e1f0}{empty}}() const noexcept}
-\DoxyCodeLine{1111     \{}
-\DoxyCodeLine{1112         \textcolor{keywordflow}{return} m\_tailIndex == m\_headIndex;}
-\DoxyCodeLine{1113     \}}
-\DoxyCodeLine{1114 }
-\DoxyCodeLine{1123     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}{reserve}}(size\_type newCapacity, \textcolor{keywordtype}{bool} enableShrink = \textcolor{keyword}{false})}
-\DoxyCodeLine{1124     \{}
-\DoxyCodeLine{1125         \textcolor{keywordflow}{if} (!enableShrink)}
-\DoxyCodeLine{1126         \{}
-\DoxyCodeLine{1127             \textcolor{keywordflow}{if} (newCapacity <= m\_capacity) \textcolor{keywordflow}{return};}
-\DoxyCodeLine{1128         \}}
-\DoxyCodeLine{1129         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{1130         \{}
-\DoxyCodeLine{1131             \textcolor{keywordflow}{if} (newCapacity < \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() ) \textcolor{keywordflow}{return};}
-\DoxyCodeLine{1132         \}}
-\DoxyCodeLine{1133 }
-\DoxyCodeLine{1134         \textcolor{comment}{// Temp for "{}copy and swap"{} idiom to exception safe operation.}}
-\DoxyCodeLine{1135         \textcolor{keyword}{auto} temp = \mbox{\hyperlink{classring__buffer}{ring\_buffer<T, allocator\_type>}}(newCapacity);}
+\DoxyCodeLine{1096         \textcolor{keywordflow}{if}(m\_headIndex < m\_tailIndex)}
+\DoxyCodeLine{1097         \{}
+\DoxyCodeLine{1098             \textcolor{keywordflow}{return} m\_headIndex + m\_capacity -\/ m\_tailIndex;}
+\DoxyCodeLine{1099         \}}
+\DoxyCodeLine{1100 }
+\DoxyCodeLine{1101         \textcolor{keywordflow}{return} m\_headIndex -\/ m\_tailIndex;}
+\DoxyCodeLine{1102     \}}
+\DoxyCodeLine{1103 }
+\DoxyCodeLine{1107     size\_type \mbox{\hyperlink{classring__buffer_a09435a2152f9b680154e1e51e4472787}{max\_size}}() const noexcept}
+\DoxyCodeLine{1108     \{}
+\DoxyCodeLine{1109         \textcolor{keyword}{constexpr} \textcolor{keyword}{auto} maxSize = std::numeric\_limits<std::size\_t>::max();}
+\DoxyCodeLine{1110         \textcolor{keywordflow}{return} maxSize / \textcolor{keyword}{sizeof}(T);}
+\DoxyCodeLine{1111     \}}
+\DoxyCodeLine{1112 }
+\DoxyCodeLine{1116     size\_type \mbox{\hyperlink{classring__buffer_aeb98388fa6ae8a7a86e968d95534c8fd}{capacity}}() const noexcept}
+\DoxyCodeLine{1117     \{}
+\DoxyCodeLine{1118         \textcolor{keywordflow}{return} m\_capacity;}
+\DoxyCodeLine{1119     \}}
+\DoxyCodeLine{1120 }
+\DoxyCodeLine{1124     allocator\_type \mbox{\hyperlink{classring__buffer_a527ba7169a95db0c12da90173963c2f9}{get\_allocator}}() const noexcept}
+\DoxyCodeLine{1125     \{}
+\DoxyCodeLine{1126         \textcolor{keywordflow}{return} m\_allocator;}
+\DoxyCodeLine{1127     \}}
+\DoxyCodeLine{1128 }
+\DoxyCodeLine{1132     \textcolor{keywordtype}{bool} \mbox{\hyperlink{classring__buffer_aa8e1113807a6554022cee5af36d3e1f0}{empty}}() const noexcept}
+\DoxyCodeLine{1133     \{}
+\DoxyCodeLine{1134         \textcolor{keywordflow}{return} m\_tailIndex == m\_headIndex;}
+\DoxyCodeLine{1135     \}}
 \DoxyCodeLine{1136 }
-\DoxyCodeLine{1137         temp.assign(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}(), \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
-\DoxyCodeLine{1138 }
-\DoxyCodeLine{1139         \textcolor{comment}{// Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.}}
-\DoxyCodeLine{1140         this-\/>\mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(temp);}
-\DoxyCodeLine{1141     \}}
-\DoxyCodeLine{1142 }
-\DoxyCodeLine{1149     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a8c31052b14b558f6656dd06dc6f00436}{push\_front}}(value\_type val)}
-\DoxyCodeLine{1150     \{}
-\DoxyCodeLine{1151         validateCapacity(1);}
-\DoxyCodeLine{1152 }
-\DoxyCodeLine{1153         \textcolor{comment}{// Decrement temporary index in case constructor throws to retain invariants (elements of the buffer are always initialized).}}
-\DoxyCodeLine{1154         \textcolor{keyword}{auto} newIndex = m\_tailIndex;}
-\DoxyCodeLine{1155         decrement(newIndex);}
-\DoxyCodeLine{1156         m\_allocator.construct(\&m\_data[newIndex], val);}
-\DoxyCodeLine{1157         m\_tailIndex = newIndex;}
-\DoxyCodeLine{1158     \}}
-\DoxyCodeLine{1159 }
-\DoxyCodeLine{1167     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_ab2d27891d77e19442f1d8acaa26b11ee}{push\_front}}(value\_type\&\& val)}
-\DoxyCodeLine{1168     \{}
-\DoxyCodeLine{1169         validateCapacity(1);}
-\DoxyCodeLine{1170 }
-\DoxyCodeLine{1171         \textcolor{comment}{// Decrement temporary index incase constructor throws to retain invariants (elements of the buffer are always initialized).}}
-\DoxyCodeLine{1172         \textcolor{keyword}{auto} newIndex = m\_tailIndex;}
-\DoxyCodeLine{1173         decrement(newIndex);}
-\DoxyCodeLine{1174         m\_allocator.construct(\&m\_data[newIndex], std::forward(val));}
-\DoxyCodeLine{1175         m\_tailIndex = newIndex;}
-\DoxyCodeLine{1176     \}}
-\DoxyCodeLine{1177 }
-\DoxyCodeLine{1186     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a3de0c8df71d288b2948d618bdd930250}{push\_back}}(\textcolor{keyword}{const} value\_type\& val)}
-\DoxyCodeLine{1187     \{}
-\DoxyCodeLine{1188         validateCapacity(1);}
-\DoxyCodeLine{1189 }
-\DoxyCodeLine{1190         m\_allocator.construct(\&m\_data[m\_headIndex], val);}
-\DoxyCodeLine{1191         increment(m\_headIndex);}
-\DoxyCodeLine{1192     \}}
-\DoxyCodeLine{1193 }
-\DoxyCodeLine{1202     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a7d8ed70b4ef81563f9e8d349f256d84c}{push\_back}}(value\_type\&\& val)}
-\DoxyCodeLine{1203     \{}
-\DoxyCodeLine{1204         validateCapacity(1);}
-\DoxyCodeLine{1205     }
-\DoxyCodeLine{1206         m\_allocator.construct(\&m\_data[m\_headIndex], std::forward<value\_type>(val));}
-\DoxyCodeLine{1207         increment(m\_headIndex);}
-\DoxyCodeLine{1208     \}}
-\DoxyCodeLine{1209 }
-\DoxyCodeLine{1214     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_aef28bc848394b3bc6a1dea129dbb412f}{pop\_front}}() noexcept}
-\DoxyCodeLine{1215     \{}
-\DoxyCodeLine{1216         m\_allocator.destroy(\&m\_data[m\_tailIndex]);}
-\DoxyCodeLine{1217         increment(m\_tailIndex);}
-\DoxyCodeLine{1218     \}}
-\DoxyCodeLine{1219 }
-\DoxyCodeLine{1224     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_ad1c703f9814872877775d2a5c2fef243}{pop\_back}}() noexcept}
-\DoxyCodeLine{1225     \{}
-\DoxyCodeLine{1226 }
-\DoxyCodeLine{1227         decrement(m\_headIndex);}
-\DoxyCodeLine{1228         m\_allocator.destroy(\&m\_data[m\_headIndex]);}
-\DoxyCodeLine{1229 }
-\DoxyCodeLine{1230     \}}
-\DoxyCodeLine{1231 }
-\DoxyCodeLine{1239     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a4404cf478938dc61b93a963581bd2f3a}{shrink\_to\_fit}}()}
-\DoxyCodeLine{1240     \{}
-\DoxyCodeLine{1241         \textcolor{keywordflow}{if} (m\_capacity <= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() + 2)}
-\DoxyCodeLine{1242         \{ }
-\DoxyCodeLine{1243             \textcolor{keywordflow}{return};}
-\DoxyCodeLine{1244         \}}
-\DoxyCodeLine{1245 }
-\DoxyCodeLine{1246         \mbox{\hyperlink{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}{reserve}}(\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}(), \textcolor{keyword}{true});}
-\DoxyCodeLine{1247     \}}
-\DoxyCodeLine{1248 }
-\DoxyCodeLine{1249 \textcolor{comment}{//===========================================================}}
-\DoxyCodeLine{1250 \textcolor{comment}{//  std::queue adaptor functions}}
-\DoxyCodeLine{1251 \textcolor{comment}{//===========================================================}}
-\DoxyCodeLine{1252 }
-\DoxyCodeLine{1256     reference \mbox{\hyperlink{classring__buffer_a6dee6af7622eafe9662e32f10d78b6b6}{front}}() noexcept}
-\DoxyCodeLine{1257     \{}
-\DoxyCodeLine{1258         \textcolor{keywordflow}{return} m\_data[m\_tailIndex];}
-\DoxyCodeLine{1259     \}}
-\DoxyCodeLine{1260 }
-\DoxyCodeLine{1264     const\_reference \mbox{\hyperlink{classring__buffer_a96289837a2a156411bddba7f214cce3a}{front}}() const noexcept}
-\DoxyCodeLine{1265     \{}
-\DoxyCodeLine{1266         \textcolor{keywordflow}{return} m\_data[m\_tailIndex];}
-\DoxyCodeLine{1267     \}}
+\DoxyCodeLine{1145     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}{reserve}}(size\_type newCapacity, \textcolor{keywordtype}{bool} enableShrink = \textcolor{keyword}{false})}
+\DoxyCodeLine{1146     \{}
+\DoxyCodeLine{1147         \textcolor{keywordflow}{if} (!enableShrink)}
+\DoxyCodeLine{1148         \{}
+\DoxyCodeLine{1149             \textcolor{keywordflow}{if} (newCapacity <= m\_capacity) \textcolor{keywordflow}{return};}
+\DoxyCodeLine{1150         \}}
+\DoxyCodeLine{1151         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1152         \{}
+\DoxyCodeLine{1153             \textcolor{keywordflow}{if} (newCapacity < \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() ) \textcolor{keywordflow}{return};}
+\DoxyCodeLine{1154         \}}
+\DoxyCodeLine{1155 }
+\DoxyCodeLine{1156         \textcolor{comment}{// Temp for "{}copy and swap"{} idiom to exception safe operation.}}
+\DoxyCodeLine{1157         \textcolor{keyword}{auto} temp = \mbox{\hyperlink{classring__buffer}{ring\_buffer<T, allocator\_type>}}(newCapacity);}
+\DoxyCodeLine{1158 }
+\DoxyCodeLine{1159         temp.assign(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}(), \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
+\DoxyCodeLine{1160 }
+\DoxyCodeLine{1161         \textcolor{comment}{// Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.}}
+\DoxyCodeLine{1162         this-\/>\mbox{\hyperlink{classring__buffer_a15bc4c9d1486b1fcd9b8c5f7956b3d4c}{swap}}(temp);}
+\DoxyCodeLine{1163     \}}
+\DoxyCodeLine{1164 }
+\DoxyCodeLine{1171     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a4bed0fe915650f882f772d022f89bc0b}{push\_front}}(\textcolor{keyword}{const} value\_type\& val)}
+\DoxyCodeLine{1172     \{}
+\DoxyCodeLine{1173         validateCapacity(1);}
+\DoxyCodeLine{1174 }
+\DoxyCodeLine{1175         \textcolor{comment}{// Decrement temporary index in case constructor throws to retain invariants (elements of the buffer are always initialized).}}
+\DoxyCodeLine{1176         \textcolor{keyword}{auto} newIndex = m\_tailIndex;}
+\DoxyCodeLine{1177         decrement(newIndex);}
+\DoxyCodeLine{1178         m\_allocator.construct(\&m\_data[newIndex], val);}
+\DoxyCodeLine{1179         m\_tailIndex = newIndex;}
+\DoxyCodeLine{1180     \}}
+\DoxyCodeLine{1181 }
+\DoxyCodeLine{1189     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_ab2d27891d77e19442f1d8acaa26b11ee}{push\_front}}(value\_type\&\& val)}
+\DoxyCodeLine{1190     \{}
+\DoxyCodeLine{1191         validateCapacity(1);}
+\DoxyCodeLine{1192 }
+\DoxyCodeLine{1193         \textcolor{comment}{// Decrement temporary index incase constructor throws to retain invariants (elements of the buffer are always initialized).}}
+\DoxyCodeLine{1194         \textcolor{keyword}{auto} newIndex = m\_tailIndex;}
+\DoxyCodeLine{1195         decrement(newIndex);}
+\DoxyCodeLine{1196         m\_allocator.construct(\&m\_data[newIndex], std::forward<value\_type>(val));}
+\DoxyCodeLine{1197         m\_tailIndex = newIndex;}
+\DoxyCodeLine{1198     \}}
+\DoxyCodeLine{1199 }
+\DoxyCodeLine{1209     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a3de0c8df71d288b2948d618bdd930250}{push\_back}}(\textcolor{keyword}{const} value\_type\& val)}
+\DoxyCodeLine{1210     \{}
+\DoxyCodeLine{1211         validateCapacity(1);}
+\DoxyCodeLine{1212 }
+\DoxyCodeLine{1213         m\_allocator.construct(\&m\_data[m\_headIndex], val);}
+\DoxyCodeLine{1214         increment(m\_headIndex);}
+\DoxyCodeLine{1215     \}}
+\DoxyCodeLine{1216 }
+\DoxyCodeLine{1225     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a7d8ed70b4ef81563f9e8d349f256d84c}{push\_back}}(value\_type\&\& val)}
+\DoxyCodeLine{1226     \{}
+\DoxyCodeLine{1227         validateCapacity(1);}
+\DoxyCodeLine{1228     }
+\DoxyCodeLine{1229         m\_allocator.construct(\&m\_data[m\_headIndex], std::forward<value\_type>(val));}
+\DoxyCodeLine{1230         increment(m\_headIndex);}
+\DoxyCodeLine{1231     \}}
+\DoxyCodeLine{1232 }
+\DoxyCodeLine{1237     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_aef28bc848394b3bc6a1dea129dbb412f}{pop\_front}}() noexcept}
+\DoxyCodeLine{1238     \{}
+\DoxyCodeLine{1239         m\_allocator.destroy(\&m\_data[m\_tailIndex]);}
+\DoxyCodeLine{1240         increment(m\_tailIndex);}
+\DoxyCodeLine{1241     \}}
+\DoxyCodeLine{1242 }
+\DoxyCodeLine{1247     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_ad1c703f9814872877775d2a5c2fef243}{pop\_back}}() noexcept}
+\DoxyCodeLine{1248     \{}
+\DoxyCodeLine{1249         decrement(m\_headIndex);}
+\DoxyCodeLine{1250         m\_allocator.destroy(\&m\_data[m\_headIndex]);}
+\DoxyCodeLine{1251 }
+\DoxyCodeLine{1252     \}}
+\DoxyCodeLine{1253 }
+\DoxyCodeLine{1261     \textcolor{keywordtype}{void} \mbox{\hyperlink{classring__buffer_a4404cf478938dc61b93a963581bd2f3a}{shrink\_to\_fit}}()}
+\DoxyCodeLine{1262     \{}
+\DoxyCodeLine{1263         \textcolor{comment}{// Reserve would allocate size + 2 elements, so no point in shrinking if buffer is smaller than that.}}
+\DoxyCodeLine{1264         \textcolor{keywordflow}{if} (m\_capacity <= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() + 2)}
+\DoxyCodeLine{1265         \{ }
+\DoxyCodeLine{1266             \textcolor{keywordflow}{return};}
+\DoxyCodeLine{1267         \}}
 \DoxyCodeLine{1268 }
-\DoxyCodeLine{1272     reference \mbox{\hyperlink{classring__buffer_ae7ca98342bbe89dd9aba19838cb7b407}{back}}() noexcept}
-\DoxyCodeLine{1273     \{}
-\DoxyCodeLine{1274         \textcolor{comment}{// Since head points to next-\/to-\/last element, it needs to be decremented once to get the correct element. }}
-\DoxyCodeLine{1275         \textcolor{comment}{// If the index is at the beginning border of the allocated memory area it needs to be wrapped around. }}
-\DoxyCodeLine{1276         \textcolor{keywordflow}{if} (m\_headIndex == 0)}
-\DoxyCodeLine{1277         \{}
-\DoxyCodeLine{1278             \textcolor{keywordflow}{return} m\_data[m\_capacity -\/ 1];}
-\DoxyCodeLine{1279         \}}
-\DoxyCodeLine{1280         \textcolor{keywordflow}{return} m\_data[m\_headIndex-\/1];}
-\DoxyCodeLine{1281     \}}
-\DoxyCodeLine{1282 }
-\DoxyCodeLine{1286     const\_reference \mbox{\hyperlink{classring__buffer_a0661379f8b19f49d5e5d026455be9617}{back}}() const noexcept}
-\DoxyCodeLine{1287     \{}
-\DoxyCodeLine{1288         \textcolor{comment}{// Since head points to next-\/to-\/last element, it needs to be decremented once to get the correct element. }}
-\DoxyCodeLine{1289         \textcolor{comment}{// If the index is at the beginning border of the allocated memory area it needs to be wrapped around. }}
-\DoxyCodeLine{1290         \textcolor{keywordflow}{if} (m\_headIndex == 0)}
-\DoxyCodeLine{1291         \{}
-\DoxyCodeLine{1292             \textcolor{keywordflow}{return} m\_data[m\_capacity -\/ 1];}
-\DoxyCodeLine{1293         \}}
-\DoxyCodeLine{1294         \textcolor{keywordflow}{return} m\_data[m\_headIndex-\/1];}
-\DoxyCodeLine{1295     \}}
-\DoxyCodeLine{1296 }
-\DoxyCodeLine{1300     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}() noexcept}
-\DoxyCodeLine{1301     \{}
-\DoxyCodeLine{1302         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}}(\textcolor{keyword}{this}, 0);}
-\DoxyCodeLine{1303     \}}
-\DoxyCodeLine{1304 }
-\DoxyCodeLine{1308     \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} \mbox{\hyperlink{classring__buffer_a8347b456303e02b7a9ee23312859a621}{begin}}() const noexcept}
-\DoxyCodeLine{1309     \{}
-\DoxyCodeLine{1310         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}}(\textcolor{keyword}{this}, 0);}
-\DoxyCodeLine{1311     \}}
-\DoxyCodeLine{1312 }
-\DoxyCodeLine{1316     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() noexcept}
-\DoxyCodeLine{1317     \{}
-\DoxyCodeLine{1318         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}}(\textcolor{keyword}{this}, \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}());}
-\DoxyCodeLine{1319     \}}
-\DoxyCodeLine{1320 }
-\DoxyCodeLine{1324     \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} \mbox{\hyperlink{classring__buffer_a8b3a0562418674a74bbc28eaa6ca793e}{end}}() const noexcept}
-\DoxyCodeLine{1325     \{}
-\DoxyCodeLine{1326         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}}(\textcolor{keyword}{this}, \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}());}
-\DoxyCodeLine{1327     \}}
-\DoxyCodeLine{1328 }
-\DoxyCodeLine{1332     \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} \mbox{\hyperlink{classring__buffer_a9494413971913e7702426e7fe8968c6a}{cbegin}}() const noexcept}
-\DoxyCodeLine{1333     \{}
-\DoxyCodeLine{1334         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}}(\textcolor{keyword}{this}, 0);}
-\DoxyCodeLine{1335     \}}
-\DoxyCodeLine{1336 }
-\DoxyCodeLine{1340     \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} \mbox{\hyperlink{classring__buffer_a3bce1fcd742096534d78bc450371775a}{cend}}() const noexcept}
-\DoxyCodeLine{1341     \{}
-\DoxyCodeLine{1342         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}}(\textcolor{keyword}{this}, \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}());}
-\DoxyCodeLine{1343     \}}
-\DoxyCodeLine{1344 }
-\DoxyCodeLine{1347     reverse\_iterator \mbox{\hyperlink{classring__buffer_ab456f054b5903b00e9b23ecf0b93675d}{rbegin}}()}
+\DoxyCodeLine{1269         \mbox{\hyperlink{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}{reserve}}(\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}(), \textcolor{keyword}{true});}
+\DoxyCodeLine{1270     \}}
+\DoxyCodeLine{1271 }
+\DoxyCodeLine{1272 \textcolor{comment}{//===========================================================}}
+\DoxyCodeLine{1273 \textcolor{comment}{//  std::queue adaptor functions}}
+\DoxyCodeLine{1274 \textcolor{comment}{//===========================================================}}
+\DoxyCodeLine{1275 }
+\DoxyCodeLine{1279     reference \mbox{\hyperlink{classring__buffer_a6dee6af7622eafe9662e32f10d78b6b6}{front}}() noexcept}
+\DoxyCodeLine{1280     \{}
+\DoxyCodeLine{1281         \textcolor{keywordflow}{return} m\_data[m\_tailIndex];}
+\DoxyCodeLine{1282     \}}
+\DoxyCodeLine{1283 }
+\DoxyCodeLine{1287     const\_reference \mbox{\hyperlink{classring__buffer_a96289837a2a156411bddba7f214cce3a}{front}}() const noexcept}
+\DoxyCodeLine{1288     \{}
+\DoxyCodeLine{1289         \textcolor{keywordflow}{return} m\_data[m\_tailIndex];}
+\DoxyCodeLine{1290     \}}
+\DoxyCodeLine{1291 }
+\DoxyCodeLine{1295     reference \mbox{\hyperlink{classring__buffer_ae7ca98342bbe89dd9aba19838cb7b407}{back}}() noexcept}
+\DoxyCodeLine{1296     \{}
+\DoxyCodeLine{1297         \textcolor{comment}{// Since head points to next-\/to-\/last element, it needs to be decremented once to get the correct element. }}
+\DoxyCodeLine{1298         \textcolor{comment}{// If the index is at the beginning border of the allocated memory area it needs to be wrapped around to the end. }}
+\DoxyCodeLine{1299         \textcolor{keywordflow}{if} (m\_headIndex == 0)}
+\DoxyCodeLine{1300         \{}
+\DoxyCodeLine{1301             \textcolor{keywordflow}{return} m\_data[m\_capacity -\/ 1];}
+\DoxyCodeLine{1302         \}}
+\DoxyCodeLine{1303         \textcolor{keywordflow}{return} m\_data[m\_headIndex-\/1];}
+\DoxyCodeLine{1304     \}}
+\DoxyCodeLine{1305 }
+\DoxyCodeLine{1309     const\_reference \mbox{\hyperlink{classring__buffer_a0661379f8b19f49d5e5d026455be9617}{back}}() const noexcept}
+\DoxyCodeLine{1310     \{}
+\DoxyCodeLine{1311         \textcolor{comment}{// Since head points to next-\/to-\/last element, it needs to be decremented once to get the correct element. }}
+\DoxyCodeLine{1312         \textcolor{comment}{// If the index is at the beginning border of the allocated memory area it needs to be wrapped around to the end. }}
+\DoxyCodeLine{1313         \textcolor{keywordflow}{if} (m\_headIndex == 0)}
+\DoxyCodeLine{1314         \{}
+\DoxyCodeLine{1315             \textcolor{keywordflow}{return} m\_data[m\_capacity -\/ 1];}
+\DoxyCodeLine{1316         \}}
+\DoxyCodeLine{1317         \textcolor{keywordflow}{return} m\_data[m\_headIndex-\/1];}
+\DoxyCodeLine{1318     \}}
+\DoxyCodeLine{1319 }
+\DoxyCodeLine{1323     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}() noexcept}
+\DoxyCodeLine{1324     \{}
+\DoxyCodeLine{1325         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}}(\textcolor{keyword}{this}, 0);}
+\DoxyCodeLine{1326     \}}
+\DoxyCodeLine{1327 }
+\DoxyCodeLine{1331     \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} \mbox{\hyperlink{classring__buffer_a8347b456303e02b7a9ee23312859a621}{begin}}() const noexcept}
+\DoxyCodeLine{1332     \{}
+\DoxyCodeLine{1333         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}}(\textcolor{keyword}{this}, 0);}
+\DoxyCodeLine{1334     \}}
+\DoxyCodeLine{1335 }
+\DoxyCodeLine{1339     \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}} \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() noexcept}
+\DoxyCodeLine{1340     \{}
+\DoxyCodeLine{1341         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__iterator}{iterator}}(\textcolor{keyword}{this}, \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}());}
+\DoxyCodeLine{1342     \}}
+\DoxyCodeLine{1343 }
+\DoxyCodeLine{1347     \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} \mbox{\hyperlink{classring__buffer_a8b3a0562418674a74bbc28eaa6ca793e}{end}}() const noexcept}
 \DoxyCodeLine{1348     \{}
-\DoxyCodeLine{1349         \textcolor{keywordflow}{return} reverse\_iterator(\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
+\DoxyCodeLine{1349         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}}(\textcolor{keyword}{this}, \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}());}
 \DoxyCodeLine{1350     \}}
 \DoxyCodeLine{1351 }
-\DoxyCodeLine{1355     const\_reverse\_iterator \mbox{\hyperlink{classring__buffer_aa243a80e8756739ce4b64f73e9a4338e}{rbegin}}()\textcolor{keyword}{ const}}
-\DoxyCodeLine{1356 \textcolor{keyword}{    }\{}
-\DoxyCodeLine{1357         \textcolor{keywordflow}{return} const\_reverse\_iterator(\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
+\DoxyCodeLine{1355     \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} \mbox{\hyperlink{classring__buffer_a9494413971913e7702426e7fe8968c6a}{cbegin}}() const noexcept}
+\DoxyCodeLine{1356     \{}
+\DoxyCodeLine{1357         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}}(\textcolor{keyword}{this}, 0);}
 \DoxyCodeLine{1358     \}}
 \DoxyCodeLine{1359 }
-\DoxyCodeLine{1363     const\_reverse\_iterator \mbox{\hyperlink{classring__buffer_a109b2e943558eab49ca6d33ca398a838}{crbegin}}()\textcolor{keyword}{ const}}
-\DoxyCodeLine{1364 \textcolor{keyword}{    }\{}
-\DoxyCodeLine{1365         \textcolor{keywordflow}{return} const\_reverse\_iterator(\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
+\DoxyCodeLine{1363     \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}} \mbox{\hyperlink{classring__buffer_a3bce1fcd742096534d78bc450371775a}{cend}}() const noexcept}
+\DoxyCodeLine{1364     \{}
+\DoxyCodeLine{1365         \textcolor{keywordflow}{return} \mbox{\hyperlink{classring__buffer_1_1__r_buf__const__iterator}{const\_iterator}}(\textcolor{keyword}{this}, \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}());}
 \DoxyCodeLine{1366     \}}
 \DoxyCodeLine{1367 }
-\DoxyCodeLine{1371     reverse\_iterator \mbox{\hyperlink{classring__buffer_a81ee796bf66742e0d25716ce4c9d6f5d}{rend}}()}
+\DoxyCodeLine{1371     reverse\_iterator \mbox{\hyperlink{classring__buffer_ab456f054b5903b00e9b23ecf0b93675d}{rbegin}}()}
 \DoxyCodeLine{1372     \{}
-\DoxyCodeLine{1373         \textcolor{keywordflow}{return} reverse\_iterator(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}());}
+\DoxyCodeLine{1373         \textcolor{keywordflow}{return} reverse\_iterator(\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
 \DoxyCodeLine{1374     \}}
 \DoxyCodeLine{1375 }
-\DoxyCodeLine{1379     const\_reverse\_iterator \mbox{\hyperlink{classring__buffer_ae9dcf3f2bfc1c9be3d18ab2d25eebd48}{rend}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{1379     const\_reverse\_iterator \mbox{\hyperlink{classring__buffer_aa243a80e8756739ce4b64f73e9a4338e}{rbegin}}()\textcolor{keyword}{ const}}
 \DoxyCodeLine{1380 \textcolor{keyword}{    }\{}
-\DoxyCodeLine{1381         \textcolor{keywordflow}{return} const\_reverse\_iterator(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}());}
+\DoxyCodeLine{1381         \textcolor{keywordflow}{return} const\_reverse\_iterator(\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
 \DoxyCodeLine{1382     \}}
 \DoxyCodeLine{1383 }
-\DoxyCodeLine{1387     const\_reverse\_iterator \mbox{\hyperlink{classring__buffer_a8a25432bd918d4cafbfb9e5bd47ea296}{crend}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{1387     const\_reverse\_iterator \mbox{\hyperlink{classring__buffer_a109b2e943558eab49ca6d33ca398a838}{crbegin}}()\textcolor{keyword}{ const}}
 \DoxyCodeLine{1388 \textcolor{keyword}{    }\{}
-\DoxyCodeLine{1389         \textcolor{keywordflow}{return} const\_reverse\_iterator(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}());}
+\DoxyCodeLine{1389         \textcolor{keywordflow}{return} const\_reverse\_iterator(\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
 \DoxyCodeLine{1390     \}}
 \DoxyCodeLine{1391 }
-\DoxyCodeLine{1392 }
-\DoxyCodeLine{1393 \textcolor{keyword}{private}:}
-\DoxyCodeLine{1394 }
-\DoxyCodeLine{1400     \textcolor{keywordtype}{void} validateCapacity(\textcolor{keywordtype}{size\_t} increase)}
-\DoxyCodeLine{1401     \{}
-\DoxyCodeLine{1402         \textcolor{keywordflow}{if} (m\_capacity <= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() + increase)}
-\DoxyCodeLine{1403         \{}
-\DoxyCodeLine{1404             \textcolor{keywordflow}{if} (m\_capacity / 2 + m\_capacity <= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() + increase)}
-\DoxyCodeLine{1405             \{}
-\DoxyCodeLine{1406                 \mbox{\hyperlink{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}{reserve}}(m\_capacity + increase + m\_capacity / 2 );}
-\DoxyCodeLine{1407             \}}
-\DoxyCodeLine{1408             \textcolor{keywordflow}{else}}
-\DoxyCodeLine{1409             \{}
-\DoxyCodeLine{1410                 \mbox{\hyperlink{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}{reserve}}(m\_capacity / 2 + m\_capacity);}
-\DoxyCodeLine{1411             \}}
-\DoxyCodeLine{1412         \}}
-\DoxyCodeLine{1413     \}}
-\DoxyCodeLine{1414 }
-\DoxyCodeLine{1424     \textcolor{keyword}{template}<\textcolor{keyword}{typename} T>}
-\DoxyCodeLine{1425     iterator insertBase(const\_iterator pos, \textcolor{keyword}{const} size\_type amount, T\&\& value)}
-\DoxyCodeLine{1426     \{}
-\DoxyCodeLine{1427         iterator it(\textcolor{keyword}{this}, pos.getIndex());}
-\DoxyCodeLine{1428 }
-\DoxyCodeLine{1429         \textcolor{keywordflow}{if} (!amount) \textcolor{keywordflow}{return} it;}
-\DoxyCodeLine{1430 }
-\DoxyCodeLine{1431         validateCapacity(amount);}
-\DoxyCodeLine{1432 }
-\DoxyCodeLine{1433         \textcolor{keywordflow}{for} (size\_type i = 0; i < amount; i++)}
-\DoxyCodeLine{1434         \{}
-\DoxyCodeLine{1435             \textcolor{comment}{// Construct element at the end.}}
-\DoxyCodeLine{1436             m\_allocator.construct(\&*\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(), std::forward<T>(value));}
-\DoxyCodeLine{1437             increment(m\_headIndex);}
-\DoxyCodeLine{1438         \}}
-\DoxyCodeLine{1439 }
-\DoxyCodeLine{1440         \textcolor{comment}{// Rotate elements from the back into pos.}}
-\DoxyCodeLine{1441         std::rotate(it, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ amount, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
-\DoxyCodeLine{1442 }
-\DoxyCodeLine{1443         \textcolor{keywordflow}{return} it;}
-\DoxyCodeLine{1444     \}}
-\DoxyCodeLine{1445 }
-\DoxyCodeLine{1457     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputIt>}
-\DoxyCodeLine{1458     iterator insertRangeBase(const\_iterator pos, InputIt rangeBegin, InputIt rangeEnd)}
-\DoxyCodeLine{1459     \{}
-\DoxyCodeLine{1460         \textcolor{keyword}{const} \textcolor{keyword}{auto} amount = std::distance<InputIt>(rangeBegin, rangeEnd);}
-\DoxyCodeLine{1461         validateCapacity(amount);}
-\DoxyCodeLine{1462         }
-\DoxyCodeLine{1463         \textcolor{keywordflow}{for} (; rangeBegin != rangeEnd; rangeBegin++)}
-\DoxyCodeLine{1464         \{}
-\DoxyCodeLine{1465             m\_allocator.construct(\&*\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(), *rangeBegin);}
-\DoxyCodeLine{1466             increment(m\_headIndex);}
-\DoxyCodeLine{1467         \}}
+\DoxyCodeLine{1395     reverse\_iterator \mbox{\hyperlink{classring__buffer_a81ee796bf66742e0d25716ce4c9d6f5d}{rend}}()}
+\DoxyCodeLine{1396     \{}
+\DoxyCodeLine{1397         \textcolor{keywordflow}{return} reverse\_iterator(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}());}
+\DoxyCodeLine{1398     \}}
+\DoxyCodeLine{1399 }
+\DoxyCodeLine{1403     const\_reverse\_iterator \mbox{\hyperlink{classring__buffer_ae9dcf3f2bfc1c9be3d18ab2d25eebd48}{rend}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{1404 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{1405         \textcolor{keywordflow}{return} const\_reverse\_iterator(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}());}
+\DoxyCodeLine{1406     \}}
+\DoxyCodeLine{1407 }
+\DoxyCodeLine{1411     const\_reverse\_iterator \mbox{\hyperlink{classring__buffer_a8a25432bd918d4cafbfb9e5bd47ea296}{crend}}()\textcolor{keyword}{ const}}
+\DoxyCodeLine{1412 \textcolor{keyword}{    }\{}
+\DoxyCodeLine{1413         \textcolor{keywordflow}{return} const\_reverse\_iterator(\mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin}}());}
+\DoxyCodeLine{1414     \}}
+\DoxyCodeLine{1415 }
+\DoxyCodeLine{1416 \textcolor{keyword}{private}:}
+\DoxyCodeLine{1417 }
+\DoxyCodeLine{1423     \textcolor{keywordtype}{void} validateCapacity(\textcolor{keywordtype}{size\_t} increase)}
+\DoxyCodeLine{1424     \{}
+\DoxyCodeLine{1425         \textcolor{keywordflow}{if} (m\_capacity <= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() + increase)}
+\DoxyCodeLine{1426         \{}
+\DoxyCodeLine{1427             \textcolor{keywordflow}{if} (m\_capacity / 2 + m\_capacity <= \mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() + increase)}
+\DoxyCodeLine{1428             \{}
+\DoxyCodeLine{1429                 \mbox{\hyperlink{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}{reserve}}(m\_capacity + increase + m\_capacity / 2 );}
+\DoxyCodeLine{1430             \}}
+\DoxyCodeLine{1431             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1432             \{}
+\DoxyCodeLine{1433                 \mbox{\hyperlink{classring__buffer_a8f6fd7a2d343de27c99761c6029f6d28}{reserve}}(m\_capacity / 2 + m\_capacity);}
+\DoxyCodeLine{1434             \}}
+\DoxyCodeLine{1435         \}}
+\DoxyCodeLine{1436     \}}
+\DoxyCodeLine{1437 }
+\DoxyCodeLine{1447     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InsertValue>}
+\DoxyCodeLine{1448     iterator insertBase(const\_iterator pos, \textcolor{keyword}{const} size\_type amount, InsertValue\&\& value)}
+\DoxyCodeLine{1449     \{}
+\DoxyCodeLine{1450         iterator it(\textcolor{keyword}{this}, pos.getIndex());}
+\DoxyCodeLine{1451 }
+\DoxyCodeLine{1452         \textcolor{keywordflow}{if} (!amount) \textcolor{keywordflow}{return} it;}
+\DoxyCodeLine{1453 }
+\DoxyCodeLine{1454         validateCapacity(amount);}
+\DoxyCodeLine{1455 }
+\DoxyCodeLine{1456         \textcolor{keywordflow}{for} (size\_type i = 0; i < amount; i++)}
+\DoxyCodeLine{1457         \{}
+\DoxyCodeLine{1458             \textcolor{comment}{// Construct element at the end.}}
+\DoxyCodeLine{1459             m\_allocator.construct(\&*\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(), std::forward<InsertValue>(value));}
+\DoxyCodeLine{1460             increment(m\_headIndex);}
+\DoxyCodeLine{1461         \}}
+\DoxyCodeLine{1462 }
+\DoxyCodeLine{1463         \textcolor{comment}{// Rotate elements from the back into pos.}}
+\DoxyCodeLine{1464         std::rotate(it, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ amount, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
+\DoxyCodeLine{1465 }
+\DoxyCodeLine{1466         \textcolor{keywordflow}{return} it;}
+\DoxyCodeLine{1467     \}}
 \DoxyCodeLine{1468 }
-\DoxyCodeLine{1469         iterator it(\textcolor{keyword}{this}, pos.getIndex());}
-\DoxyCodeLine{1470         std::rotate(it, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ amount, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
-\DoxyCodeLine{1471 }
-\DoxyCodeLine{1472         \textcolor{keywordflow}{return} it;}
-\DoxyCodeLine{1473     \}}
-\DoxyCodeLine{1474 }
-\DoxyCodeLine{1477     \textcolor{keywordtype}{void} increment(\textcolor{keywordtype}{size\_t}\& index) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{1478     \{   }
-\DoxyCodeLine{1479         ++index;}
-\DoxyCodeLine{1480         \textcolor{comment}{// Wrap index around at end of capacity.}}
-\DoxyCodeLine{1481         \textcolor{keywordflow}{if}(index >= m\_capacity)}
-\DoxyCodeLine{1482         \{}
-\DoxyCodeLine{1483             index = 0;}
-\DoxyCodeLine{1484         \}}
-\DoxyCodeLine{1485     \}}
-\DoxyCodeLine{1486 }
-\DoxyCodeLine{1490     \textcolor{keywordtype}{void} increment(\textcolor{keywordtype}{size\_t}\& index, \textcolor{keywordtype}{size\_t} times) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{1491     \{}
-\DoxyCodeLine{1492         \textcolor{keywordflow}{while}(times > 0)}
-\DoxyCodeLine{1493         \{}
-\DoxyCodeLine{1494             increment(index);}
-\DoxyCodeLine{1495             times-\/-\/;}
-\DoxyCodeLine{1496         \}}
-\DoxyCodeLine{1497     \}}
-\DoxyCodeLine{1498 }
-\DoxyCodeLine{1501     \textcolor{keywordtype}{void} decrement(\textcolor{keywordtype}{size\_t}\& index) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{1502     \{}
-\DoxyCodeLine{1503         \textcolor{keywordflow}{if}(index == 0)}
-\DoxyCodeLine{1504         \{}
-\DoxyCodeLine{1505             index = m\_capacity -\/ 1;}
-\DoxyCodeLine{1506         \}}
-\DoxyCodeLine{1507         \textcolor{keywordflow}{else}}
-\DoxyCodeLine{1508         \{}
-\DoxyCodeLine{1509             -\/-\/index;}
-\DoxyCodeLine{1510         \}}
-\DoxyCodeLine{1511     \}}
-\DoxyCodeLine{1512     }
-\DoxyCodeLine{1516     \textcolor{keywordtype}{void} decrement(\textcolor{keywordtype}{size\_t}\& index, \textcolor{keywordtype}{size\_t} times) \textcolor{keyword}{noexcept}}
-\DoxyCodeLine{1517     \{}
-\DoxyCodeLine{1518         \textcolor{keywordflow}{while}(times > 0)}
-\DoxyCodeLine{1519         \{}
-\DoxyCodeLine{1520             decrement(index);}
-\DoxyCodeLine{1521             times-\/-\/;}
-\DoxyCodeLine{1522         \}}
-\DoxyCodeLine{1523     \}}
-\DoxyCodeLine{1524 }
-\DoxyCodeLine{1525 \textcolor{comment}{//==========================================}}
-\DoxyCodeLine{1526 \textcolor{comment}{// Members }}
-\DoxyCodeLine{1527 \textcolor{comment}{//==========================================}}
-\DoxyCodeLine{1528 }
-\DoxyCodeLine{1529     size\_type m\_headIndex; }
-\DoxyCodeLine{1530     size\_type m\_tailIndex; }
-\DoxyCodeLine{1531     size\_type m\_capacity;  }
-\DoxyCodeLine{1533     T* m\_data;  }
-\DoxyCodeLine{1534     Allocator m\_allocator;  }
-\DoxyCodeLine{1535 \};}
-\DoxyCodeLine{1536 }
-\DoxyCodeLine{1537 \textcolor{comment}{//===========================}}
-\DoxyCodeLine{1538 \textcolor{comment}{// Non-\/member functions}}
-\DoxyCodeLine{1539 \textcolor{comment}{//===========================}}
-\DoxyCodeLine{1540 }
-\DoxyCodeLine{1547 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T , \textcolor{keyword}{typename} Alloc>}
-\DoxyCodeLine{1548 \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} operator==(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer<T,Alloc>}}\& lhs, \textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer<T,Alloc>}}\& rhs)}
-\DoxyCodeLine{1549 \{}
-\DoxyCodeLine{1550     \textcolor{keywordflow}{if}(lhs.\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() != rhs.\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}())}
-\DoxyCodeLine{1551     \{}
-\DoxyCodeLine{1552         \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
-\DoxyCodeLine{1553     \}}
+\DoxyCodeLine{1480     \textcolor{keyword}{template}<\textcolor{keyword}{typename} InputIt>}
+\DoxyCodeLine{1481     iterator insertRangeBase(const\_iterator pos, InputIt rangeBegin, InputIt rangeEnd)}
+\DoxyCodeLine{1482     \{}
+\DoxyCodeLine{1483         \textcolor{keyword}{const} \textcolor{keyword}{auto} amount = std::distance<InputIt>(rangeBegin, rangeEnd);}
+\DoxyCodeLine{1484         validateCapacity(amount);}
+\DoxyCodeLine{1485         }
+\DoxyCodeLine{1486         \textcolor{keywordflow}{for} (; rangeBegin != rangeEnd; rangeBegin++)}
+\DoxyCodeLine{1487         \{}
+\DoxyCodeLine{1488             m\_allocator.construct(\&*\mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}(), *rangeBegin);}
+\DoxyCodeLine{1489             increment(m\_headIndex);}
+\DoxyCodeLine{1490         \}}
+\DoxyCodeLine{1491 }
+\DoxyCodeLine{1492         iterator it(\textcolor{keyword}{this}, pos.getIndex());}
+\DoxyCodeLine{1493         std::rotate(it, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}() -\/ amount, \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end}}());}
+\DoxyCodeLine{1494 }
+\DoxyCodeLine{1495         \textcolor{keywordflow}{return} it;}
+\DoxyCodeLine{1496     \}}
+\DoxyCodeLine{1497 }
+\DoxyCodeLine{1501     \textcolor{keywordtype}{void} increment(\textcolor{keywordtype}{size\_t}\& index) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{1502     \{   }
+\DoxyCodeLine{1503         ++index;}
+\DoxyCodeLine{1504         \textcolor{comment}{// Wrap index around at end of physical memory area.}}
+\DoxyCodeLine{1505         \textcolor{keywordflow}{if}(index >= m\_capacity)}
+\DoxyCodeLine{1506         \{}
+\DoxyCodeLine{1507             index = 0;}
+\DoxyCodeLine{1508         \}}
+\DoxyCodeLine{1509     \}}
+\DoxyCodeLine{1510 }
+\DoxyCodeLine{1515     \textcolor{keywordtype}{void} increment(\textcolor{keywordtype}{size\_t}\& index, \textcolor{keywordtype}{size\_t} times) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{1516     \{}
+\DoxyCodeLine{1517         \textcolor{keywordflow}{while}(times > 0)}
+\DoxyCodeLine{1518         \{}
+\DoxyCodeLine{1519             increment(index);}
+\DoxyCodeLine{1520             times-\/-\/;}
+\DoxyCodeLine{1521         \}}
+\DoxyCodeLine{1522     \}}
+\DoxyCodeLine{1523 }
+\DoxyCodeLine{1527     \textcolor{keywordtype}{void} decrement(\textcolor{keywordtype}{size\_t}\& index) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{1528     \{}
+\DoxyCodeLine{1529         \textcolor{keywordflow}{if}(index == 0)}
+\DoxyCodeLine{1530         \{}
+\DoxyCodeLine{1531             index = m\_capacity -\/ 1;}
+\DoxyCodeLine{1532         \}}
+\DoxyCodeLine{1533         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{1534         \{}
+\DoxyCodeLine{1535             -\/-\/index;}
+\DoxyCodeLine{1536         \}}
+\DoxyCodeLine{1537     \}}
+\DoxyCodeLine{1538     }
+\DoxyCodeLine{1542     \textcolor{keywordtype}{void} decrement(\textcolor{keywordtype}{size\_t}\& index, \textcolor{keywordtype}{size\_t} times) \textcolor{keyword}{noexcept}}
+\DoxyCodeLine{1543     \{}
+\DoxyCodeLine{1544         \textcolor{keywordflow}{while}(times > 0)}
+\DoxyCodeLine{1545         \{}
+\DoxyCodeLine{1546             decrement(index);}
+\DoxyCodeLine{1547             times-\/-\/;}
+\DoxyCodeLine{1548         \}}
+\DoxyCodeLine{1549     \}}
+\DoxyCodeLine{1550 }
+\DoxyCodeLine{1551 \textcolor{comment}{//==========================================}}
+\DoxyCodeLine{1552 \textcolor{comment}{// Members }}
+\DoxyCodeLine{1553 \textcolor{comment}{//==========================================}}
 \DoxyCodeLine{1554 }
-\DoxyCodeLine{1555     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 0; i < lhs.\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}(); i++)}
-\DoxyCodeLine{1556     \{}
-\DoxyCodeLine{1557         \textcolor{keywordflow}{if}(lhs[i] != rhs[i])}
-\DoxyCodeLine{1558         \{}
-\DoxyCodeLine{1559             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
-\DoxyCodeLine{1560         \}}
-\DoxyCodeLine{1561     \}}
+\DoxyCodeLine{1555     size\_type m\_headIndex; }
+\DoxyCodeLine{1556     size\_type m\_tailIndex; }
+\DoxyCodeLine{1557     size\_type m\_capacity;  }
+\DoxyCodeLine{1559     T* m\_data;  }
+\DoxyCodeLine{1560     Allocator m\_allocator;  }
+\DoxyCodeLine{1561 \};}
 \DoxyCodeLine{1562 }
-\DoxyCodeLine{1563     \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
-\DoxyCodeLine{1564 \}}
-\DoxyCodeLine{1565 }
-\DoxyCodeLine{1572 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,\textcolor{keyword}{typename} Alloc>}
-\DoxyCodeLine{1573 \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} operator!=(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer<T,Alloc>}}\& lhs, \textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer<T,Alloc>}}\& rhs)}
-\DoxyCodeLine{1574 \{}
-\DoxyCodeLine{1575     \textcolor{keywordflow}{return} !(lhs == rhs);}
-\DoxyCodeLine{1576 \}}
-\DoxyCodeLine{1577 }
-\DoxyCodeLine{1578 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DYNAMIC\_RINGBUFFER\_HPP*/}\textcolor{preprocessor}{}}
+\DoxyCodeLine{1563 \textcolor{comment}{//===========================}}
+\DoxyCodeLine{1564 \textcolor{comment}{// Non-\/member functions}}
+\DoxyCodeLine{1565 \textcolor{comment}{//===========================}}
+\DoxyCodeLine{1566 }
+\DoxyCodeLine{1573 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T , \textcolor{keyword}{typename} Alloc>}
+\DoxyCodeLine{1574 \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} operator==(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer<T,Alloc>}}\& lhs, \textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer<T,Alloc>}}\& rhs)}
+\DoxyCodeLine{1575 \{}
+\DoxyCodeLine{1576     \textcolor{keywordflow}{if}(lhs.\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}() != rhs.\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}())}
+\DoxyCodeLine{1577     \{}
+\DoxyCodeLine{1578         \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{1579     \}}
+\DoxyCodeLine{1580 }
+\DoxyCodeLine{1581     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} i = 0; i < lhs.\mbox{\hyperlink{classring__buffer_aca0782fc0b1264ff01c5ffbe199423a5}{size}}(); i++)}
+\DoxyCodeLine{1582     \{}
+\DoxyCodeLine{1583         \textcolor{keywordflow}{if}(lhs[i] != rhs[i])}
+\DoxyCodeLine{1584         \{}
+\DoxyCodeLine{1585             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{1586         \}}
+\DoxyCodeLine{1587     \}}
+\DoxyCodeLine{1588 }
+\DoxyCodeLine{1589     \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{1590 \}}
+\DoxyCodeLine{1591 }
+\DoxyCodeLine{1598 \textcolor{keyword}{template}<\textcolor{keyword}{typename} T,\textcolor{keyword}{typename} Alloc>}
+\DoxyCodeLine{1599 \textcolor{keyword}{inline} \textcolor{keywordtype}{bool} operator!=(\textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer<T,Alloc>}}\& lhs, \textcolor{keyword}{const} \mbox{\hyperlink{classring__buffer}{ring\_buffer<T,Alloc>}}\& rhs)}
+\DoxyCodeLine{1600 \{}
+\DoxyCodeLine{1601     \textcolor{keywordflow}{return} !(lhs == rhs);}
+\DoxyCodeLine{1602 \}}
+\DoxyCodeLine{1603 }
+\DoxyCodeLine{1604 \textcolor{preprocessor}{\#endif }\textcolor{comment}{/*DYNAMIC\_RINGBUFFER\_HPP*/}\textcolor{preprocessor}{}}
 
 \end{DoxyCode}

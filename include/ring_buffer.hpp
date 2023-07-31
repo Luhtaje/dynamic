@@ -1103,7 +1103,7 @@ public:
 
     /// @brief Gets the theoretical maximum size of the container.
     /// @return Maximum size of the buffer.
-    /// @note 
+    /// @details Constant complexity.
     size_type max_size() const noexcept
     {
         constexpr auto maxSize = std::numeric_limits<std::size_t>::max();
@@ -1140,7 +1140,7 @@ public:
     /// @param enableShrink True to enable reserve to reduce the capacity, to a minimum of size() +2.
     /// @throw Can throw std::bad_alloc. 
     /// @exception If T's move (or copy if T has no move) constructor throws, behaviour is undefined. Otherwise Stong Exception Guarantee.
-    /// @notes All references and pointers are invalidated (iterators stay valid). If memory is allocated, the memory layout is rotated so that first element matches the beginning of physical memory.
+    /// @notes All references, pointers and iterators are invalidated. If memory is allocated, the memory layout is rotated so that first element matches the beginning of physical memory.
     /// @details Linear complexity in relation to size of the buffer.
     void reserve(size_type newCapacity, bool enableShrink = false)
     {
@@ -1204,7 +1204,7 @@ public:
     /// @throw Can throw std::bad_alloc.
     /// @exception If the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function retains invariants (Basic Exception Guarantee).
     /// @pre value_type needs to satisfy CopyInsertable.
-    /// @post If more memory is allocated, all pointers and references are invalidated.
+    /// @post If more memory is allocated all pointers, iterators and references are invalidated.
     /// @details Constant complexity.
     void push_back(const value_type& val)
     {
@@ -1220,7 +1220,7 @@ public:
     /// @throw Can throw std::bad_alloc if more memory is allocated.
     /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function retains invariants (Basic Exception Guarantee).
     /// @pre value_type needs to satisfy MoveInsertable or CopyInsertable.
-    /// @post If more memory is allocated, all pointers and references are invalidated.
+    /// @post If more memory is allocated all pointers, iterators and references are invalidated.
     /// @details Constant complexity.
     void push_back(value_type&& val)
     {
@@ -1254,7 +1254,7 @@ public:
     /// @brief Releases unused allocated memory. 
     /// @pre T must satisfy MoveConstructible or CopyConstructible.
     /// @post m_capacity == size() + 2.
-    /// @note Reduces capacity by allocating a smaller memory area and moving the elements.
+    /// @note Reduces capacity by allocating a smaller memory area and moving the elements. Shrinking the buffer invalidates all pointers, iterators and references.
     /// @throw Might throw std::bad_alloc if memory allocation fails.
     /// @exception If T's move (or copy) constructor can and does throw, behaviour is undefined. If any other exception is thrown (bad_alloc) this function has no effect (Strong exception guarantee).
     /// @details Linear complexity in relation to size of the buffer.
@@ -1282,7 +1282,7 @@ public:
     }
 
     /// @brief Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer.
-    /// @return const-Reference to the first element.
+    /// @return const_reference to the first element.
     /// @details Constant complexity.
     const_reference front() const noexcept
     {
@@ -1295,7 +1295,7 @@ public:
     reference back() noexcept
     {
         // Since head points to next-to-last element, it needs to be decremented once to get the correct element. 
-        // If the index is at the beginning border of the allocated memory area it needs to be wrapped around. 
+        // If the index is at the beginning border of the allocated memory area it needs to be wrapped around to the end. 
         if (m_headIndex == 0)
         {
             return m_data[m_capacity - 1];
@@ -1304,12 +1304,12 @@ public:
     }
 
     /// @brief Returns a const-reference to the last element in the buffer. Behaviour is undefined for empty buffer.
-    /// @return const-reference to the last element in the buffer.
+    /// @return const_reference to the last element in the buffer.
     /// @details Constant complexity.
     const_reference back() const noexcept
     {
         // Since head points to next-to-last element, it needs to be decremented once to get the correct element. 
-        // If the index is at the beginning border of the allocated memory area it needs to be wrapped around. 
+        // If the index is at the beginning border of the allocated memory area it needs to be wrapped around to the end. 
         if (m_headIndex == 0)
         {
             return m_data[m_capacity - 1];

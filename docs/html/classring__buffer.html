@@ -107,12 +107,12 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>reference</b> = T &a
 <tr class="memitem:adca2866bc954c6d9feed98e06b480244"><td class="memItemLeft" align="right" valign="top"><a id="adca2866bc954c6d9feed98e06b480244" name="adca2866bc954c6d9feed98e06b480244"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>const_reference</b> = const T &amp;</td></tr>
 <tr class="separator:adca2866bc954c6d9feed98e06b480244"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa37a287966cc5bbf8eefa27c82007d34"><td class="memItemLeft" align="right" valign="top"><a id="aa37a287966cc5bbf8eefa27c82007d34" name="aa37a287966cc5bbf8eefa27c82007d34"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>pointer</b> = typename T *</td></tr>
-<tr class="separator:aa37a287966cc5bbf8eefa27c82007d34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9097acc95036817b641672f84a17d2d9"><td class="memItemLeft" align="right" valign="top"><a id="a9097acc95036817b641672f84a17d2d9" name="a9097acc95036817b641672f84a17d2d9"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>const_pointer</b> = typename const T *</td></tr>
-<tr class="separator:a9097acc95036817b641672f84a17d2d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6cdf728b5383f55939236b958dbdc6e9"><td class="memItemLeft" align="right" valign="top"><a id="a6cdf728b5383f55939236b958dbdc6e9" name="a6cdf728b5383f55939236b958dbdc6e9"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>pointer</b> = T *</td></tr>
+<tr class="separator:a6cdf728b5383f55939236b958dbdc6e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7a3d9241f27d43d0bb84fec76da2409"><td class="memItemLeft" align="right" valign="top"><a id="ae7a3d9241f27d43d0bb84fec76da2409" name="ae7a3d9241f27d43d0bb84fec76da2409"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>const_pointer</b> = const T *</td></tr>
+<tr class="separator:ae7a3d9241f27d43d0bb84fec76da2409"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9bb2a577a8bc997739a848ab3efd0f9"><td class="memItemLeft" align="right" valign="top"><a id="af9bb2a577a8bc997739a848ab3efd0f9" name="af9bb2a577a8bc997739a848ab3efd0f9"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>difference_type</b> = ptrdiff_t</td></tr>
 <tr class="separator:af9bb2a577a8bc997739a848ab3efd0f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -183,6 +183,14 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acefe57c42e075e935c20a4da038b7df7"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classring__buffer_1_1__r_buf__iterator.html">iterator</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classring__buffer.html#acefe57c42e075e935c20a4da038b7df7">emplace</a> (<a class="el" href="classring__buffer_1_1__r_buf__const__iterator.html">const_iterator</a> pos, Args &amp;&amp;... args)</td></tr>
 <tr class="memdesc:acefe57c42e075e935c20a4da038b7df7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct an element in place from arguments.  <a href="classring__buffer.html#acefe57c42e075e935c20a4da038b7df7">More...</a><br /></td></tr>
 <tr class="separator:acefe57c42e075e935c20a4da038b7df7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a7e65ec20452b89d10f1a587fa39222"><td class="memTemplParams" colspan="2">template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:a4a7e65ec20452b89d10f1a587fa39222"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a4a7e65ec20452b89d10f1a587fa39222">emplace_front</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:a4a7e65ec20452b89d10f1a587fa39222"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an element in place to front from argumets.  <a href="classring__buffer.html#a4a7e65ec20452b89d10f1a587fa39222">More...</a><br /></td></tr>
+<tr class="separator:a4a7e65ec20452b89d10f1a587fa39222"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed98662b3760dac1c9ea6c98d0106068"><td class="memTemplParams" colspan="2">template&lt;class... Args&gt; </td></tr>
+<tr class="memitem:aed98662b3760dac1c9ea6c98d0106068"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classring__buffer.html#aed98662b3760dac1c9ea6c98d0106068">emplace_back</a> (Args &amp;&amp;... args)</td></tr>
+<tr class="memdesc:aed98662b3760dac1c9ea6c98d0106068"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs an element in place to front from argumets.  <a href="classring__buffer.html#aed98662b3760dac1c9ea6c98d0106068">More...</a><br /></td></tr>
+<tr class="separator:aed98662b3760dac1c9ea6c98d0106068"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad68227da7f12db1402a6bce1cc8b834a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classring__buffer_1_1__r_buf__iterator.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#ad68227da7f12db1402a6bce1cc8b834a">erase</a> (<a class="el" href="classring__buffer_1_1__r_buf__const__iterator.html">const_iterator</a> pos)</td></tr>
 <tr class="memdesc:ad68227da7f12db1402a6bce1cc8b834a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Erase an element at a given position.  <a href="classring__buffer.html#ad68227da7f12db1402a6bce1cc8b834a">More...</a><br /></td></tr>
 <tr class="separator:ad68227da7f12db1402a6bce1cc8b834a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -232,9 +240,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aca0782fc0b1264ff01c5ffbe199423a5"><td class="memItemLeft" align="right" valign="top">size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#aca0782fc0b1264ff01c5ffbe199423a5">size</a> () const noexcept</td></tr>
 <tr class="memdesc:aca0782fc0b1264ff01c5ffbe199423a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the size of the container.  <a href="classring__buffer.html#aca0782fc0b1264ff01c5ffbe199423a5">More...</a><br /></td></tr>
 <tr class="separator:aca0782fc0b1264ff01c5ffbe199423a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09435a2152f9b680154e1e51e4472787"><td class="memItemLeft" align="right" valign="top"><a id="a09435a2152f9b680154e1e51e4472787" name="a09435a2152f9b680154e1e51e4472787"></a>
-size_type&#160;</td><td class="memItemRight" valign="bottom"><b>max_size</b> () const noexcept</td></tr>
-<tr class="memdesc:a09435a2152f9b680154e1e51e4472787"><td class="mdescLeft">&#160;</td><td class="mdescRight">TODO what is this, is this needed somewhere? <br /></td></tr>
+<tr class="memitem:a09435a2152f9b680154e1e51e4472787"><td class="memItemLeft" align="right" valign="top">size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a09435a2152f9b680154e1e51e4472787">max_size</a> () const noexcept</td></tr>
+<tr class="memdesc:a09435a2152f9b680154e1e51e4472787"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the theoretical maximum size of the container.  <a href="classring__buffer.html#a09435a2152f9b680154e1e51e4472787">More...</a><br /></td></tr>
 <tr class="separator:a09435a2152f9b680154e1e51e4472787"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb98388fa6ae8a7a86e968d95534c8fd"><td class="memItemLeft" align="right" valign="top">size_type&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#aeb98388fa6ae8a7a86e968d95534c8fd">capacity</a> () const noexcept</td></tr>
 <tr class="memdesc:aeb98388fa6ae8a7a86e968d95534c8fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Capacity getter.  <a href="classring__buffer.html#aeb98388fa6ae8a7a86e968d95534c8fd">More...</a><br /></td></tr>
@@ -248,9 +255,9 @@ size_type&#160;</td><td class="memItemRight" valign="bottom"><b>max_size</b> () 
 <tr class="memitem:a8f6fd7a2d343de27c99761c6029f6d28"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a8f6fd7a2d343de27c99761c6029f6d28">reserve</a> (size_type newCapacity, bool enableShrink=false)</td></tr>
 <tr class="memdesc:a8f6fd7a2d343de27c99761c6029f6d28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocates memory and copies the existing buffer to the new memory location. Can be used to increase or decrease capacity.  <a href="classring__buffer.html#a8f6fd7a2d343de27c99761c6029f6d28">More...</a><br /></td></tr>
 <tr class="separator:a8f6fd7a2d343de27c99761c6029f6d28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c31052b14b558f6656dd06dc6f00436"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a8c31052b14b558f6656dd06dc6f00436">push_front</a> (value_type val)</td></tr>
-<tr class="memdesc:a8c31052b14b558f6656dd06dc6f00436"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.  <a href="classring__buffer.html#a8c31052b14b558f6656dd06dc6f00436">More...</a><br /></td></tr>
-<tr class="separator:a8c31052b14b558f6656dd06dc6f00436"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bed0fe915650f882f772d022f89bc0b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a4bed0fe915650f882f772d022f89bc0b">push_front</a> (const value_type &amp;val)</td></tr>
+<tr class="memdesc:a4bed0fe915650f882f772d022f89bc0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.  <a href="classring__buffer.html#a4bed0fe915650f882f772d022f89bc0b">More...</a><br /></td></tr>
+<tr class="separator:a4bed0fe915650f882f772d022f89bc0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2d27891d77e19442f1d8acaa26b11ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#ab2d27891d77e19442f1d8acaa26b11ee">push_front</a> (value_type &amp;&amp;val)</td></tr>
 <tr class="memdesc:ab2d27891d77e19442f1d8acaa26b11ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer by move if move constructor is provided by value_type. If buffer would get full after the operation, allocates more memory.  <a href="classring__buffer.html#ab2d27891d77e19442f1d8acaa26b11ee">More...</a><br /></td></tr>
 <tr class="separator:ab2d27891d77e19442f1d8acaa26b11ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -299,24 +306,23 @@ size_type&#160;</td><td class="memItemRight" valign="bottom"><b>max_size</b> () 
 <tr class="memitem:a3bce1fcd742096534d78bc450371775a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classring__buffer_1_1__r_buf__const__iterator.html">const_iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a3bce1fcd742096534d78bc450371775a">cend</a> () const noexcept</td></tr>
 <tr class="memdesc:a3bce1fcd742096534d78bc450371775a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct const_iterator pointing to past the last element.  <a href="classring__buffer.html#a3bce1fcd742096534d78bc450371775a">More...</a><br /></td></tr>
 <tr class="separator:a3bce1fcd742096534d78bc450371775a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab456f054b5903b00e9b23ecf0b93675d"><td class="memItemLeft" align="right" valign="top"><a id="ab456f054b5903b00e9b23ecf0b93675d" name="ab456f054b5903b00e9b23ecf0b93675d"></a>
-reverse_iterator&#160;</td><td class="memItemRight" valign="bottom"><b>rbegin</b> ()</td></tr>
-<tr class="memdesc:ab456f054b5903b00e9b23ecf0b93675d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity. <br /></td></tr>
+<tr class="memitem:ab456f054b5903b00e9b23ecf0b93675d"><td class="memItemLeft" align="right" valign="top">reverse_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#ab456f054b5903b00e9b23ecf0b93675d">rbegin</a> ()</td></tr>
+<tr class="memdesc:ab456f054b5903b00e9b23ecf0b93675d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a reverse iterator pointing to the first element in reverse order (last element in normal order).  <a href="classring__buffer.html#ab456f054b5903b00e9b23ecf0b93675d">More...</a><br /></td></tr>
 <tr class="separator:ab456f054b5903b00e9b23ecf0b93675d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa243a80e8756739ce4b64f73e9a4338e"><td class="memItemLeft" align="right" valign="top">const_reverse_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#aa243a80e8756739ce4b64f73e9a4338e">rbegin</a> () const</td></tr>
-<tr class="memdesc:aa243a80e8756739ce4b64f73e9a4338e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity.  <a href="classring__buffer.html#aa243a80e8756739ce4b64f73e9a4338e">More...</a><br /></td></tr>
+<tr class="memdesc:aa243a80e8756739ce4b64f73e9a4338e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a const reverse iterator pointing to the first element in reverse order (last element in normal order).  <a href="classring__buffer.html#aa243a80e8756739ce4b64f73e9a4338e">More...</a><br /></td></tr>
 <tr class="separator:aa243a80e8756739ce4b64f73e9a4338e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a109b2e943558eab49ca6d33ca398a838"><td class="memItemLeft" align="right" valign="top">const_reverse_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a109b2e943558eab49ca6d33ca398a838">crbegin</a> () const</td></tr>
-<tr class="memdesc:a109b2e943558eab49ca6d33ca398a838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity.  <a href="classring__buffer.html#a109b2e943558eab49ca6d33ca398a838">More...</a><br /></td></tr>
+<tr class="memdesc:a109b2e943558eab49ca6d33ca398a838"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a const reverse iterator pointing to the first element in reverse order (last element in normal order).  <a href="classring__buffer.html#a109b2e943558eab49ca6d33ca398a838">More...</a><br /></td></tr>
 <tr class="separator:a109b2e943558eab49ca6d33ca398a838"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a81ee796bf66742e0d25716ce4c9d6f5d"><td class="memItemLeft" align="right" valign="top">reverse_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a81ee796bf66742e0d25716ce4c9d6f5d">rend</a> ()</td></tr>
-<tr class="memdesc:a81ee796bf66742e0d25716ce4c9d6f5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity.  <a href="classring__buffer.html#a81ee796bf66742e0d25716ce4c9d6f5d">More...</a><br /></td></tr>
+<tr class="memdesc:a81ee796bf66742e0d25716ce4c9d6f5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order).  <a href="classring__buffer.html#a81ee796bf66742e0d25716ce4c9d6f5d">More...</a><br /></td></tr>
 <tr class="separator:a81ee796bf66742e0d25716ce4c9d6f5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9dcf3f2bfc1c9be3d18ab2d25eebd48"><td class="memItemLeft" align="right" valign="top">const_reverse_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#ae9dcf3f2bfc1c9be3d18ab2d25eebd48">rend</a> () const</td></tr>
-<tr class="memdesc:ae9dcf3f2bfc1c9be3d18ab2d25eebd48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity.  <a href="classring__buffer.html#ae9dcf3f2bfc1c9be3d18ab2d25eebd48">More...</a><br /></td></tr>
+<tr class="memdesc:ae9dcf3f2bfc1c9be3d18ab2d25eebd48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order).  <a href="classring__buffer.html#ae9dcf3f2bfc1c9be3d18ab2d25eebd48">More...</a><br /></td></tr>
 <tr class="separator:ae9dcf3f2bfc1c9be3d18ab2d25eebd48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a25432bd918d4cafbfb9e5bd47ea296"><td class="memItemLeft" align="right" valign="top">const_reverse_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a8a25432bd918d4cafbfb9e5bd47ea296">crend</a> () const</td></tr>
-<tr class="memdesc:a8a25432bd918d4cafbfb9e5bd47ea296"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity.  <a href="classring__buffer.html#a8a25432bd918d4cafbfb9e5bd47ea296">More...</a><br /></td></tr>
+<tr class="memdesc:a8a25432bd918d4cafbfb9e5bd47ea296"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order).  <a href="classring__buffer.html#a8a25432bd918d4cafbfb9e5bd47ea296">More...</a><br /></td></tr>
 <tr class="separator:a8a25432bd918d4cafbfb9e5bd47ea296"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
@@ -1009,7 +1015,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </div><div class="memdoc">
 
 <p>Returns a const-reference to the last element in the buffer. Behaviour is undefined for empty buffer. </p>
-<dl class="section return"><dt>Returns</dt><dd>const-reference to the last element in the buffer.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>const_reference to the last element in the buffer.</dd></dl>
 <p>Constant complexity. </p>
 
 </div>
@@ -1072,7 +1078,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 
 <p>Construct const_iterator at begin. </p>
 <dl class="section return"><dt>Returns</dt><dd>Const_iterator pointing to first element.</dd></dl>
-<p>Constant complexity. </p>
+<p>Constant complexity. Iterator is invalid if the buffer is empty (dereferencing points to uninitialized memory.). </p>
 
 </div>
 </div>
@@ -1103,7 +1109,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 
 <p>Construct iterator at begin. </p>
 <dl class="section return"><dt>Returns</dt><dd>Iterator pointing to first element.</dd></dl>
-<p>Constant complexity. </p>
+<p>Constant complexity. Iterator is invalid if the buffer is empty (dereferencing points to uninitialized memory.). </p>
 
 </div>
 </div>
@@ -1256,8 +1262,8 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity. </p>
-<dl class="section return"><dt>Returns</dt><dd>const_reverse_iterator pointing to the first element in reverse order. </dd></dl>
+<p>Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). </p>
+<p >Constant complexity. </p><dl class="section return"><dt>Returns</dt><dd>const_reverse_iterator pointing to the first element in reverse order. </dd></dl>
 
 </div>
 </div>
@@ -1286,8 +1292,8 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity. </p>
-<dl class="section return"><dt>Returns</dt><dd>const_reverse_iterator pointing to one past the last element in reverse order. </dd></dl>
+<p>Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). </p>
+<p >Constant complexity. </p><dl class="section return"><dt>Returns</dt><dd>const_reverse_iterator pointing to one past the last element in reverse order. </dd></dl>
 
 </div>
 </div>
@@ -1384,6 +1390,100 @@ template&lt;class... Args&gt; </div>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element. Additionally, rotate can throw bad_alloc and if T does not provide a noexcept move semantics. </td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown, invariants are preserved. (Basic exception guarantee).</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Constant complexity. </p>
+
+</div>
+</div>
+<a id="aed98662b3760dac1c9ea6c98d0106068" name="aed98662b3760dac1c9ea6c98d0106068"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed98662b3760dac1c9ea6c98d0106068">&#9670;&#160;</a></span>emplace_back()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;class... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classring__buffer.html">ring_buffer</a>&lt; T, Allocator &gt;::emplace_back </td>
+          <td>(</td>
+          <td class="paramtype">Args &amp;&amp;...&#160;</td>
+          <td class="paramname"><em>args</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs an element in place to front from argumets. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args</td><td>Argument pack containing arguments to construct value_type element. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section pre"><dt>Precondition</dt><dd>value_type is EmplaceConstructible from args. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element. </td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown, invariants are preserved. (Basic exception guarantee).</td></tr>
+  </table>
+  </dd>
+</dl>
+<p>Constant complexity. </p>
+
+</div>
+</div>
+<a id="a4a7e65ec20452b89d10f1a587fa39222" name="a4a7e65ec20452b89d10f1a587fa39222"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a7e65ec20452b89d10f1a587fa39222">&#9670;&#160;</a></span>emplace_front()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;class... Args&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classring__buffer.html">ring_buffer</a>&lt; T, Allocator &gt;::emplace_front </td>
+          <td>(</td>
+          <td class="paramtype">Args &amp;&amp;...&#160;</td>
+          <td class="paramname"><em>args</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs an element in place to front from argumets. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">args</td><td>Argument pack containing arguments to construct value_type element. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section pre"><dt>Precondition</dt><dd>value_type is EmplaceConstructible from args. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element. </td></tr>
     <tr><td class="paramname">If</td><td>any exception is thrown, invariants are preserved. (Basic exception guarantee).</td></tr>
   </table>
   </dd>
@@ -1606,7 +1706,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </div><div class="memdoc">
 
 <p>Returns a reference to the first element in the buffer. Behaviour is undefined for empty buffer. </p>
-<dl class="section return"><dt>Returns</dt><dd>const-Reference to the first element.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>const_reference to the first element.</dd></dl>
 <p>Constant complexity. </p>
 
 </div>
@@ -1979,6 +2079,37 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 
 </div>
 </div>
+<a id="a09435a2152f9b680154e1e51e4472787" name="a09435a2152f9b680154e1e51e4472787"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09435a2152f9b680154e1e51e4472787">&#9670;&#160;</a></span>max_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">size_type <a class="el" href="classring__buffer.html">ring_buffer</a>&lt; T, Allocator &gt;::max_size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the theoretical maximum size of the container. </p>
+<dl class="section return"><dt>Returns</dt><dd>Maximum size of the buffer.</dd></dl>
+<p>Constant complexity. </p>
+
+</div>
+</div>
 <a id="abff7619acabb085c8a582dd02c0737cb" name="abff7619acabb085c8a582dd02c0737cb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abff7619acabb085c8a582dd02c0737cb">&#9670;&#160;</a></span>operator=() <span class="overload">[1/3]</span></h2>
 
@@ -2295,12 +2426,13 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc. </td></tr>
-    <tr><td class="paramname">If</td><td>the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee). </td></tr>
+    <tr><td class="paramname">If</td><td>the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function retains invariants (Basic Exception Guarantee). </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>value_type needs to satisfy CopyInsertable. </dd></dl>
-<dl class="section post"><dt>Postcondition</dt><dd>If more memory is allocated, all pointers and references are invalidated. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>If more memory is allocated all pointers, iterators and references are invalidated.</dd></dl>
+<p>Constant complexity. </p>
 
 </div>
 </div>
@@ -2341,18 +2473,68 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc if more memory is allocated. </td></tr>
-    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception (std::bad_alloc) this function has no effect (Strong Exception Guarantee). </td></tr>
+    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function retains invariants (Basic Exception Guarantee). </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>value_type needs to satisfy MoveInsertable or CopyInsertable. </dd></dl>
-<dl class="section post"><dt>Postcondition</dt><dd>If more memory is allocated, all pointers and references are invalidated.</dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>If more memory is allocated all pointers, iterators and references are invalidated.</dd></dl>
+<p>Constant complexity. </p>
+
+</div>
+</div>
+<a id="a4bed0fe915650f882f772d022f89bc0b" name="a4bed0fe915650f882f772d022f89bc0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bed0fe915650f882f772d022f89bc0b">&#9670;&#160;</a></span>push_front() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="classring__buffer.html">ring_buffer</a>&lt; T, Allocator &gt;::push_front </td>
+          <td>(</td>
+          <td class="paramtype">const value_type &amp;&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory. </p>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory for allocation. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>Element to insert. Needs to be CopyConstructible. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>All iterators are invalidated. If allocation happens, all pointers and references are invalidated. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function retains invariants (Basic Exception Guarantee).</td></tr>
+  </table>
+  </dd>
+</dl>
 <p>Constant complexity. </p>
 
 </div>
 </div>
 <a id="ab2d27891d77e19442f1d8acaa26b11ee" name="ab2d27891d77e19442f1d8acaa26b11ee"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab2d27891d77e19442f1d8acaa26b11ee">&#9670;&#160;</a></span>push_front() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab2d27891d77e19442f1d8acaa26b11ee">&#9670;&#160;</a></span>push_front() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2394,7 +2576,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="section note"><dt>Note</dt><dd>All iterators are invalidated. If allocation happens, all pointers and references are invalidated. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).</td></tr>
+    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function retains invariants (Basic Exception Guarantee).</td></tr>
   </table>
   </dd>
 </dl>
@@ -2402,8 +2584,8 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 
 </div>
 </div>
-<a id="a8c31052b14b558f6656dd06dc6f00436" name="a8c31052b14b558f6656dd06dc6f00436"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c31052b14b558f6656dd06dc6f00436">&#9670;&#160;</a></span>push_front() <span class="overload">[2/2]</span></h2>
+<a id="ab456f054b5903b00e9b23ecf0b93675d" name="ab456f054b5903b00e9b23ecf0b93675d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab456f054b5903b00e9b23ecf0b93675d">&#9670;&#160;</a></span>rbegin() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2414,10 +2596,9 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="classring__buffer.html">ring_buffer</a>&lt; T, Allocator &gt;::push_front </td>
+          <td class="memname">reverse_iterator <a class="el" href="classring__buffer.html">ring_buffer</a>&lt; T, Allocator &gt;::rbegin </td>
           <td>(</td>
-          <td class="paramtype">value_type&#160;</td>
-          <td class="paramname"><em>val</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -2428,32 +2609,14 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory. </p>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory for allocation. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">val</td><td>Element to insert. Needs to be CopyConstructible. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section note"><dt>Note</dt><dd>All iterators are invalidated. If allocation happens, all pointers and references are invalidated. </dd></dl>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Constant complexity. </p>
+<p>Get a reverse iterator pointing to the first element in reverse order (last element in normal order). </p>
+<dl class="section return"><dt>Returns</dt><dd>reverse_iterator pointing to first element in reverse order.</dd></dl>
+<p>Constant complexity. Iterator is invalid if the buffer is empty (dereferencing points to uninitialized memory.). </p>
 
 </div>
 </div>
 <a id="aa243a80e8756739ce4b64f73e9a4338e" name="aa243a80e8756739ce4b64f73e9a4338e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa243a80e8756739ce4b64f73e9a4338e">&#9670;&#160;</a></span>rbegin()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa243a80e8756739ce4b64f73e9a4338e">&#9670;&#160;</a></span>rbegin() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2477,8 +2640,9 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). Constant complexity. </p>
-<dl class="section return"><dt>Returns</dt><dd>const_reverse_iterator pointing to the first element in reverse order. </dd></dl>
+<p>Get a const reverse iterator pointing to the first element in reverse order (last element in normal order). </p>
+<dl class="section return"><dt>Returns</dt><dd>const_reverse_iterator pointing to the first element in reverse order.</dd></dl>
+<p>Constant complexity. </p>
 
 </div>
 </div>
@@ -2507,8 +2671,8 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Get a reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity. </p>
-<dl class="section return"><dt>Returns</dt><dd>reverse_iterator pointing to one past the last element in reverse order. </dd></dl>
+<p>Get a reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). </p>
+<p >Constant complexity. </p><dl class="section return"><dt>Returns</dt><dd>reverse_iterator pointing to one past the last element in reverse order. </dd></dl>
 
 </div>
 </div>
@@ -2537,8 +2701,8 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). Constant complexity. </p>
-<dl class="section return"><dt>Returns</dt><dd>const_reverse_iterator pointing to one past the last element in reverse order. </dd></dl>
+<p>Get a const reverse iterator pointing to one past the last element in reverse order (one before the first element in normal order). </p>
+<p >Constant complexity. </p><dl class="section return"><dt>Returns</dt><dd>const_reverse_iterator pointing to one past the last element in reverse order. </dd></dl>
 
 </div>
 </div>
@@ -2595,7 +2759,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc. </td></tr>
-    <tr><td class="paramname">If</td><td>T's move (or copy if T has no move) constructor throws, behaviour is undefined. Otherwise Stong Exception Guarantee. @notes All references and pointers are invalidated (iterators stay valid). If memory is allocated, the memory layout is rotated so that first element matches the beginning of physical memory.</td></tr>
+    <tr><td class="paramname">If</td><td>T's move (or copy if T has no move) constructor throws, behaviour is undefined. Otherwise Stong Exception Guarantee. @notes All references, pointers and iterators are invalidated. If memory is allocated, the memory layout is rotated so that first element matches the beginning of physical memory.</td></tr>
   </table>
   </dd>
 </dl>
@@ -2631,7 +2795,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <p>Releases unused allocated memory. </p>
 <dl class="section pre"><dt>Precondition</dt><dd>T must satisfy MoveConstructible or CopyConstructible. </dd></dl>
 <dl class="section post"><dt>Postcondition</dt><dd>m_capacity == <a class="el" href="classring__buffer.html#aca0782fc0b1264ff01c5ffbe199423a5" title="Gets the size of the container.">size()</a> + 2. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Reduces capacity by allocating a smaller memory area and moving the elements. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Reduces capacity by allocating a smaller memory area and moving the elements. Shrinking the buffer invalidates all pointers, iterators and references. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Might</td><td>throw std::bad_alloc if memory allocation fails. </td></tr>
@@ -2669,7 +2833,8 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </div><div class="memdoc">
 
 <p>Gets the size of the container. </p>
-<dl class="section return"><dt>Returns</dt><dd>Size of buffer. @det </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Size of buffer.</dd></dl>
+<p>Constant complexity. </p>
 
 </div>
 </div>

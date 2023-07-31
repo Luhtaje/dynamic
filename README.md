@@ -14,7 +14,7 @@ The project is structured as follows:
 
 - `googletest/`: This directory contains the GoogleTest framework files. Note that GoogleTest is included as a GitHub submodule.
 
-- `src/`: This directory houses all the source files for the ring buffer library.
+- `includ/`: This directory houses all the header(s) for the ring buffer library.
 
 - `test/`: This directory contains the test files for the ring buffer library.
 
@@ -37,7 +37,7 @@ mkdir build
 cd build
 cmake ..
 ```
-This will create a Visual Studio project. Set the project "googletests" as startup project and hit run to run the tests.
+This will create a Visual Studio project. Set the project "RunTests" as startup project and hit run to run the tests.
 
 
 ## Documentation
