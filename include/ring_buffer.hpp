@@ -532,8 +532,8 @@ public:
     /// @details Linear complexity in relation to amount of constructed elements (O(n)).
     ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
     {
-        m_data = m_allocator.allocate(count + 2);
         m_capacity = count + 2;
+        m_data = m_allocator.allocate(m_capacity);
 
         for (size_t i = 0; i < count; i++)
         {
@@ -568,7 +568,7 @@ public:
     /// @details Linear complexity in relation to the size of the range (O(n)).
     /// @note Behavior is undefined if elements in range are not valid.
     template<typename InputIt>
-    ring_buffer(InputIt beginIt, InputIt endIt) : m_headIndex(0) , m_tailIndex(0)
+    ring_buffer(InputIt beginIt, InputIt endIt, const allocator_type& alloc = allocator_type()) : m_headIndex(0) , m_tailIndex(0)
     {
         const auto size = std::distance<InputIt>(beginIt , endIt);
 
@@ -588,7 +588,7 @@ public:
     /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
     /// @note Allocates memory for 2 extra elements.
     /// @details Linear complexity in relation to initializer list size (O(n)).
-    explicit ring_buffer(std::initializer_list<T> init) : ring_buffer(init.begin(),init.end())
+    ring_buffer(std::initializer_list<T> init) : ring_buffer(init.begin(),init.end())
     {
     }
 
@@ -610,34 +610,95 @@ public:
         }
     }
 
+    /// @brief Copy constructor with custom allocator.
+    /// @param rhs Reference to a RingBuffer to create a copy from.
+    /// @param alloc Allocator for the new buffer.
+    /// @pre T must meet CopyInsertable.
+    /// @post this == ring_buffer(rhs) but with a different allocator.
+    /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation, or something from value_types constructor.
+    /// @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).
+    /// @details Linear complexity in relation to buffer size.
+    ring_buffer(const ring_buffer& rhs, const allocator_type& alloc) : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex), m_capacity(rhs.m_capacity), m_allocator(alloc)
+    {
+        m_data = m_allocator.allocate(rhs.capacity());
+
+        for (size_type i = 0; i < rhs.size(); i++)
+        {
+            m_allocator.construct(m_data + i, rhs[i]);
+            increment(m_headIndex);
+        }
+    }
+
     /// @brief Move constructor.
     /// @param other Rvalue reference to other buffer.
     /// @pre value_type must resolve std::is_nothrow_move_constructible<value_type>::value to true. Otherwise function does nothing.
     /// @details Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant.
-    ring_buffer(ring_buffer&& other) noexcept : m_headIndex(0), m_tailIndex(0), m_capacity(0)
+    ring_buffer(ring_buffer&& other) noexcept : m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex), m_capacity(other.m_capacity), m_allocator(std::move(other.m_allocator))
     {
         if (!std::is_nothrow_move_constructible<value_type>::value) return;
 
         if (std::allocator_traits<allocator_type>::propagate_on_container_move_assignment::value)
         {
-            m_allocator = other.get_allocator();
+            m_allocator = other.m_allocator;
             m_data = std::exchange(other.m_data, nullptr);
         }
-        else if (m_allocator == other.get_allocator())
+        else if (m_allocator == other.m_allocator)
         {
             m_data = std::exchange(other.m_data, nullptr);
         }
+        // Allocator is different and does not propagate, move elements individually.
         else
         {
+            m_data = m_allocator.allocate(m_capacity);
+
             for (size_t i = 0; i < other.size(); i++)
             {
-                m_allocator.construct(&this->operator[](other.begin().getIndex() + i), std::move(other[i]));
+                m_allocator.construct(&this->operator[](i), std::move(other[i]));
             }
+            other.m_data = nullptr;
         }
 
-        m_capacity = std::exchange(other.m_capacity, m_capacity);
-        m_headIndex = std::exchange(other.m_headIndex, m_headIndex);
-        m_tailIndex = std::exchange(other.m_tailIndex, m_tailIndex);
+        other.m_capacity = 0;
+        other.m_headIndex = 0;
+        other.m_tailIndex = 0;
+    }
+
+    /// @brief Move constructor with different allocator.
+    /// @param other Rvalue reference to other buffer.
+    /// @param alloc Allocator for the new ring buffer.
+    /// @pre value_type must resolve std::is_nothrow_move_constructible<value_type>::value to true. Otherwise function does nothing.
+    /// @details Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant.
+    ring_buffer(ring_buffer&& other, const allocator_type& alloc) noexcept : m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex), m_capacity(other.m_capacity), m_allocator(alloc)
+    {
+        if (!std::is_nothrow_move_constructible<value_type>::value) return;
+        
+        // Allocator is the same, just take it all.
+        if (m_allocator == other.get_allocator())
+        {
+            m_data = other.m_data;
+            other.m_data = nullptr;
+            other.m_headIndex = 0;
+            other.m_tailIndex = 0;
+            other.m_capacity = 0;
+
+        }
+        // Allocator is different, allocate memory with new allocator and manually move the elements. Clean up original buffer after.
+        else
+        {
+            m_data = m_allocator.allocate(m_capacity);
+            for (size_type i = 0; i < other.size(); i++)
+            {
+                m_allocator.construct(&this->operator[](i), std::move(other[i]));
+            }
+
+            // Clean up the original buffer.
+            other.clear();
+            other.m_allocator.deallocate(other.m_data, other.m_capacity);
+            other.m_data = nullptr;
+            other.m_capacity = 0;
+            other.m_headIndex = 0;
+            other.m_tailIndex = 0;
+        }
 
     }
 
