@@ -1198,9 +1198,10 @@ public:
     /// @throw Throws std::bad_alloc if there is not enough memory for allocation. Throws std::bad_array_new_lenght if std::numeric_limits<std::size_t>::max() / sizeof(T) < newsize.
     /// @param newCapacity Amount of memory to allocate. If newCapacity is less than or equal to m_capacity, function does nothing.
     /// @param enableShrink True to enable reserve to reduce the capacity, to a minimum of size() +2.
+    /// @pre T must meet MoveInsertable.
     /// @throw Can throw std::bad_alloc. 
     /// @exception If T's move (or copy if T has no move) constructor throws, behaviour is undefined. Otherwise Stong Exception Guarantee.
-    /// @notes All references, pointers and iterators are invalidated. If memory is allocated, the memory layout is rotated so that first element matches the beginning of physical memory.
+    /// @note All references, pointers and iterators are invalidated. If memory is allocated, the memory layout is rotated so that first element matches the beginning of physical memory.
     /// @details Linear complexity in relation to size of the buffer.
     void reserve(size_type newCapacity, bool enableShrink = false)
     {
@@ -1214,9 +1215,15 @@ public:
         }
 
         // Temp for "copy and swap" idiom to exception safe operation.
-        auto temp = ring_buffer<T, allocator_type>(newCapacity);
+        auto temp = ring_buffer<T, allocator_type>();
+        temp.m_capacity = newCapacity;
+        temp.m_data = temp.m_allocator.allocate(newCapacity);
 
-        temp.assign(begin(), end());
+        for(size_t i = 0; i < this->size(); i++)
+        {
+            temp.m_allocator.construct(temp.m_data + i, std::move(this->operator[](i)));
+        }
+        temp.m_headIndex = this->size();
 
         // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
         this->swap(temp);
@@ -1268,7 +1275,10 @@ public:
     /// @details Constant complexity.
     void push_back(const value_type& val)
     {
-        validateCapacity(1);
+        if(this->size() + 1 == m_capacity)
+        {
+            reserve(m_capacity / 2 + m_capacity);
+        }
 
         m_allocator.construct(&m_data[m_headIndex], val);
         increment(m_headIndex);
