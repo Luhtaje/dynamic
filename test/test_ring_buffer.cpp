@@ -805,7 +805,8 @@ TYPED_TEST(RingBufferTest, shrink_to_fit)
 {
     this->t_buffer.reserve(100);
     this->t_buffer.shrink_to_fit();
-    ASSERT_EQ(this->t_buffer.size() + 2, this->t_buffer.capacity());
+    // Shrink to fit reduces cap to size () + 1 (the allocation buffer)
+    ASSERT_EQ(this->t_buffer.size() + 1, this->t_buffer.capacity());
 }
 
 }

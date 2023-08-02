@@ -7,7 +7,11 @@
 #include <utility>
 #include <stdexcept>
 
-
+namespace
+{
+    // Buffer always reserves one extra space. Capacity should not equal size when buffer has non-zero capacity.
+    constexpr size_t allocBuffer = 1;
+}
 // Forward declaration of _rBuf_const_iterator.
 template<class _rBuf>
 class _rBuf_const_iterator;
@@ -501,22 +505,21 @@ public:
 //============================
 
 
-    /// @brief Default constructor. Constructs to 0 size and 2 capacity.
-    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
+    /// @brief Default constructor.
     /// @post this->empty() == true.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Constant complexity.
-    ring_buffer() : ring_buffer(0, allocator_type())
+    ring_buffer() : ring_buffer(allocator_type())
     {
     }
 
-    /// @brief Constructs the container with a custom allocator to 0 size and 2 capacity.
+    /// @brief Constructs the container with a custom allocator.
     /// @param alloc Custom allocator for the buffer.
     /// @post this->empty() == true.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Constant complexity.
-    explicit ring_buffer(const allocator_type& alloc) : ring_buffer(0, alloc)
+    explicit ring_buffer(const allocator_type& alloc) : m_headIndex(0), m_tailIndex(0), m_capacity(0), m_data(nullptr), m_allocator(alloc)
     {
     }
 
@@ -530,9 +533,8 @@ public:
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to amount of constructed elements (O(n)).
-    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
+    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
     {
-        m_capacity = count + 2;
         m_data = m_allocator.allocate(m_capacity);
 
         for (size_t i = 0; i < count; i++)
@@ -706,10 +708,13 @@ public:
     ~ring_buffer()
     {
         // Calls destructor for each element in the buffer.
-        for_each(begin(),end(),[this](T& elem) { m_allocator.destroy(&elem); });
+        for_each(begin(), end(), [this](T& elem) { m_allocator.destroy(&elem); });
 
         // After destruction deallocate the memory.
-        m_allocator.deallocate(m_data, m_capacity);
+        if (m_data != nullptr)
+        {
+            m_allocator.deallocate(m_data, m_capacity);
+        }
     }
 
     /// @brief Inserts an element to the buffer.
@@ -1205,16 +1210,16 @@ public:
     /// @details Linear complexity in relation to size of the buffer.
     void reserve(size_type newCapacity, bool enableShrink = false)
     {
-        if (!enableShrink)
+        if (enableShrink)
         {
-            if (newCapacity <= m_capacity) return;
+            if (newCapacity < size()) return;
         }
         else
         {
-            if (newCapacity < size() ) return;
+            if (newCapacity <= m_capacity) return;
         }
 
-        // Temp for "copy and swap" idiom to exception safe operation.
+        // Temp for "move and swap" idiom to provide exception safety.
         auto temp = ring_buffer<T, allocator_type>();
         temp.m_capacity = newCapacity;
         temp.m_data = temp.m_allocator.allocate(newCapacity);
@@ -1225,7 +1230,6 @@ public:
         }
         temp.m_headIndex = this->size();
 
-        // Assings the data from temp to original buffer. The resources from temp will be released when function goes out of scope.
         this->swap(temp);
     }
 
@@ -1275,10 +1279,7 @@ public:
     /// @details Constant complexity.
     void push_back(const value_type& val)
     {
-        if(this->size() + 1 == m_capacity)
-        {
-            reserve(m_capacity / 2 + m_capacity);
-        }
+        validateCapacity(1);
 
         m_allocator.construct(&m_data[m_headIndex], val);
         increment(m_headIndex);
@@ -1330,13 +1331,7 @@ public:
     /// @details Linear complexity in relation to size of the buffer.
     void shrink_to_fit()
     {
-        // Reserve would allocate size + 2 elements, so no point in shrinking if buffer is smaller than that.
-        if (m_capacity <= size() + 2)
-        { 
-            return;
-        }
-
-        reserve(size(), true);
+        reserve(size() + allocBuffer, true);
     }
 
 //===========================================================
@@ -1492,16 +1487,25 @@ private:
     /// @note This function should be called before increasing the size of the buffer.
     void validateCapacity(size_t increase)
     {
-        if (m_capacity <= size() + increase)
+        if (m_capacity > size() + increase + allocBuffer) return;
+
+        auto enlargedCap = m_capacity / 2 + m_capacity;
+
+        if (enlargedCap > size() + increase)
         {
-            if (m_capacity / 2 + m_capacity <= size() + increase)
-            {
-                reserve(m_capacity + increase + m_capacity / 2 );
-            }
-            else
-            {
-                reserve(m_capacity / 2 + m_capacity);
-            }
+            reserve(enlargedCap + allocBuffer);
+            return;
+        }
+        
+        // Special case, 1.5*m_capacity is not enough, allocate increase + the "normal" capacity increase.
+        if(enlargedCap > 2)
+        {
+            reserve(enlargedCap + increase + allocBuffer);
+        }
+        // Takes care of the special case where capacity is 0 / 1 and multiplying that does not produce a change.
+        else
+        {
+            reserve(2);
         }
     }
 
