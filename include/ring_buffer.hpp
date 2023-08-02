@@ -859,7 +859,6 @@ public:
             ++returnIt;
         }
 
-
         // Last element is always destroyed.
         m_allocator.destroy(&*(end() - 1));
         decrement(m_headIndex);
@@ -1246,7 +1245,7 @@ public:
         // Decrement temporary index in case constructor throws to retain invariants (elements of the buffer are always initialized).
         auto newIndex = m_tailIndex;
         decrement(newIndex);
-        m_allocator.construct(&m_data[newIndex], val);
+        m_allocator.construct(m_data + newIndex, val);
         m_tailIndex = newIndex;
     }
 
@@ -1264,7 +1263,7 @@ public:
         // Decrement temporary index incase constructor throws to retain invariants (elements of the buffer are always initialized).
         auto newIndex = m_tailIndex;
         decrement(newIndex);
-        m_allocator.construct(&m_data[newIndex], std::forward<value_type>(val));
+        m_allocator.construct(m_data + newIndex, std::forward<value_type>(val));
         m_tailIndex = newIndex;
     }
 
@@ -1281,7 +1280,7 @@ public:
     {
         validateCapacity(1);
 
-        m_allocator.construct(&m_data[m_headIndex], val);
+        m_allocator.construct(m_data + m_headIndex, val);
         increment(m_headIndex);
     }
 
@@ -1297,7 +1296,7 @@ public:
     {
         validateCapacity(1);
     
-        m_allocator.construct(&m_data[m_headIndex], std::forward<value_type>(val));
+        m_allocator.construct(m_data + m_headIndex, std::forward<value_type>(val));
         increment(m_headIndex);
     }
 
@@ -1307,7 +1306,7 @@ public:
     /// @details Constant complexity.
     void pop_front() noexcept
     {
-        m_allocator.destroy(&m_data[m_tailIndex]);
+        m_allocator.destroy(m_data + m_tailIndex);
         increment(m_tailIndex);
     }
 
@@ -1318,7 +1317,7 @@ public:
     void pop_back() noexcept
     {
         decrement(m_headIndex);
-        m_allocator.destroy(&m_data[m_headIndex]);
+        m_allocator.destroy(m_data + m_headIndex);
 
     }
 
@@ -1573,7 +1572,7 @@ private:
     /// @param index The index to increment.
     /// @details Constant complexity.
     void increment(size_t& index) noexcept
-    {   
+    {
         ++index;
         // Wrap index around at end of physical memory area.
         if(index >= m_capacity)
