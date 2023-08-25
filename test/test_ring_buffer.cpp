@@ -59,7 +59,7 @@ ring_buffer<char> CreateBuffer<char>(int /*size*/)
     auto buf = ring_buffer<char>();
     for(size_t i = 0 ; i < TEST_BUFFER_SIZE; i++)
     {
-        buf.push_back(char(rand() % 26));
+        buf.push_back('a' + char(rand() % 26));
     }
     return buf;
 }
@@ -124,7 +124,7 @@ std::string getValue<std::string>()
     std::string str("");
     for(int i = 0; i < 5; i++)
     {
-        str.push_back(char(rand() % 100));
+        str.push_back('a' + char(rand() % 100));
     }
     return str;
 }
@@ -373,11 +373,12 @@ TYPED_TEST(RingBufferTest, insertSizeVal)
 // Tests requirement: SequenceContainer, insert() exprssion a.insert(p, i, j) where p is position iterator and [i, j) is a valid range.
 TYPED_TEST(RingBufferTest, insertRange)
 {
+    ring_buffer<TypeParam> rangeSource = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+    const auto refBuffer(this->t_buffer);
+
     const auto pos = 1;
     const auto amount = 2;
     const auto beginOffset = 1;
-    ring_buffer<TypeParam> rangeSource = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
-    const auto refBuffer(this->t_buffer);
 
     const auto rangeBeginIt = rangeSource.begin() + beginOffset;
     const auto rangeEndIt = rangeBeginIt + amount;
