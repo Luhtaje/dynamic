@@ -378,9 +378,9 @@ TYPED_TEST(RingBufferTest, insertRange)
 
     const auto pos = 1;
     const auto amount = 2;
-    const auto beginOffset = 1;
+    const auto beginOffset = 0;
 
-    const auto rangeBeginIt = rangeSource.begin() + beginOffset;
+    const auto rangeBeginIt = rangeSource.begin();
     const auto rangeEndIt = rangeBeginIt + amount;
     const auto posIt = this->t_buffer.begin() + pos;
 
@@ -404,7 +404,7 @@ TYPED_TEST(RingBufferTest, insertRange)
     for (size_t i = 0; i < amount; i++)
     {
         ASSERT_EQ(returnIt[i], posIt[i]);
-        ASSERT_EQ(rangeSource[beginOffset + i], this->t_buffer[pos + i]);
+        ASSERT_EQ(rangeSource[i], this->t_buffer[pos + i]);
     }
 }
 

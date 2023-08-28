@@ -1582,7 +1582,7 @@ private:
             else
             {
                 // Distance from the physical end of the buffer. Negative value means the insert positions distance is from the end of the buffer, positive means it has wrapped and is near beginning.
-                const auto distanceFromBorder = m_tailIndex + pos - m_capacity;
+                const int distanceFromBorder = m_tailIndex + posIndex - m_capacity;
                 if (distanceFromBorder < 0)
                 {
                     const auto initialTail = m_tailIndex;
@@ -1590,7 +1590,7 @@ private:
                     for (size_t i = 0; i < amount ; i++)
                     {
                         // Construct empty elements in the tail.
-                        auto tempIndex = m_tailIndex
+                        auto tempIndex = m_tailIndex;
                         decrement(tempIndex);
                         m_allocator.construct(m_data + tempIndex);
                         m_tailIndex = tempIndex;
@@ -1616,11 +1616,19 @@ private:
         }
         else
         {
+            // Construct empty elements at the end.
+            for (size_t i = 0; i < amount; i++)
+            {
+                m_allocator.construct(m_data + m_headIndex);
+                increment(m_headIndex);
+            }
+
             // value_type is not trivially copyable, need to do slow operation.
             std::move_backward(it, end() - amount, end());
         }
 
-        for(size_t i = 0; i < amount ; i++)
+        // Assign the elements to the new memory slots.
+        for (size_t i = 0; i < amount; i++)
         {
             *(it + i) = *(rangeBegin + i);
         }
