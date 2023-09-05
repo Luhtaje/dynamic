@@ -34,7 +34,7 @@ public:
     using pointer = T*;
     using const_pointer= const T*;
 
-    using difference_type = ptrdiff_t;
+    using difference_type = std::ptrdiff_t;
     using size_type = std::size_t;
 
 //========================================
@@ -1506,6 +1506,66 @@ private:
         }
     }
 
+    void byteCopy(const size_t posIndex, const size_t amount)
+    {
+        // Normal case, buffer is in a simple state.
+        if(m_headIndex > m_tailIndex)
+        {
+                //Need to iteratore the destination index with increment (border check), starting point is safe.
+                m_allocator.construct(m_data + m_headIndex);
+                increment(m_headIndex);
+
+            // Move the trailing elements from the breaking point by amount elements.
+            std::memmove(m_data + m_tailIndex + posIndex + amount, m_data + m_tailIndex + posIndex, (size() - posIndex) * sizeof(value_type)); 
+        }
+        else
+        {
+            // Distance from the physical end of the buffer. Negative value means the insert positions distance is from the end of the buffer, positive means it has wrapped and is near beginning.
+            const int distanceFromBorder = m_tailIndex + posIndex - m_capacity;
+            if (distanceFromBorder < 0)
+            {
+                const auto initialTail = m_tailIndex;
+
+                for (size_t i = 0; i < amount ; i++)
+                {
+                    // Construct empty elements in the tail.
+                    auto tempIndex = m_tailIndex;
+                    decrement(tempIndex);
+                    m_allocator.construct(m_data + tempIndex);
+                    m_tailIndex = tempIndex;
+                }
+
+                std::memmove(m_data + m_tailIndex, m_data + initialTail, (initialTail + distanceFromBorder) * sizeof(value_type));
+            }
+            // Posindex is at the beginning of physical memory layout. This part can be handled as a separate system that is "rightside up".
+            else
+            {
+                size_t physicalPosIndex = posIndex - (m_capacity - m_tailIndex);
+                size_t initialHeadIndex = m_headIndex;
+                // Construct empty elements in the head.
+                for (size_t i = 0; i < amount ; i++)
+                {
+                    m_allocator.construct(m_data + m_headIndex);
+                    increment(m_headIndex);
+                }
+                std::memmove(m_data + initialHeadIndex, m_data + physicalPosIndex, (m_headIndex - initialHeadIndex) * sizeof(value_type));
+            }
+        }
+    }
+
+    void slowCopy(const size_t posIndex, const size_t amount)
+    {
+        // Construct empty elements at the end.
+        for (size_t i = 0; i < amount; i++)
+        {
+            m_allocator.construct(m_data + m_headIndex);
+            increment(m_headIndex);
+        }
+
+        // value_type is not trivially copyable, need to do slow operation.
+        std::move_backward(begin() + posIndex, end() - amount, end());
+    }
+
     /// @brief Base function for inserting elements from value.
     /// @tparam Value type of the buffer.
     /// @param pos Iterator pointing to the element where after insert new element will exist.
@@ -1518,21 +1578,21 @@ private:
     template<typename InsertValue>
     iterator insertBase(const_iterator pos, const size_type amount, InsertValue&& value)
     {
-        iterator it(this, pos.getIndex());
 
+        iterator it(this, pos.getIndex());
         if (!amount) return it;
 
         validateCapacity(amount);
 
-        for (size_type i = 0; i < amount; i++)
+        // Use memmove to move elements to create space to insert.
+        if (std::is_trivially_copyable<value_type>::value)
         {
-            // Initialize elements
-            m_allocator.construct(&*end());
-            increment(m_headIndex);
+            byteCopy(pos.getIndex(), amount);
         }
-
-        // Rotate elements to make room for new elements.
-        std::move_backward(it, end() - amount, end());
+        else
+        {
+           slowCopy(pos.getIndex(), amount);
+        }
 
         // Assign elements
         for (size_type i = 0; i < amount; i++)
@@ -1566,68 +1626,14 @@ private:
         // Use memmove to move elements to create space to insert.
         if (std::is_trivially_copyable<value_type>::value)
         {
-            // Normal case, buffer is in a simple state.
-            if(m_headIndex > m_tailIndex )
-            {
-                // Construct empty elements at the end.
-                for (size_t i = 0; i < amount ; i++)
-                {
-                    m_allocator.construct(m_data + m_headIndex);
-                    increment(m_headIndex);
-                }
-                
-                // Move the trailing elements from the breaking point by amount elements.
-                std::memmove(m_data + m_tailIndex + posIndex + amount, m_data + m_tailIndex + posIndex, (size() - posIndex) * sizeof(value_type)); 
-            }
-            else
-            {
-                // Distance from the physical end of the buffer. Negative value means the insert positions distance is from the end of the buffer, positive means it has wrapped and is near beginning.
-                const int distanceFromBorder = m_tailIndex + posIndex - m_capacity;
-                if (distanceFromBorder < 0)
-                {
-                    const auto initialTail = m_tailIndex;
-
-                    for (size_t i = 0; i < amount ; i++)
-                    {
-                        // Construct empty elements in the tail.
-                        auto tempIndex = m_tailIndex;
-                        decrement(tempIndex);
-                        m_allocator.construct(m_data + tempIndex);
-                        m_tailIndex = tempIndex;
-                        
-                        std::memcpy(m_data + m_tailIndex, m_data + initialTail + i, sizeof(value_type)); 
-                    }
-                }
-                // Posindex is at the beginning of physical memory layout. This part can be handled as a separate system that is "rightside up".
-                else
-                {
-                    const auto initialHead = m_headIndex;
-
-                    // Construct empty elements in the head.
-                    for (size_t i = 0; i < amount ; i++)
-                    {
-                        m_allocator.construct(m_data + m_headIndex);
-                        increment(m_headIndex);
-                    }
-                    
-                    std::memmove(m_data + (initialHead - distanceFromBorder), m_data + distanceFromBorder, (initialHead - distanceFromBorder)* sizeof(value_type));
-                }
-            }
+            byteCopy(pos.getIndex(), amount);
         }
         else
         {
-            // Construct empty elements at the end.
-            for (size_t i = 0; i < amount; i++)
-            {
-                m_allocator.construct(m_data + m_headIndex);
-                increment(m_headIndex);
-            }
-
-            // value_type is not trivially copyable, need to do slow operation.
-            std::move_backward(it, end() - amount, end());
+            slowCopy(pos.getIndex(), amount);
         }
 
-        // Assign the elements to the new memory slots.
+        //Assign the elements to the new memory slots.
         for (size_t i = 0; i < amount; i++)
         {
             *(it + i) = *(rangeBegin + i);
