@@ -140,7 +140,9 @@ public:
             return (temp += offset);
         }
 
-        // TODO
+        /// @brief Addition operator with the offset at the beginning of the operation.
+        /// @param offset The number of positions to move the iterator forward.
+        /// @param iter Base iterator to what the offset is added to.
         /// @note If offset is such that the iterator is beyond end() or begin(), the return iterator is invalid (dereferencing it is undefined behaviour).
         /// @details Constant complexity.
         friend _rBuf_const_iterator operator+(const difference_type offset, _rBuf_const_iterator iter)
@@ -208,8 +210,9 @@ public:
         }
 
         /// @brief Comparison operator < overload
-        /// @param other iterator to compare
-        /// @return true if other is larger.
+        /// @param other iterator to compare against.
+        /// @return True if other is larger.
+        /// @note Comparing to an iterator from another container is undefined.
         /// @details Constant complexity.
         bool operator<(const _rBuf_const_iterator& other) const noexcept
         {
@@ -217,8 +220,9 @@ public:
         }
 
         /// @brief Comparison operator > overload
-        /// @param other iterator to compare
-        /// @return true if other is smaller.
+        /// @param other iterator to compare against.
+        /// @return True if other is smaller.
+        /// @note Comparing to an iterator from another container is undefined.
         /// @details Constant complexity.
         bool operator>(const _rBuf_const_iterator& other) const noexcept
         {
@@ -226,7 +230,10 @@ public:
             return (other.m_logicalIndex < m_logicalIndex);
         }
 
-        /// <summary>
+        /// @brief Less or equal operator.
+        /// @param other Other iterator to compare against.
+        /// @return Returns true if index of this is less or equal than other's. Otherwise false.
+        /// @note Comparing to an iterator from another container is undefined.
         /// @details Constant complexity.
         bool operator<=(const _rBuf_const_iterator& other) const noexcept
         {
@@ -234,7 +241,10 @@ public:
             return (!(other < m_logicalIndex));
         }
 
-        /// <summary>
+        /// @brief Greater or equal than operator.
+        /// @param other Iterator to compare against.
+        /// @return Returns true if this's index is greater than or equal to other.
+        /// @note Comparing to an iterator from another container is undefined.
         /// @details Constant complexity.
         bool operator>=(const _rBuf_const_iterator& other) const noexcept
         {
