@@ -13,7 +13,7 @@
 namespace 
 {
 
-const static size_t TEST_BUFFER_SIZE = 6;
+const static size_t TEST_BUFFER_SIZE = 7;
 const static size_t TEST_INT_VALUE = 9;
 
 // Define some factory functions.
@@ -28,19 +28,19 @@ ring_buffer<T> CreateBuffer();
 template <>
 ring_buffer<std::pair<int,std::string>> CreateBuffer<std::pair<int,std::string>>()
 {
-    return ring_buffer < std::pair<int, std::string>>{ {1, "Hello" }, { 2, "World" }, { 3, "I" }, { 4, "Love" }, { 5, "Mackerel"}, { 6, "wow" }};
+    return ring_buffer < std::pair<int, std::string>>{ {1, "Hello" }, { 2, "World" }, { 3, "I" }, { 4, "Love" }, { 5, "Mackerel"}, { 6, "wow" }, {7, "sheesh"}};
 }
 
 template <>
 ring_buffer<std::string> CreateBuffer<std::string>()
 {
-    return ring_buffer<std::string>{"abc", "def", "ghj", "cjk", "okm", "tyu"};
+    return ring_buffer<std::string>{"abc", "def", "ghj", "cjk", "okm", "tyu", "iop"};
 }
 
 template <>
 ring_buffer<char> CreateBuffer<char>()
 {
-    return ring_buffer<char>{'a','b','c','d','e','f'};
+    return ring_buffer<char>{'a','b','c','d','e','f','g'};
 }
 
 //=================================
@@ -715,8 +715,8 @@ TYPED_TEST(RingBufferTest, at)
     }
 
     // Test OB access.
-    ASSERT_THROW(this->t_buffer.at(6), std::out_of_range);
-    ASSERT_THROW(c_buffer.at(6), std::out_of_range);
+    ASSERT_THROW(this->t_buffer.at(TEST_BUFFER_SIZE), std::out_of_range);
+    ASSERT_THROW(c_buffer.at(TEST_BUFFER_SIZE), std::out_of_range);
 }
 
 // Tests requirement: Container, a.swap(b), swap(a, b).
@@ -806,8 +806,8 @@ TYPED_TEST(RingBufferTest, shrink_to_fit)
 {
     this->t_buffer.reserve(100);
     this->t_buffer.shrink_to_fit();
-    // Shrink to fit reduces cap to size () + 1 (the allocation buffer)
-    ASSERT_EQ(this->t_buffer.size() + 1, this->t_buffer.capacity());
+    // Shrink to fit reduces cap to size () + 2 (the allocation buffer)
+    ASSERT_EQ(this->t_buffer.size() + 2, this->t_buffer.capacity());
 }
 
 TYPED_TEST(RingBufferTest, find)

@@ -10,8 +10,8 @@
 
 namespace
 {
-    // Buffer always reserves one extra space. Capacity should not equal size when buffer has non-zero capacity.
-    constexpr size_t allocBuffer = 1;
+    // Buffer always reserves two "extra" spaces. This ensures that reserve and other relocating functions work correctly (ensures that there is room to operate on index and move it after).
+    constexpr size_t allocBuffer = 2;
 }
 // Forward declaration of _rBuf_const_iterator.
 template<class _rBuf>
@@ -541,11 +541,11 @@ public:
     /// @param alloc Custom allocator.
     /// @pre T needs to satisfy CopyInsertable.
     /// @post std::distance(begin(), end()) == count.
-    /// @note Allocates memory for count + 2 elements.
+    /// @note Allocates memory for count + allocBuffer elements.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to amount of constructed elements (O(n)).
-    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + 2), m_allocator(alloc)
+    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + allocBuffer), m_allocator(alloc)
     {
         m_data = m_allocator.allocate(m_capacity);
 
@@ -563,8 +563,8 @@ public:
     /// @details Linear complexity in relation to count (O(n)).
     explicit ring_buffer(size_type count, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
     {
-        m_data = m_allocator.allocate(count + 2);
-        m_capacity = count + 2;
+        m_data = m_allocator.allocate(count + allocBuffer);
+        m_capacity = count + allocBuffer;
 
         for (size_t i = 0; i < count; i++)
         {
@@ -581,22 +581,14 @@ public:
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to the size of the range (O(n)).
     /// @note Behavior is undefined if elements in range are not valid.
-    template<
-        typename InputIt,
-        typename = std::enable_if_t<
-            std::is_convertible<
-                typename std::iterator_traits<InputIt>::value_type,
-                value_type
-            >::value
-        >
-    >
+    template<typename InputIt,typename = std::enable_if_t<std::is_convertible<typename std::iterator_traits<InputIt>::value_type,value_type>::value>>
     ring_buffer(InputIt beginIt, InputIt endIt, const allocator_type& alloc = allocator_type())
         : m_headIndex(0), m_tailIndex(0)
     {
         const auto size = std::distance<InputIt>(beginIt , endIt);
 
-        m_data = m_allocator.allocate(size + 2);
-        m_capacity = size + 2;
+        m_data = m_allocator.allocate(size + allocBuffer);
+        m_capacity = size + allocBuffer;
 
         for (difference_type i = 0; i < size; i++)
         {
@@ -1331,7 +1323,7 @@ public:
 
     /// @brief Releases unused allocated memory. 
     /// @pre T must satisfy MoveConstructible or CopyConstructible.
-    /// @post m_capacity == size() + 2.
+    /// @post m_capacity == size() + allocBuffer.
     /// @note Reduces capacity by allocating a smaller memory area and moving the elements. Shrinking the buffer invalidates all pointers, iterators and references.
     /// @throw Might throw std::bad_alloc if memory allocation fails.
     /// @exception If T's move (or copy) constructor can and does throw, behaviour is undefined. If any other exception is thrown (bad_alloc) this function has no effect (Strong exception guarantee).
