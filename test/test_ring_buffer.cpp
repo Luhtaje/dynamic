@@ -813,8 +813,8 @@ TYPED_TEST(RingBufferTest, shrink_to_fit)
 TYPED_TEST(RingBufferTest, find)
 {
     this->t_buffer.pop_front();
-    auto val = getValue<TypeParam>():
+    auto val = getValue<TypeParam>();
     this->t_buffer.insert(this->t_buffer.begin() + 2, val);
-    std:find(this->t_buffer.begin(), this->t_buffer.end(), val);
+    auto ret = std::find(this->t_buffer.begin(), this->t_buffer.end(), val);
 }
 }
