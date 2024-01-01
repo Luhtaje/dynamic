@@ -820,7 +820,7 @@ TYPED_TEST(RingBufferTest, find)
 
 TEST(RingBufferTest, shuffle)
 {
-    ring_buffer<size_t> testBuffer;
+    ring_buffer<size_t> testBuffer(5000,1);
     for (size_t i = 0; i < 2500; i++)
     {
         testBuffer.pop_front();
