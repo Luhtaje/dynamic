@@ -817,4 +817,20 @@ TYPED_TEST(RingBufferTest, find)
     this->t_buffer.insert(this->t_buffer.begin() + 2, val);
     auto ret = std::find(this->t_buffer.begin(), this->t_buffer.end(), val);
 }
+
+TEST(RingBufferTest, shuffle)
+{
+    ring_buffer<size_t> testBuffer;
+    for (size_t i = 0; i < 2500; i++)
+    {
+        testBuffer.pop_front();
+        testBuffer.push_back(i);
+    }
+
+    for(auto i = 0; i < 500000; i++)
+    {
+        testBuffer.insert(testBuffer.begin(), i);
+    }
+
+}
 }
