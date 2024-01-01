@@ -545,13 +545,15 @@ public:
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to amount of constructed elements (O(n)).
-    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_capacity(count + allocBuffer), m_allocator(alloc)
+    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
     {
-        m_data = m_allocator.allocate(m_capacity);
+        m_data = m_allocator.allocate(count + allocBuffer);
+        m_capacity = count + allocBuffer;
 
         for (size_t i = 0; i < count; i++)
         {
-            push_back(val);
+            m_allocator.construct(m_data + i, val);
+            increment(m_headIndex);
         }
     }
 
@@ -1537,7 +1539,7 @@ private:
                     m_tailIndex = tempIndex;
                 }
 
-                std::memmove(m_data + m_tailIndex, m_data + initialTail, (initialTail + distanceFromBorder) * sizeof(value_type));
+                std::memmove(m_data + m_tailIndex, m_data + initialTail, ((initialTail + posIndex) - m_tailIndex) * sizeof(value_type));
             }
             // Posindex is at the beginning of physical memory layout. This part can be handled as a separate system that is "rightside up".
             else
