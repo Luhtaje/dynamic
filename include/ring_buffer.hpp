@@ -1529,16 +1529,6 @@ private:
         std::move_backward(begin() + posIndex, end() - amount, end());
     }
 
-    void generateAndCopy()
-    {
-        //Important to increment the index with the function call (includes border check), starting point is safe.
-        m_allocator.construct(m_data + m_headIndex);
-        increment(m_headIndex);
-
-        // Move the trailing elements from the breaking point by amount elements.
-        std::memmove(m_data + m_tailIndex + posIndex + amount, m_data + m_tailIndex + posIndex, (size() - posIndex) * sizeof(value_type));
-    }
-
     /// @brief Base function for inserting elements from value.
     /// @tparam Value type of the buffer.
     /// @param pos Iterator pointing to the element where after insert new element will exist.
