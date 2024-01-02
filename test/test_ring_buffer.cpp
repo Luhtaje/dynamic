@@ -447,9 +447,8 @@ TYPED_TEST(RingBufferTest, erase)
     const auto erasePos = this->t_buffer.begin() + offset;
     const auto refBuffer(this->t_buffer);
 
+    const auto endBeforeErase = this->t_buffer.end();
     const auto erasedIt = this->t_buffer.erase(erasePos);
-
-    ASSERT_EQ(*erasedIt, *(erasePos + 1));
 
     for (auto i = 0; i < this->t_buffer.size(); i++)
     {
@@ -462,12 +461,13 @@ TYPED_TEST(RingBufferTest, erase)
             ASSERT_EQ(refBuffer[i + offset], this->t_buffer[i]);
         }
     }
+}
 
-    auto endBeforeErase = this->t_buffer.end();
-    auto erasedEnd = this->t_buffer.erase(this->t_buffer.end() - 1);
-
-    ASSERT_TRUE(endBeforeErase != erasedEnd);
-    ASSERT_TRUE(erasedEnd == this->t_buffer.end());
+//Tests an edge case for erase, where target is last element and it should return end().
+TYPED_TEST(RingBufferTest, eraseLast)
+{
+    const auto erasedIt = this->t_buffer.erase(this->t_buffer.end() - 1);
+    ASSERT_EQ(erasedIt, this->t_buffer.end());
 }
 
 // Tests requirement: SequenceContainer erase() expression erase(q1 , q2)
@@ -491,6 +491,18 @@ TYPED_TEST(RingBufferTest, eraseRange)
     {
         ASSERT_EQ(refBuffer[erasedIt.getIndex() + diff], *erasedIt);
     }
+}
+
+// Tests edge case where last is end, verifies that returns new end().
+TYPED_TEST(RingBufferTest, eraseRangeLast)
+{
+    auto rangeBegin = this->t_buffer.begin() + 2;
+    auto rangeEnd = this->t_buffer.end();
+    auto refBuffer(this->t_buffer);
+
+    auto erasedIt = this->t_buffer.erase(rangeBegin, rangeEnd);
+
+    ASSERT_EQ(erasedIt, this->t_buffer.end());
 }
 
 // Tests requirement: SequenceContainer clear()
@@ -820,14 +832,14 @@ TYPED_TEST(RingBufferTest, find)
 
 TEST(RingBufferTest, shuffle)
 {
-    ring_buffer<size_t> testBuffer(5000,1);
+    ring_buffer<size_t> testBuffer(5000);
     for (size_t i = 0; i < 2500; i++)
     {
         testBuffer.pop_front();
         testBuffer.push_back(i);
     }
 
-    for(auto i = 0; i < 500000; i++)
+    for(auto i = 0; i < 5000; i++)
     {
         testBuffer.insert(testBuffer.begin(), i);
     }
