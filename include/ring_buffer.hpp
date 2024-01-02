@@ -781,6 +781,7 @@ public:
     /// @pre pos must be a valid dereferenceable iterator within the container. Iterators must point to elements that are implicitly convertible to value_type. Otherwise behavior is undefined.
     /// @throw Can throw std::bad_alloc and something from value_types constructor. 
     /// @exception If any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee)
+    /// @details Amortized linear complexity in relation to range size.
     template <typename InputIt>
     iterator insert(const_iterator pos, InputIt sourceBegin, InputIt sourceEnd)
     {
@@ -795,6 +796,7 @@ public:
     /// @note Internally calls insertRangeBase.
     /// @throw Can throw std::bad_alloc and something from value_types constructor.
     /// @exception If any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee)
+    /// @details Amortized linear complexity in relation to range size.
     iterator insert(const_iterator pos, std::initializer_list<T> list)
     {
         return insertRangeBase(pos, list.begin(), list.end());
@@ -808,7 +810,7 @@ public:
     /// @post returned iterator points at the element constructed from args.
     /// @throw Can throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element. Additionally, rotate can throw bad_alloc and if T does not provide a noexcept move semantics.
     /// @exception If any exception is thrown, invariants are preserved. (Basic exception guarantee).
-    /// @details Constant complexity.
+    /// @details Amortized constant complexity.
     template<class... Args>
     iterator emplace(const_iterator pos, Args&&... args)
     {
@@ -832,7 +834,7 @@ public:
     /// @pre value_type is EmplaceConstructible from args.
     /// @throw Can throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element.
     /// @exception If any exception is thrown, invariants are preserved. (Basic exception guarantee).
-    /// @details Constant complexity.
+    /// @details  Amortized constant complexity.
     template<class... Args>
     void emplace_front(Args&&... args)
     {
@@ -850,7 +852,7 @@ public:
     /// @pre value_type is EmplaceConstructible from args.
     /// @throw Can throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element.
     /// @exception If any exception is thrown, invariants are preserved. (Basic exception guarantee).
-    /// @details Constant complexity.
+    /// @details Amortized constant complexity.
     template<class... Args>
     void emplace_back(Args&&... args)
     {
@@ -863,68 +865,25 @@ public:
     /// @brief Erase an element at a given position.
     /// @param pos Pointer to the element to be erased.
     /// @pre value_type must be nothrow-MoveConstructible. pos must be a valid dereferenceable iterator within the container. Otherwise behavior is undefined.
-    /// @return Returns an iterator that was immediately following the ereased element. If the erased element was last in the buffer, returns a pointer to the new last element.
-    /// @except Linear Complexity.
+    /// @return Returns an iterator that was immediately following the ereased element. If the erased element was last in the buffer, returns a pointer to end().
+    /// @exception
+    /// @details Linear Complexity in relation to distance of end buffer from the target element.
     iterator erase(const_iterator pos)
     {
-        iterator returnIt(this, pos.getIndex());
-
-        if (pos != end() - 1)
-        {
-            // Move assign elements effectively overwriting the 
-            for (auto it = returnIt; it < end() - 1; it++)
-            {
-                *it = std::move(*(it + 1));
-            }
-            ++returnIt;
-        }
-
-        // Last element is always destroyed.
-        m_allocator.destroy(&*(end() - 1));
-        decrement(m_headIndex);
-
-        return returnIt;
+        return eraseBase(pos, pos + 1);
     }
 
     /// @brief Erase the specified elements from the container according to the range [first,last). Might destroy or move assign to the elements depending if last == end(). If last == end(), elements in [first,last) are destroyed.
     /// @param first iterator to the first element to erase.
     /// @param last iterator past the last element to erase.
     /// @pre First and last must be valid iterators to *this.
-    /// @return Returns an iterator to the element that was immediately following the erased elements. If last == end(), then end() is returned.
+    /// @return Returns an iterator to the element that was immediately following the erased elements. If last == end(), then new end() is returned.
     /// @throw Possibly throws from value_types move/copy assignment operator if last != end().
     /// @exception If last != end, this function will not throw (noexcept). If the assignemnt throws, the invariants are retained. (Basic exception guarantee).
     /// @details Linear Complexity in relation to size of the range, and then linear in remaining elements after the erased range.
     iterator erase(const_iterator first, const_iterator last)
     {
-        iterator returnIt(this, first.getIndex());
-
-        const auto diff = std::distance(first, last);
- 
-        // If the range does not reach the end, move elements.
-        if (last != end())
-        {
-            auto tempIt = returnIt;
-            // Move elements effectively overwriting the elements to be erased.
-            for (; tempIt + diff !=  end(); ++tempIt)
-            {
-                *tempIt = std::move(*(tempIt + diff));
-            }
-
-            for (; tempIt != end(); ++tempIt)
-            {
-                m_allocator.destroy(&*tempIt);
-            }
-        }
-        else
-        {
-            for (auto it = end() - diff; it != end(); it++)
-            {
-                m_allocator.destroy(&*(it));
-            }
-        }
-
-        decrement(m_headIndex, diff);
-        return returnIt;
+        return eraseBase(first, last);
     }
 
     /// @brief Destroys all elements in a buffer. Does not modify capacity.
@@ -1515,9 +1474,9 @@ private:
         // Normal case, buffer is in a simple state.
         if(m_headIndex > m_tailIndex)
         {
-                //Need to iteratore the destination index with increment (border check), starting point is safe.
-                m_allocator.construct(m_data + m_headIndex);
-                increment(m_headIndex);
+            //Important to increment the index with the function call (includes border check), starting point is safe.
+            m_allocator.construct(m_data + m_headIndex);
+            increment(m_headIndex);
 
             // Move the trailing elements from the breaking point by amount elements.
             std::memmove(m_data + m_tailIndex + posIndex + amount, m_data + m_tailIndex + posIndex, (size() - posIndex) * sizeof(value_type)); 
@@ -1568,6 +1527,16 @@ private:
 
         // value_type is not trivially copyable, need to do slow operation.
         std::move_backward(begin() + posIndex, end() - amount, end());
+    }
+
+    void generateAndCopy()
+    {
+        //Important to increment the index with the function call (includes border check), starting point is safe.
+        m_allocator.construct(m_data + m_headIndex);
+        increment(m_headIndex);
+
+        // Move the trailing elements from the breaking point by amount elements.
+        std::memmove(m_data + m_tailIndex + posIndex + amount, m_data + m_tailIndex + posIndex, (size() - posIndex) * sizeof(value_type));
     }
 
     /// @brief Base function for inserting elements from value.
@@ -1644,6 +1613,30 @@ private:
         }
 
         return it;
+    }
+
+    iterator eraseBase(const_iterator first, const_iterator last)
+    {
+        iterator returnIt(this, first.getIndex());
+
+        const auto diff = std::distance(first, last);
+
+        if (diff)
+        {
+            auto tempIt(returnIt);
+            for (; tempIt + diff < end(); tempIt++)
+            {
+                std::swap(*(tempIt + diff), *tempIt);
+            }
+
+            for (; tempIt < end(); tempIt++)
+            {
+                m_allocator.destroy(&*(tempIt));
+            }
+
+            decrement(m_headIndex, diff);
+        }
+        return returnIt;
     }
 
     /// @brief Increment an index. The ringbuffer internally increments the head and tail index when adding elements.
