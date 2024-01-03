@@ -830,19 +830,51 @@ TYPED_TEST(RingBufferTest, find)
     auto ret = std::find(this->t_buffer.begin(), this->t_buffer.end(), val);
 }
 
-TEST(RingBufferTest, shuffle)
+TEST(RingBufferTest, insertShuffleMonkey)
 {
-    ring_buffer<size_t> testBuffer(5000);
-    for (size_t i = 0; i < 2500; i++)
+    ring_buffer<size_t> testBuffer(5);
+    for (size_t i = 0; i < 1; i++)
     {
         testBuffer.pop_front();
         testBuffer.push_back(i);
     }
 
-    for(auto i = 0; i < 5000; i++)
+    testBuffer.insert(testBuffer.begin(), testBuffer.begin(), testBuffer.end()-2);
+
+
+    testBuffer.pop_front();
+    testBuffer.push_back(1);
+    testBuffer.pop_front();
+    testBuffer.push_back(1);
+    testBuffer.pop_front();
+    testBuffer.push_back(1);
+    testBuffer.pop_front();
+    testBuffer.push_back(1);
+
+    testBuffer.shrink_to_fit();
+
+
+    testBuffer.insert(testBuffer.begin() + 3, testBuffer.begin(), testBuffer.end() - 2);
+
+    for (auto i = 0; i < testBuffer.size(); i++)
     {
-        testBuffer.insert(testBuffer.begin(), i);
+        std::cout << testBuffer[i] << std::endl;
     }
 
+    testBuffer.pop_front();
+    testBuffer.push_back(2);
+    testBuffer.pop_front();
+    testBuffer.push_back(2);
+    testBuffer.pop_front();
+    testBuffer.push_back(2);
+    testBuffer.pop_front();
+    testBuffer.push_back(2);
+
+    testBuffer.insert(testBuffer.begin() + 3, testBuffer.begin(), testBuffer.end() - 2);
+
+    for (auto i = 0; i < testBuffer.size(); i++)
+    {
+        std::cout << testBuffer[i] << std::endl;
+    }
 }
 }
