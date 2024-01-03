@@ -650,7 +650,7 @@ public:
     /// @param other Rvalue reference to other buffer.
     /// @pre value_type must resolve std::is_nothrow_move_constructible<value_type>::value to true. Otherwise function does nothing.
     /// @details Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant.
-    ring_buffer(ring_buffer&& other) noexcept : m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex), m_capacity(other.m_capacity), m_allocator(std::move(other.m_allocator))
+    ring_buffer(ring_buffer&& other) noexcept : m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex), m_capacity(other.m_capacity), m_allocator(std::move(other.m_allocator)), m_data(nullptr)
     {
         if (!std::is_nothrow_move_constructible<value_type>::value) return;
 
@@ -1457,66 +1457,45 @@ private:
             return;
         }
         
-        // Special case, 1.5*m_capacity is not enough, allocate increase + the "normal" capacity increase.
+        // Special case where 1.5*m_capacity is not enough, allocate <increase> + the normal capacity increase.
         if(enlargedCap > 2)
         {
             reserve(enlargedCap + increase + allocBuffer);
         }
-        // Takes care of the special case where capacity is 0 / 1 and multiplying that does not produce a change.
+        // Special case where capacity is 0 / 1 and multiplying does not produce a change.
         else
         {
             reserve(2);
         }
     }
 
-    void byteCopy(const size_t posIndex, const size_t amount)
+
+    /// @brief Shifts elements after posIndex by <amount> using std::memmove.
+    /// @param posIndex Logical index to first empty element after shift.
+    /// @param amount Amount of shift. Creates <amount> empty elements at posIndex. 
+    /// @details Amortized linear complexity in relation to amount of elements between pos and head. Sometimes shifts the memory layout before operation that adds linear complexity in relation to buffer size.
+    void byteShift(const size_t posIndex, const size_t amount)
     {
-        // Normal case, buffer is in a simple state.
-        if(m_headIndex > m_tailIndex)
+        // If head has reached over physical memory border, or there not enough room to memmove in one chunk, reset the memory layout.
+        if( m_tailIndex > m_headIndex ||
+            m_tailIndex + posIndex + amount >= m_capacity)
         {
-            //Important to increment the index with the function call (includes border check), starting point is safe.
-            m_allocator.construct(m_data + m_headIndex);
-            increment(m_headIndex);
-
-            // Move the trailing elements from the breaking point by amount elements.
-            std::memmove(m_data + m_tailIndex + posIndex + amount, m_data + m_tailIndex + posIndex, (size() - posIndex) * sizeof(value_type)); 
+            // Simplifies a lot of edge cases with a minor performance cost.
+            data();
         }
-        else
+
+        //Always copies towards head, could optimize by copying towards the end that is closer to pos. Keeping it simple for now.
+        for (size_t i = 0; i < amount; i++)
         {
-            // Distance from the physical end of the buffer. Negative value means the insert positions distance is from the end of the buffer, positive means it has wrapped and is near beginning.
-            const int distanceFromBorder = m_tailIndex + posIndex - m_capacity;
-            if (distanceFromBorder < 0)
-            {
-                const auto initialTail = m_tailIndex;
-
-                for (size_t i = 0; i < amount ; i++)
-                {
-                    // Construct empty elements in the tail.
-                    auto tempIndex = m_tailIndex;
-                    decrement(tempIndex);
-                    m_allocator.construct(m_data + tempIndex);
-                    m_tailIndex = tempIndex;
-                }
-
-                std::memmove(m_data + m_tailIndex, m_data + initialTail, ((initialTail + posIndex) - m_tailIndex) * sizeof(value_type));
-            }
-            // Posindex is at the beginning of physical memory layout. This part can be handled as a separate system that is "rightside up".
-            else
-            {
-                size_t physicalPosIndex = posIndex - (m_capacity - m_tailIndex);
-                size_t initialHeadIndex = m_headIndex;
-                // Construct empty elements in the head.
-                for (size_t i = 0; i < amount ; i++)
-                {
-                    m_allocator.construct(m_data + m_headIndex);
-                    increment(m_headIndex);
-                }
-                std::memmove(m_data + initialHeadIndex, m_data + physicalPosIndex, (m_headIndex - initialHeadIndex) * sizeof(value_type));
-            }
+            m_allocator.construct(m_data + m_headIndex + i);
         }
+
+        // "Shift" elements forward from the breaking point by amount.
+        std::memmove(m_data + m_tailIndex + posIndex + amount, m_data + m_tailIndex + posIndex, (size() - posIndex) * sizeof(value_type));
+        increment(m_headIndex, amount);
     }
 
-    void slowCopy(const size_t posIndex, const size_t amount)
+    void slowShift(const size_t posIndex, const size_t amount)
     {
         // Construct empty elements at the end.
         for (size_t i = 0; i < amount; i++)
@@ -1547,14 +1526,14 @@ private:
 
         validateCapacity(amount);
 
-        // Use memmove to move elements to create space to insert.
+        // Make room for new elements.
         if (std::is_trivially_copyable<value_type>::value)
         {
-            byteCopy(pos.getIndex(), amount);
+            byteShift(pos.getIndex(), amount);
         }
         else
         {
-           slowCopy(pos.getIndex(), amount);
+            slowShift(pos.getIndex(), amount);
         }
 
         // Assign elements
@@ -1589,11 +1568,11 @@ private:
         // Use memmove to move elements to create space to insert.
         if (std::is_trivially_copyable<value_type>::value)
         {
-            byteCopy(pos.getIndex(), amount);
+            byteShift(pos.getIndex(), amount);
         }
         else
         {
-            slowCopy(pos.getIndex(), amount);
+            slowShift(pos.getIndex(), amount);
         }
 
         //Assign the elements to the new memory slots.
