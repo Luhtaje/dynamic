@@ -67,7 +67,6 @@ public:
         /// @details Constant complexity.
         pointer operator->() const
         {
-            //TODO: check value initialization and bounds. Shhhh......
             return &(*m_container)[m_logicalIndex];
         }
 
@@ -108,7 +107,6 @@ public:
         /// @details Constant complexity.
         _rBuf_const_iterator operator--(int)
         {
-            //TODO:    check value initialization and "under" begin() decrement.
             auto temp(*this);
             --m_logicalIndex;
             return temp;
@@ -227,7 +225,6 @@ public:
         /// @details Constant complexity.
         bool operator>(const _rBuf_const_iterator& other) const noexcept
         {
-            //TODO:compatibility check
             return (other.m_logicalIndex < m_logicalIndex);
         }
 
@@ -238,7 +235,6 @@ public:
         /// @details Constant complexity.
         bool operator<=(const _rBuf_const_iterator& other) const noexcept
         {
-            //TODO:compatibility check
             return (!(other < m_logicalIndex));
         }
 
@@ -316,7 +312,6 @@ public:
         /// @details Constant complexity.
         reference operator*() const noexcept
         {
-            //TODO: bounds checking and value-initialization.
             return (*(const_cast<_rBuf*>(_rBuf_const_iterator<_rBuf>::m_container)))[_rBuf_const_iterator<_rBuf>::m_logicalIndex];
         }
 
@@ -325,7 +320,6 @@ public:
         /// @details Constant complexity.
         pointer operator->() const noexcept
         {
-            //TODO: check value initialization and bounds.
             return const_cast<pointer>(_rBuf_const_iterator<_rBuf>::operator->());
         }
 
@@ -433,7 +427,6 @@ public:
         /// @details Constant complexity.
         difference_type operator-(const _rBuf_iterator& other) const noexcept
         {
-            //TODO: compatibility check
             return (_rBuf_const_iterator<_rBuf>::m_logicalIndex - other._rBuf_const_iterator<_rBuf>::m_logicalIndex);
         }
 
@@ -453,7 +446,6 @@ public:
         /// @details Constant complexity.
         bool operator<(const _rBuf_iterator& other) const noexcept
         {
-            //TODO:compatibility check
             return (_rBuf_const_iterator<_rBuf>::m_logicalIndex < other._rBuf_const_iterator<_rBuf>::m_logicalIndex);
         }
 
@@ -463,7 +455,6 @@ public:
         /// @details Constant complexity.
         bool operator>(const _rBuf_iterator& other) const noexcept
         {
-            //TODO:compatibility check
             return (_rBuf_const_iterator<_rBuf>::m_logicalIndex > other._rBuf_const_iterator<_rBuf>::m_logicalIndex);
         }
 
@@ -473,7 +464,6 @@ public:
         /// @details Constant complexity.
         bool operator<=(const _rBuf_iterator& other) const noexcept
         {
-            //TODO:compatibility check
             return (_rBuf_const_iterator<_rBuf>::m_logicalIndex <= other._rBuf_const_iterator<_rBuf>::m_logicalIndex);
         }
 
@@ -821,7 +811,6 @@ public:
         m_allocator.construct(&*end());
         std::move_backward(it, end() - 1, end());
 
-        // TODO room for improvement here I think, but should suffice to show if this is works.
         m_allocator.destroy(&*it);
         m_allocator.construct(&*it, std::forward<Args>(args)...);
         increment(m_headIndex);
