@@ -855,7 +855,7 @@ public:
     /// @param pos Pointer to the element to be erased.
     /// @pre value_type must be nothrow-MoveConstructible. pos must be a valid dereferenceable iterator within the container. Otherwise behavior is undefined.
     /// @return Returns an iterator that was immediately following the ereased element. If the erased element was last in the buffer, returns a pointer to end().
-    /// @exception
+    /// @exception If value_type is nothrow_move_constructible and nothrow_move_assignable function is noexcept. Otherwise provides no exception guarantee at all.
     /// @details Linear Complexity in relation to distance of end buffer from the target element.
     iterator erase(const_iterator pos)
     {
@@ -866,9 +866,9 @@ public:
     /// @param first iterator to the first element to erase.
     /// @param last iterator past the last element to erase.
     /// @pre First and last must be valid iterators to *this.
-    /// @return Returns an iterator to the element that was immediately following the erased elements. If last == end(), then new end() is returned.
+    /// @return Returns an iterator to the element that was immediately following the last erased elements. If last == end(), then new end() is returned.
     /// @throw Possibly throws from value_types move/copy assignment operator if last != end().
-    /// @exception If last != end, this function will not throw (noexcept). If the assignemnt throws, the invariants are retained. (Basic exception guarantee).
+    /// @exception If value_type is nothrow_move_constructible and nothrow_move_assignable function is noexcept. Otherwise provides no exception guarantee at all.
     /// @details Linear Complexity in relation to size of the range, and then linear in remaining elements after the erased range.
     iterator erase(const_iterator first, const_iterator last)
     {
@@ -1463,6 +1463,8 @@ private:
     /// @param posIndex Logical index to first empty element after shift.
     /// @param amount Amount of shift. Creates <amount> empty elements at posIndex. 
     /// @details Amortized linear complexity in relation to amount of elements between pos and head. Sometimes shifts the memory layout before operation that adds linear complexity in relation to buffer size.
+    /// @throw data can throw bad_alloc, value_type construction can throw something, and memmove as well.
+    /// @exception No exception safety guarantee.
     void byteShift(const size_t posIndex, const size_t amount)
     {
         // If head has reached over physical memory border, or there not enough room to memmove in one chunk, reset the memory layout.
@@ -1484,6 +1486,10 @@ private:
         increment(m_headIndex, amount);
     }
 
+    /// @brief Shift ekements after posIndex by <amount> using move / copy constructors.
+    /// @param posIndex Logical index to first empty element after shift.
+    /// @param amount Amount of shift. Creates <amount> empty elements at posIndex. 
+    /// @details Linear complexity in relation to amount and end() - posIndex.
     void slowShift(const size_t posIndex, const size_t amount)
     {
         // Construct empty elements at the end.
@@ -1493,7 +1499,6 @@ private:
             increment(m_headIndex);
         }
 
-        // value_type is not trivially copyable, need to do slow operation.
         std::move_backward(begin() + posIndex, end() - amount, end());
     }
 
@@ -1573,13 +1578,20 @@ private:
         return it;
     }
 
+    /// @brief Base function for erasing elements from the buffer. Erases always as a range.
+    /// @param first Iterator pointing to the first element of the range to erase.
+    /// @param last Iterator pointing to past the last element to erase.
+    /// @return Returns an iterator pointing to the element immediately after the erased elements.
+    /// @pre First and last must be valid iterators to *this.
+    /// @throw If value_type is not nothrow move assignable/constructible, might throw something from swap. 
+    /// @exception If swap does not throw, function is noexcept. Otherwise provides no exception guarantee at all.
     iterator eraseBase(const_iterator first, const_iterator last)
     {
         iterator returnIt(this, first.getIndex());
 
         const auto diff = std::distance(first, last);
 
-        if (diff)
+        if (diff > 0)
         {
             auto tempIt(returnIt);
             for (; tempIt + diff < end(); tempIt++)

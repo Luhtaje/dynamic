@@ -16,6 +16,76 @@ namespace
 const static size_t TEST_BUFFER_SIZE = 7;
 const static size_t TEST_INT_VALUE = 9;
 
+class NonTrivialTestType {
+public:
+    NonTrivialTestType(size_t data = 0) : data_(new size_t(data)) {
+    }
+
+    // Non-trivial copy constructor
+    NonTrivialTestType(const NonTrivialTestType& other) : data_(new size_t(*other.data_)) {
+    }
+
+    // Copy assignment operator
+    NonTrivialTestType& operator=(const NonTrivialTestType& other) {
+        if (this != &other) {
+            delete data_;
+            data_ = new size_t(*other.data_);
+        }
+        return *this;
+    }
+
+    // Move constructor
+    NonTrivialTestType(NonTrivialTestType&& other) noexcept : data_(other.data_) {
+        other.data_ = nullptr;
+    }
+
+    // Move assignment operator
+    NonTrivialTestType& operator=(NonTrivialTestType&& other) noexcept {
+        if (this != &other) {
+            delete data_;
+            data_ = other.data_;
+            other.data_ = nullptr;
+        }
+        return *this;
+    }
+
+    bool operator!=(const NonTrivialTestType& other) const {
+        return *data_ != *other.data_;
+    }
+
+    bool operator<=(const NonTrivialTestType& other) const {
+        return *data_ <= *other.data_;
+    }
+
+    bool operator<(const NonTrivialTestType& other) const {
+        return *data_ < *other.data_;
+    }
+
+    bool operator>=(const NonTrivialTestType& other) const {
+        return *data_ >= *other.data_;
+    }
+
+    bool operator>(const NonTrivialTestType& other) const {
+        return *data_ > *other.data_;
+    }
+
+    bool operator==(const NonTrivialTestType& other) const {
+        return *data_ == *other.data_;
+    }
+
+
+    ~NonTrivialTestType() {
+        delete data_;
+    }
+
+    size_t getData() const {
+        return *data_;
+    }
+
+private:
+    size_t* data_;
+};
+
 // Define some factory functions.
 
 //==========================
@@ -41,6 +111,12 @@ template <>
 ring_buffer<char> CreateBuffer<char>()
 {
     return ring_buffer<char>{'a','b','c','d','e','f','g'};
+}
+
+template <>
+ring_buffer<NonTrivialTestType> CreateBuffer<NonTrivialTestType>()
+{
+    return ring_buffer<NonTrivialTestType>{1,2,3,4,5,6,7};
 }
 
 //=================================
@@ -95,6 +171,17 @@ ring_buffer<std::string> CreateBuffer<std::string>(int /*size*/)
     return buf;
 }
 
+template<>
+ring_buffer<NonTrivialTestType> CreateBuffer<NonTrivialTestType>(int /*size*/)
+{
+    auto buf = ring_buffer<NonTrivialTestType>();
+    for (size_t i = 0; i < TEST_BUFFER_SIZE; i++)
+    {
+        buf.push_back(i);
+    }
+    return buf;
+}
+
 //====================================
 // Individual random value generators.
 //====================================
@@ -129,6 +216,13 @@ std::string getValue<std::string>()
     return str;
 }
 
+template <>
+NonTrivialTestType getValue<NonTrivialTestType>()
+{
+    srand(time(0));
+    return size_t(rand() % 26);
+}
+
 //====================
 // Fixture.
 //====================
@@ -141,7 +235,7 @@ protected:
     RingBufferTest() : t_buffer(CreateBuffer<T>()) {}
 };
 
-using Types = ::testing::Types<char, std::pair<int,std::string>, std::string>;
+using Types = ::testing::Types<char, std::pair<int,std::string>, std::string, NonTrivialTestType>;
 TYPED_TEST_SUITE(RingBufferTest, Types);
 
 //==================Requirement tests ===================//
@@ -858,7 +952,8 @@ TEST(RingBufferTest, insertShuffleMonkey)
 
     for (auto i = 0; i < testBuffer.size(); i++)
     {
-        std::cout << testBuffer[i] << std::endl;
+        // Just to check that the elements are all valid.
+        testBuffer[i];
     }
 
     testBuffer.pop_front();
@@ -874,7 +969,7 @@ TEST(RingBufferTest, insertShuffleMonkey)
 
     for (auto i = 0; i < testBuffer.size(); i++)
     {
-        std::cout << testBuffer[i] << std::endl;
+        testBuffer[i];
     }
 }
 }
