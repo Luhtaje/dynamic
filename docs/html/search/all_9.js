@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['max_5fsize_0',['max_size',['../classring__buffer.html#a09435a2152f9b680154e1e51e4472787',1,'ring_buffer']]]
+  ['max_5fsize_23',['max_size',['../classring__buffer.html#a09435a2152f9b680154e1e51e4472787',1,'ring_buffer']]]
 ];
