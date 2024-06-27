@@ -537,17 +537,17 @@ public:
     /// @details Linear complexity in relation to amount of constructed elements (O(n)).
     ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
     {
-        m_data = m_allocator.allocate(count + allocBuffer);
+        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, count + allocBuffer);
         m_capacity = count + allocBuffer;
 
         for (size_t i = 0; i < count; i++)
         {
-            m_allocator.construct(m_data + i, val);
+            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + i, val);
             increment(m_headIndex);
         }
     }
 
-    /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any elemen.
+    /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any element.
     /// @param capacity Capacity of the buffer.
     /// @pre T must satisfy DefaultInsertable.
     /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
@@ -555,12 +555,12 @@ public:
     /// @details Linear complexity in relation to count (O(n)).
     explicit ring_buffer(size_type count, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
     {
-        m_data = m_allocator.allocate(count + allocBuffer);
+        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, count + allocBuffer);
         m_capacity = count + allocBuffer;
 
         for (size_t i = 0; i < count; i++)
         {
-            m_allocator.construct(m_data + i);
+            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + i);
             increment(m_headIndex);
         }
     }
@@ -579,12 +579,12 @@ public:
     {
         const auto size = std::distance<InputIt>(beginIt , endIt);
 
-        m_data = m_allocator.allocate(size + allocBuffer);
+        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, size + allocBuffer);
         m_capacity = size + allocBuffer;
 
         for (difference_type i = 0; i < size; i++)
         {
-            m_allocator.construct(m_data + i, *(beginIt + i));
+            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + i, *(beginIt + i));
             increment(m_headIndex);
         }
     }
@@ -606,13 +606,14 @@ public:
     /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation, or something from value_types constructor.
     /// @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).
     /// @details Linear complexity in relation to buffer size.
-    ring_buffer(const ring_buffer& rhs) : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex), m_capacity(rhs.m_capacity)
+    ring_buffer(const ring_buffer& rhs) 
+    : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex), m_capacity(rhs.m_capacity), m_allocator(std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.m_allocator))
     {
-        m_data = m_allocator.allocate(rhs.capacity());
+        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, rhs.capacity());
 
         for (size_t i = 0; i < rhs.size(); i++)
         {
-            m_allocator.construct(&this->operator[](i), rhs[i]);
+            std::allocator_traits<allocator_type>::construct(m_allocator, &this->operator[](i), rhs[i]);
             increment(m_headIndex);
         }
     }
@@ -627,11 +628,11 @@ public:
     /// @details Linear complexity in relation to buffer size.
     ring_buffer(const ring_buffer& rhs, const allocator_type& alloc) : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex), m_capacity(rhs.m_capacity), m_allocator(alloc)
     {
-        m_data = m_allocator.allocate(rhs.capacity());
+        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, rhs.capacity());
 
         for (size_type i = 0; i < rhs.size(); i++)
         {
-            m_allocator.construct(m_data + i, rhs[i]);
+            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + i, rhs[i]);
             increment(m_headIndex);
         }
     }
@@ -640,30 +641,12 @@ public:
     /// @param other Rvalue reference to other buffer.
     /// @pre value_type must resolve std::is_nothrow_move_constructible<value_type>::value to true. Otherwise function does nothing.
     /// @details Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant.
-    ring_buffer(ring_buffer&& other) noexcept : m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex), m_capacity(other.m_capacity), m_allocator(std::move(other.m_allocator)), m_data(nullptr)
+    ring_buffer(ring_buffer&& other) noexcept : m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex), m_capacity(other.m_capacity), m_data(nullptr)
     {
         if (!std::is_nothrow_move_constructible<value_type>::value) return;
 
-        if (std::allocator_traits<allocator_type>::propagate_on_container_move_assignment::value)
-        {
-            m_allocator = other.m_allocator;
-            m_data = std::exchange(other.m_data, nullptr);
-        }
-        else if (m_allocator == other.m_allocator)
-        {
-            m_data = std::exchange(other.m_data, nullptr);
-        }
-        // Allocator is different and does not propagate, move elements individually.
-        else
-        {
-            m_data = m_allocator.allocate(m_capacity);
-
-            for (size_t i = 0; i < other.size(); i++)
-            {
-                m_allocator.construct(&this->operator[](i), std::move(other[i]));
-            }
-            other.m_data = nullptr;
-        }
+        m_allocator = std::move(other.m_allocator);
+        m_data = std::exchange(other.m_data, nullptr);
 
         other.m_capacity = 0;
         other.m_headIndex = 0;
@@ -679,7 +662,6 @@ public:
     {
         if (!std::is_nothrow_move_constructible<value_type>::value) return;
         
-        // Allocator is the same, just take it all.
         if (m_allocator == other.get_allocator())
         {
             m_data = other.m_data;
@@ -692,15 +674,15 @@ public:
         // Allocator is different, allocate memory with new allocator and manually move the elements. Clean up original buffer after.
         else
         {
-            m_data = m_allocator.allocate(m_capacity);
+            m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, m_capacity);
             for (size_type i = 0; i < other.size(); i++)
             {
-                m_allocator.construct(&this->operator[](i), std::move(other[i]));
+                std::allocator_traits<allocator_type>::construct(m_allocator, &this->operator[](i), std::move(other[i]));
             }
 
             // Clean up the original buffer.
             other.clear();
-            other.m_allocator.deallocate(other.m_data, other.m_capacity);
+            std::allocator_traits<allocator_type>::deallocate(other.m_allocator, other.m_data, other.m_capacity);
             other.m_data = nullptr;
             other.m_capacity = 0;
             other.m_headIndex = 0;
@@ -713,12 +695,12 @@ public:
     ~ring_buffer()
     {
         // Calls destructor for each element in the buffer.
-        for_each(begin(), end(), [this](T& elem) { m_allocator.destroy(&elem); });
+        for_each(begin(), end(), [this](T& elem) { std::allocator_traits<allocator_type>::destroy(m_allocator, &elem); });
 
         // After destruction deallocate the memory.
         if (m_data != nullptr)
         {
-            m_allocator.deallocate(m_data, m_capacity);
+            std::allocator_traits<allocator_type>::deallocate(m_allocator, m_data, m_capacity);
         }
     }
 
@@ -808,11 +790,11 @@ public:
 
         iterator it(this, pos.getIndex());
 
-        m_allocator.construct(&*end());
+        std::allocator_traits<allocator_type>::construct(m_allocator, &*end());
         std::move_backward(it, end() - 1, end());
 
-        m_allocator.destroy(&*it);
-        m_allocator.construct(&*it, std::forward<Args>(args)...);
+        std::allocator_traits<allocator_type>::destroy(m_allocator, &*it);
+        std::allocator_traits<allocator_type>::construct(m_allocator, &*it, std::forward<Args>(args)...);
         increment(m_headIndex);
 
         return it;
@@ -832,7 +814,7 @@ public:
         auto tempIndex = m_tailIndex;
         decrement(tempIndex);
         
-        m_allocator.construct(&m_data[tempIndex], std::forward<Args>(args)...);
+        std::allocator_traits<allocator_type>::construct(m_allocator, &m_data[tempIndex], std::forward<Args>(args)...);
         m_tailIndex = tempIndex;
     }
 
@@ -847,7 +829,7 @@ public:
     {
         validateCapacity(1);
 
-        m_allocator.construct(&*end(), std::forward<Args>(args)...);
+        std::allocator_traits<allocator_type>::construct(m_allocator, &*end(), std::forward<Args>(args)...);
         increment(m_headIndex);
     }
 
@@ -882,7 +864,7 @@ public:
     {
         for(; m_tailIndex < m_headIndex ; ++m_tailIndex)
         {
-            m_allocator.destroy(&m_data[m_tailIndex]);
+            std::allocator_traits<allocator_type>::destroy(m_allocator, &m_data[m_tailIndex]);
         }
 
         m_headIndex = 0;
@@ -949,8 +931,44 @@ public:
     /// @details Linear complexity in relation to buffer size.
     ring_buffer& operator=(const ring_buffer& other)
     {
-        ring_buffer copy(other);
-        copy.swap(*this);
+
+        if (std::allocator_traits<allocator_type>::propagate_on_container_copy_assignment::value && m_allocator != other.m_allocator)
+        {
+            clear();
+            std::allocator_traits<allocator_type>::deallocate(m_allocator,m_data, m_capacity);
+
+            m_allocator = other.m_allocator;
+            m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, other.m_capacity);
+            m_capacity = other.m_capacity;
+            m_headIndex = other.m_headIndex;
+            m_tailIndex = other.m_tailIndex;
+
+            for (size_type i = 0; i < other.size(), i++)
+            {
+                std::iterator_traits<allocator_type>::construct(m_allocator, &this->operator[](i), other[i])
+            }
+        } 
+        else
+        {
+            if (size() >= other.size())
+            {
+                std::copy(other.begin(), other.end(), begin());
+                for (size_type i = other.size(); i < size(); i++)
+                {
+                    std::allocator_traits<allocator_type>::destroy(m_allocator, &this->operator[](i))
+                }
+                resize(other.size());
+            }
+            else
+            {
+                std::copy(other.begin(), other.begin() + size(), begin());
+                for (size_type i = size(); i < other.size(); i++)
+                {
+                    push_back(other[i]);
+                }
+            }
+        }
+
         return *this;
     }
 
@@ -1047,14 +1065,19 @@ public:
     /// @brief Member swap implementation. Swaps RingBuffers member to member.
     /// @param other Reference to a ring_buffer to swap with.
     /// @details Constant complexity.
+    /// @note Requires allocator_type to return true_type from propagate_on_container_swap, otherwise memory operations 
     void swap(ring_buffer& other) noexcept
     {
         using std::swap;
+        if (std::allocator_traits<allocator_type>::propagate_on_container_swap::value)
+        {
+            swap(m_allocator, other.m_allocator);
+        }
+
         swap(m_data, other.m_data);
         swap(m_headIndex, other.m_headIndex);
         swap(m_tailIndex, other.m_tailIndex);
         swap(m_capacity, other.m_capacity);
-        swap(m_allocator, other.m_allocator);
     }
 
     /// @brief Friend swap.
@@ -1082,15 +1105,15 @@ public:
         }
 
         // Data pointer for "do stuff and swap" idiom to provide strong excepion guarantee.
-        auto tempData = m_allocator.allocate(m_capacity);
+        auto tempData = std::allocator_traits<allocator_type>::allocate(m_allocator, m_capacity);
 
         for (size_t i = 0; i < size(); i++)
         {
-            m_allocator.construct(tempData + i, std::move(this->operator[](i)));
-            m_allocator.destroy(&this->operator[](i));
+            std::allocator_traits<allocator_type>::construct(m_allocator, tempData + i, std::move(this->operator[](i)));
+            std::allocator_traits<allocator_type>::destroy(m_allocator, &this->operator[](i));
         }
 
-        m_allocator.deallocate(m_data, size());
+        std::allocator_traits<allocator_type>::deallocate(m_allocator, m_data, size());
 
         // If memory was allocated, the buffer matches beginning of physical memory.
         m_headIndex = size();
@@ -1171,11 +1194,11 @@ public:
         // Temp for "move and swap" idiom to provide exception safety.
         auto temp = ring_buffer<T, allocator_type>();
         temp.m_capacity = newCapacity;
-        temp.m_data = temp.m_allocator.allocate(newCapacity);
+        temp.m_data = std::allocator_traits<allocator_type>::allocate(temp.m_allocator, newCapacity);
 
         for(size_t i = 0; i < this->size(); i++)
         {
-            temp.m_allocator.construct(temp.m_data + i, std::move(this->operator[](i)));
+            std::allocator_traits<allocator_type>::construct(temp.m_allocator, temp.m_data + i, std::move(this->operator[](i)));
         }
         temp.m_headIndex = this->size();
 
@@ -1195,7 +1218,7 @@ public:
         // Decrement temporary index in case constructor throws to retain invariants (elements of the buffer are always initialized).
         auto newIndex = m_tailIndex;
         decrement(newIndex);
-        m_allocator.construct(m_data + newIndex, val);
+        std::allocator_traits<allocator_type>::construct(m_allocator, m_data + newIndex, val);
         m_tailIndex = newIndex;
     }
 
@@ -1213,7 +1236,7 @@ public:
         // Decrement temporary index incase constructor throws to retain invariants (elements of the buffer are always initialized).
         auto newIndex = m_tailIndex;
         decrement(newIndex);
-        m_allocator.construct(m_data + newIndex, std::forward<value_type>(val));
+        std::allocator_traits<allocator_type>::construct(m_allocator, m_data + newIndex, std::forward<value_type>(val));
         m_tailIndex = newIndex;
     }
 
@@ -1230,7 +1253,7 @@ public:
     {
         validateCapacity(1);
 
-        m_allocator.construct(m_data + m_headIndex, val);
+        std::allocator_traits<allocator_type>::construct(m_allocator, m_data + m_headIndex, val);
         increment(m_headIndex);
     }
 
@@ -1246,7 +1269,7 @@ public:
     {
         validateCapacity(1);
     
-        m_allocator.construct(m_data + m_headIndex, std::forward<value_type>(val));
+        std::allocator_traits<allocator_type>::construct(m_allocator, m_data + m_headIndex, std::forward<value_type>(val));
         increment(m_headIndex);
     }
 
@@ -1256,7 +1279,7 @@ public:
     /// @details Constant complexity.
     void pop_front() noexcept
     {
-        m_allocator.destroy(m_data + m_tailIndex);
+        std::allocator_traits<allocator_type>::destroy(m_allocator, m_data + m_tailIndex);
         increment(m_tailIndex);
     }
 
@@ -1267,7 +1290,7 @@ public:
     void pop_back() noexcept
     {
         decrement(m_headIndex);
-        m_allocator.destroy(m_data + m_headIndex);
+        std::allocator_traits<allocator_type>::destroy(m_allocator, m_data + m_headIndex);
 
     }
 
@@ -1478,7 +1501,7 @@ private:
         //Always copies towards head, could optimize by copying towards the end that is closer to pos. Keeping it simple for now.
         for (size_t i = 0; i < amount; i++)
         {
-            m_allocator.construct(m_data + m_headIndex + i);
+            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + m_headIndex + i);
         }
 
         // "Shift" elements forward from the breaking point by amount.
@@ -1495,7 +1518,7 @@ private:
         // Construct empty elements at the end.
         for (size_t i = 0; i < amount; i++)
         {
-            m_allocator.construct(m_data + m_headIndex);
+            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + m_headIndex);
             increment(m_headIndex);
         }
 
@@ -1601,7 +1624,7 @@ private:
 
             for (; tempIt < end(); tempIt++)
             {
-                m_allocator.destroy(&*(tempIt));
+                std::allocator_traits<allocator_type>::destroy(m_allocator, &*(tempIt));
             }
 
             decrement(m_headIndex, diff);
@@ -1671,7 +1694,7 @@ private:
     size_type m_capacity;  /*!< Capacity of the buffer. How many elements of type T the buffer has currently allocated memory for.*/
     
     T* m_data;  /*!< Pointer to allocated memory.*/
-    Allocator m_allocator;  /*!< Allocator used to allocate/ deallocate and construct/ destruct elements. Default is std::allocator<T>*/
+    Allocator m_allocator;  /*!< Allocator used to allocate/deallocate and construct/destruct elements. Default is std::allocator<T>*/
 };
 
 //===========================
