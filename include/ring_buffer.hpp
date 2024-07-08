@@ -17,25 +17,61 @@ namespace
 template<class _rBuf>
 class _rBuf_const_iterator;
 
+//Base class that wraps memory allocation into an initialization (RAII).
+template<typename T, typename Allocator = std::allocator<T>>
+struct ring_buffer_base {
+
+    using size_type = std::size_t;
+
+protected:
+    size_type m_capacity;  /*!< Capacity of the buffer. How many elements of type T the buffer has currently allocated memory for.*/
+
+    T* m_data;  /*!< Pointer to allocated memory.*/
+    Allocator m_allocator;  /*!< Allocator used to allocate/deallocate and construct/destruct elements. Default is std::allocator<T>*/
+
+public:
+    ring_buffer_base(const Allocator& alloc, size_type capacity)
+        : m_allocator(alloc), m_data(std::allocator_traits<Allocator>::allocate(m_allocator, capacity)), m_capacity(capacity)
+    {
+    }
+
+    ring_buffer_base(ring_buffer_base&& other) noexcept : m_allocator(std::move(other.m_allocator))
+    {
+        m_data = std::exchange(other.m_data, nullptr);
+        m_capacity = std::exchange(other.m_capacity, 0);
+    }
+
+    void swap(ring_buffer_base& other) noexcept
+    {
+        std::swap(m_allocator, other.m_allocator);
+        std::swap(m_data, other.m_data);
+        std::swap(m_capacity, other.m_capacity);
+    }
+
+    ring_buffer_base() { std::allocator_traits<Allocator>::deallocate(m_data, m_capacity); }
+};
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
 /// @tparam T Type of the elements.
 /// @tparam Allocator Allocator used for (de)allocation and (de)construction. Defaults to std::allocator<T>
 template<typename T, typename Allocator = std::allocator<T>> 
-class ring_buffer
+class ring_buffer : private ring_buffer_base<T,Allocator>
 {
 
 public:
 
+    using base = typename ring_buffer<T,Allocator>::ring_buffer_base;
+
     using value_type = T;
     using allocator_type = Allocator;
     using reference = T&;
-    using const_reference= const T&;
+    using const_reference = const T&;
     using pointer = T*;
-    using const_pointer= const T*;
+    using const_pointer = const T*;
 
     using difference_type = std::ptrdiff_t;
     using size_type = std::size_t;
+
 
 //========================================
 // Iterators
@@ -59,7 +95,7 @@ public:
         _rBuf_const_iterator() : m_container(nullptr), m_logicalIndex(0) {}
 
         /// @brief Constructor.
-        /// @param index Index representing the logical element of the.
+        /// @param index Index representing the logical element of the buffer where iterator points to.
         explicit _rBuf_const_iterator(const _rBuf* container, difference_type index) : m_container(container), m_logicalIndex(index) {}
 
         /// @brief Arrow operator.
@@ -496,6 +532,70 @@ public:
     };
 
 
+    /// @brief a LegacyForwardIterator that internally holds a raw pointer. 
+    template<typename T>
+    class InitializerIterator {
+
+public:
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = T;
+        using difference_type = std::ptrdiff_t;
+        using pointer = T*;
+        using reference = T&;
+
+        InitializerIterator (value_type* ptr = nullptr) : m_ptr(ptr)
+        {
+        }
+
+        reference operator*() const noexcept { 
+            return *m_ptr;
+        }
+
+        pointer operator->() noexcept
+        {
+            return m_ptr;
+        }
+
+        InitializerIterator operator++() noexcept
+        {
+            ++m_ptr;
+            return *this;
+        }
+
+        InitializerIterator operator++(int) noexcept
+        {
+            InitializerIterator temp = *this;
+            ++(*this);
+            return temp;
+        }
+
+        InitializerIterator operator+(int count) noexcept
+        {
+            InitializerIterator temp = *this;
+            for (auto i = 0; i < count; i++)
+            {
+                 temp.m_ptr++;
+            }
+
+            return temp;
+        }
+
+        friend bool operator==(const InitializerIterator& left, const InitializerIterator& right) noexcept
+        {
+            return left.m_ptr == right.m_ptr;
+        }
+
+        friend bool operator !=(const InitializerIterator& left, const InitializerIterator& right) noexcept
+        {
+            return left.m_ptr != right.m_ptr;
+        }
+
+private:
+        T* m_ptr;
+    };
+
+    using init_iterator = InitializerIterator<T>;
+
     using iterator = _rBuf_iterator<ring_buffer<T>>;
     using const_iterator = _rBuf_const_iterator<ring_buffer<T>>;
 
@@ -506,9 +606,9 @@ public:
 // End of iterators
 //============================
 
-
     /// @brief Default constructor.
     /// @post this->empty() == true.
+    /// @throw Can throw std::bad_alloc if there is not enough memory available for allocation.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Constant complexity.
     ring_buffer() : ring_buffer(allocator_type())
@@ -518,10 +618,10 @@ public:
     /// @brief Constructs the container with a custom allocator.
     /// @param alloc Custom allocator for the buffer.
     /// @post this->empty() == true.
-    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
+    /// @throw Can throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Constant complexity.
-    explicit ring_buffer(const allocator_type& alloc) : m_headIndex(0), m_tailIndex(0), m_capacity(0), m_data(nullptr), m_allocator(alloc)
+    explicit ring_buffer(const allocator_type& alloc) : ring_buffer_base(alloc, allocBuffer), m_headIndex(0), m_tailIndex(0)
     {
     }
 
@@ -530,38 +630,45 @@ public:
     /// @param val Reference to a value which the elements are initialized to.
     /// @param alloc Custom allocator.
     /// @pre T needs to satisfy CopyInsertable.
-    /// @post std::distance(begin(), end()) == count.
+    /// @post std::distance(begin(), end()) == size().
     /// @note Allocates memory for count + allocBuffer elements.
-    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation.
+    /// @throw Can throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to amount of constructed elements (O(n)).
-    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
+    ring_buffer(size_type count, const_reference val, const allocator_type& alloc = allocator_type()) : ring_buffer_base(alloc, count + allocBuffer), m_headIndex(count), m_tailIndex(0)
     {
-        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, count + allocBuffer);
-        m_capacity = count + allocBuffer;
-
-        for (size_t i = 0; i < count; i++)
-        {
-            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + i, val);
-            increment(m_headIndex);
-        }
+        std::uninitialized_fill_n(init_begin(), count, val);
     }
-
-    /// @brief Custom constructor. Initializes a buffer to a capacity without constructing any element.
-    /// @param capacity Capacity of the buffer.
+    
+    /// @brief Custom constructor. Initializes a buffer to with count amount of default constructed value_type elements.
+    /// @param count Capacity of the buffer.
     /// @pre T must satisfy DefaultInsertable.
-    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
+    /// @throw Can throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to count (O(n)).
-    explicit ring_buffer(size_type count, const allocator_type& alloc = allocator_type()) : m_headIndex(0), m_tailIndex(0), m_allocator(alloc)
+    explicit ring_buffer(size_type count, const allocator_type& alloc = allocator_type()) : ring_buffer_base(alloc, count + allocBuffer), m_headIndex(count), m_tailIndex(0)
     {
-        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, count + allocBuffer);
-        m_capacity = count + allocBuffer;
+        init_iterator first = init_begin();
+        init_iterator current = init_begin();
 
-        for (size_t i = 0; i < count; i++)
+        try
         {
-            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + i);
-            increment(m_headIndex);
+            for (size_t i = 0; i < count; i++)
+            {
+                std::allocator_traits<allocator_type>::construct(m_allocator, &*current);
+                current++;
+            }
+        }
+        catch (...)
+        {
+            for (; first != current; first++)
+            {
+                std::allocator_traits<allocator_type>::destroy(m_allocator, &*first);
+            }
+            
+            m_headIndex = 0;
+
+            throw;
         }
     }
 
@@ -569,30 +676,21 @@ public:
     /// @param beginIt Iterator to first element of range.
     /// @param endIt Iterator pointing to past-the-last element of range.
     /// @pre valye_type must satisfy CopyInsertable. InputIt must be deferencable to value_type, and incrementing rangeBegin (repeatedly) must reach rangeEnd. Otherwise behaviour is undefined.
-    /// @throw Might throw std::bad_alloc if there is not enough memory available for allocation, or something from T's constructor.
+    /// @throw Can throw std::bad_alloc if there is not enough memory available for allocation, or something from T's constructor.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
     /// @details Linear complexity in relation to the size of the range (O(n)).
     /// @note Behavior is undefined if elements in range are not valid.
     template<typename InputIt,typename = std::enable_if_t<std::is_convertible<typename std::iterator_traits<InputIt>::value_type,value_type>::value>>
     ring_buffer(InputIt beginIt, InputIt endIt, const allocator_type& alloc = allocator_type())
-        : m_headIndex(0), m_tailIndex(0)
+        : ring_buffer_base(alloc, std::distance<InputIt>(beginIt,endIt) + allocBuffer), m_headIndex(std::distance<InputIt>(beginIt, endIt)), m_tailIndex(0)
     {
-        const auto size = std::distance<InputIt>(beginIt , endIt);
-
-        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, size + allocBuffer);
-        m_capacity = size + allocBuffer;
-
-        for (difference_type i = 0; i < size; i++)
-        {
-            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + i, *(beginIt + i));
-            increment(m_headIndex);
-        }
+        std::uninitialized_copy(beginIt, endIt, init_begin());
     }
 
     /// @brief Initializer list contructor.
     /// @param init Initializer list to initialize the buffer from.
     /// @pre T must satisfy CopyInsertable.
-    /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
+    /// @throw Can throw std::bad_alloc if there is not enough memory for allocation, or some exception from T's constructor..
     /// @note Allocates memory for 2 extra elements.
     /// @details Linear complexity in relation to initializer list size (O(n)).
     ring_buffer(std::initializer_list<T> init) : ring_buffer(init.begin(),init.end())
@@ -603,19 +701,13 @@ public:
     /// @param rhs Reference to a RingBuffer to create a copy from.
     /// @pre T must meet CopyInsertable.
     /// @post this == ring_buffer(rhs).
-    /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation, or something from value_types constructor.
+    /// @throw Can throw std::bad_alloc if there is not enough memory for memory allocation, or something from T's constructor.
     /// @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).
     /// @details Linear complexity in relation to buffer size.
     ring_buffer(const ring_buffer& rhs) 
-    : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex), m_capacity(rhs.m_capacity), m_allocator(std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.m_allocator))
+    : m_headIndex(rhs.m_headIndex), m_tailIndex(rhs.m_tailIndex), ring_buffer_base(std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.m_allocator), rhs.capacity())
     {
-        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, rhs.capacity());
-
-        for (size_t i = 0; i < rhs.size(); i++)
-        {
-            std::allocator_traits<allocator_type>::construct(m_allocator, &this->operator[](i), rhs[i]);
-            increment(m_headIndex);
-        }
+        std::uninitialized_copy(rhs.begin(), rhs.end(), init_begin());
     }
 
     /// @brief Copy constructor with custom allocator.
@@ -626,29 +718,16 @@ public:
     /// @throw Might throw std::bad_alloc if there is not enough memory for memory allocation, or something from value_types constructor.
     /// @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).
     /// @details Linear complexity in relation to buffer size.
-    ring_buffer(const ring_buffer& rhs, const allocator_type& alloc) : m_headIndex(rhs.m_tailIndex), m_tailIndex(rhs.m_tailIndex), m_capacity(rhs.m_capacity), m_allocator(alloc)
+    ring_buffer(const ring_buffer& rhs, const allocator_type& alloc) : ring_buffer_base(alloc, rhs.m_capacity) m_headIndex(rhs.m_headIndex), m_tailIndex(rhs.m_tailIndex)
     {
-        m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, rhs.capacity());
-
-        for (size_type i = 0; i < rhs.size(); i++)
-        {
-            std::allocator_traits<allocator_type>::construct(m_allocator, m_data + i, rhs[i]);
-            increment(m_headIndex);
-        }
+        std::uninitialized_copy(rhs.begin(), rhs.end(), init_begin());
     }
 
     /// @brief Move constructor.
     /// @param other Rvalue reference to other buffer.
-    /// @pre value_type must resolve std::is_nothrow_move_constructible<value_type>::value to true. Otherwise function does nothing.
-    /// @details Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant.
-    ring_buffer(ring_buffer&& other) noexcept : m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex), m_capacity(other.m_capacity), m_data(nullptr)
+    /// @details Constant complexity.
+    ring_buffer(ring_buffer&& other) noexcept : ring_buffer_base(std::forward<ring_buffer_base>(other)), m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex)
     {
-        if (!std::is_nothrow_move_constructible<value_type>::value) return;
-
-        m_allocator = std::move(other.m_allocator);
-        m_data = std::exchange(other.m_data, nullptr);
-
-        other.m_capacity = 0;
         other.m_headIndex = 0;
         other.m_tailIndex = 0;
     }
@@ -656,39 +735,34 @@ public:
     /// @brief Move constructor with different allocator.
     /// @param other Rvalue reference to other buffer.
     /// @param alloc Allocator for the new ring buffer.
-    /// @pre value_type must resolve std::is_nothrow_move_constructible<value_type>::value to true. Otherwise function does nothing.
-    /// @details Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant.
-    ring_buffer(ring_buffer&& other, const allocator_type& alloc) noexcept : m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex), m_capacity(other.m_capacity), m_allocator(alloc)
+    /// @details Linear complexity in relation to buffer size.
+    ring_buffer(ring_buffer&& other, const allocator_type& alloc) : ring_buffer_base(alloc, other.m_capacity), m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex)
     {
-        if (!std::is_nothrow_move_constructible<value_type>::value) return;
         
-        if (m_allocator == other.get_allocator())
-        {
-            m_data = other.m_data;
-            other.m_data = nullptr;
-            other.m_headIndex = 0;
-            other.m_tailIndex = 0;
-            other.m_capacity = 0;
+        init_iterator first = init_begin();
+        init_iterator current = init_begin();
 
-        }
-        // Allocator is different, allocate memory with new allocator and manually move the elements. Clean up original buffer after.
-        else
+        try
         {
-            m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, m_capacity);
-            for (size_type i = 0; i < other.size(); i++)
+            for (size_t i = 0; i < other.size(); i++)
             {
-                std::allocator_traits<allocator_type>::construct(m_allocator, &this->operator[](i), std::move(other[i]));
+                std::allocator_traits<allocator_type>::construct(m_allocator, &*current, std::move(other[i]));
+                current++;
             }
-
-            // Clean up the original buffer.
-            other.clear();
-            std::allocator_traits<allocator_type>::deallocate(other.m_allocator, other.m_data, other.m_capacity);
-            other.m_data = nullptr;
-            other.m_capacity = 0;
-            other.m_headIndex = 0;
-            other.m_tailIndex = 0;
+        }
+        catch (...)
+        {
+            for (; first != current; first++)
+            {
+                std::allocator_traits<allocator_type>::destroy(m_allocator, &*first);
+            }
+            m_headIndex = 0;
+            m_tailIndex = 0;
+            throw;
         }
 
+        other.m_headIndex = 0;
+        other.m_tailIndex = 0;
     }
 
     /// Destructor.
@@ -696,12 +770,6 @@ public:
     {
         // Calls destructor for each element in the buffer.
         for_each(begin(), end(), [this](T& elem) { std::allocator_traits<allocator_type>::destroy(m_allocator, &elem); });
-
-        // After destruction deallocate the memory.
-        if (m_data != nullptr)
-        {
-            std::allocator_traits<allocator_type>::deallocate(m_allocator, m_data, m_capacity);
-        }
     }
 
     /// @brief Inserts an element to the buffer.
@@ -1450,7 +1518,27 @@ public:
         return const_reverse_iterator(begin());
     }
 
+
 private:
+    
+    template<typename T>
+    void swap(ring_buffer_base<T>& left, ring_buffer_base<T>& right) noexcept
+    {
+        std::swap(left.m_data,right.m_data);
+        std::swap(left.m_capacity, right.m_capacity);
+    }
+     
+    /// @brief Returns a ForwardIterator to the beginning of the allocated memory area, that is not invalid while size == 0. 
+    /// @note Used to initialize elements with std::uninitialized_fill and other respective algorithms.
+    init_iterator init_begin()
+    {
+        return init_iterator(m_data);
+    }
+
+    init_iterator init_begin(int count)
+    {
+        return init_iterator(m_data) + count;
+    }
 
     /// @brief Reserves more memory if needed for an increase in size. If more memory is needed, allocates (capacity * 1.5) or if that is not enough (capacity * 1.5 + increase).
     /// @param increase Expected increase in size of the buffer, based on which memory is allocated.
@@ -1685,17 +1773,12 @@ private:
         }
     }
 
-//==========================================
-// Members 
-//==========================================
-
-    size_type m_headIndex; /*!< Index of the head. Index pointing to past the last element.*/ 
+    size_type m_headIndex; /*!< Index of the head. Index pointing to past the last element.*/
     size_type m_tailIndex; /*!< Index of the tail. Index to the first element in the buffer.*/
-    size_type m_capacity;  /*!< Capacity of the buffer. How many elements of type T the buffer has currently allocated memory for.*/
-    
-    T* m_data;  /*!< Pointer to allocated memory.*/
-    Allocator m_allocator;  /*!< Allocator used to allocate/deallocate and construct/destruct elements. Default is std::allocator<T>*/
+
 };
+
+
 
 //===========================
 // Non-member functions

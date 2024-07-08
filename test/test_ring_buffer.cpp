@@ -271,10 +271,16 @@ TYPED_TEST(RingBufferTest, copyConstruction)
 TYPED_TEST(RingBufferTest, moveConstruction)
 {
     ring_buffer<TypeParam> copy(this->t_buffer);
+    auto refCopy(this->t_buffer);
+    
     ASSERT_EQ(this->t_buffer.empty(), false);
 
     ring_buffer<TypeParam> moved(std::move(this->t_buffer));
 
+    std::allocator<TypeParam> alloc = {};
+    ring_buffer<TypeParam> secondMoved(std::move(refCopy), alloc);
+
+    ASSERT_EQ(secondMoved, copy);
     ASSERT_EQ(moved, copy);
     ASSERT_EQ(this->t_buffer.size(), 0);
 
@@ -946,7 +952,6 @@ TEST(RingBufferTest, insertShuffleMonkey)
     testBuffer.push_back(1);
 
     testBuffer.shrink_to_fit();
-
 
     testBuffer.insert(testBuffer.begin() + 3, testBuffer.begin(), testBuffer.end() - 2);
 
