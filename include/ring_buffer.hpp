@@ -21,9 +21,10 @@ class _rBuf_const_iterator;
 template<typename T, typename Allocator = std::allocator<T>>
 struct ring_buffer_base {
 
-    using size_type = std::size_t;
-
 protected:
+    using size_type = std::size_t;
+    using allocator_type = Allocator;
+
     size_type m_capacity;  /*!< Capacity of the buffer. How many elements of type T the buffer has currently allocated memory for.*/
 
     T* m_data;  /*!< Pointer to allocated memory.*/
@@ -31,7 +32,7 @@ protected:
 
 public:
     ring_buffer_base(const Allocator& alloc, size_type capacity)
-        : m_allocator(alloc), m_data(std::allocator_traits<Allocator>::allocate(m_allocator, capacity)), m_capacity(capacity)
+        : m_allocator(alloc), m_data(std::allocator_traits<allocator_type>::allocate(m_allocator, capacity)), m_capacity(capacity)
     {
     }
 
@@ -41,14 +42,19 @@ public:
         m_capacity = std::exchange(other.m_capacity, 0);
     }
 
-    void swap(ring_buffer_base& other) noexcept
+    template<typename T>
+    void swap(ring_buffer_base<T>& left, ring_buffer_base<T>& right) noexcept
     {
-        std::swap(m_allocator, other.m_allocator);
-        std::swap(m_data, other.m_data);
-        std::swap(m_capacity, other.m_capacity);
+        if (std::allocator_traits<allocator_type>::propagate_on_container_swap::value)
+        {
+            std::swap(left.m_allocator, right.m_allocator);
+        }
+        
+        std::swap(left.m_data, right.m_data);
+        std::swap(left.m_capacity, right.m_capacity);
     }
 
-    ring_buffer_base() { std::allocator_traits<Allocator>::deallocate(m_data, m_capacity); }
+    ring_buffer_base() { std::allocator_traits<allocator_type>::deallocate(m_data, m_capacity); }
 };
 
 /// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
@@ -63,14 +69,11 @@ public:
     using base = typename ring_buffer<T,Allocator>::ring_buffer_base;
 
     using value_type = T;
-    using allocator_type = Allocator;
     using reference = T&;
     using const_reference = const T&;
     using pointer = T*;
     using const_pointer = const T*;
-
     using difference_type = std::ptrdiff_t;
-    using size_type = std::size_t;
 
 
 //========================================
@@ -640,8 +643,8 @@ private:
         std::uninitialized_fill_n(init_begin(), count, val);
     }
     
-    /// @brief Custom constructor. Initializes a buffer to with count amount of default constructed value_type elements.
-    /// @param count Capacity of the buffer.
+    /// @brief Custom constructor. Initializes a buffer with count amount of default constructed value_type elements.
+    /// @param count amount of default constructed value_type elements.
     /// @pre T must satisfy DefaultInsertable.
     /// @throw Can throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor.
     /// @exception If any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).
@@ -738,7 +741,6 @@ private:
     /// @details Linear complexity in relation to buffer size.
     ring_buffer(ring_buffer&& other, const allocator_type& alloc) : ring_buffer_base(alloc, other.m_capacity), m_headIndex(other.m_headIndex), m_tailIndex(other.m_tailIndex)
     {
-        
         init_iterator first = init_begin();
         init_iterator current = init_begin();
 
@@ -918,7 +920,7 @@ private:
     /// @pre First and last must be valid iterators to *this.
     /// @return Returns an iterator to the element that was immediately following the last erased elements. If last == end(), then new end() is returned.
     /// @throw Possibly throws from value_types move/copy assignment operator if last != end().
-    /// @exception If value_type is nothrow_move_constructible and nothrow_move_assignable function is noexcept. Otherwise provides no exception guarantee at all.
+    /// @exception If value_type is nothrow_move_constructible and nothrow_move_assignable function is noexcept. Otherwisde provides no exception guarantee at all.
     /// @details Linear Complexity in relation to size of the range, and then linear in remaining elements after the erased range.
     iterator erase(const_iterator first, const_iterator last)
     {
@@ -930,9 +932,9 @@ private:
     /// @details Linear complexity in relation to size of the buffer.
     void clear() noexcept
     {
-        for(; m_tailIndex < m_headIndex ; ++m_tailIndex)
+        for(size_t i = 0; i < size() ; ++i)
         {
-            std::allocator_traits<allocator_type>::destroy(m_allocator, &m_data[m_tailIndex]);
+            std::allocator_traits<allocator_type>::destroy(m_allocator, &this->operator[](i));
         }
 
         m_headIndex = 0;
@@ -990,49 +992,45 @@ private:
     }
 
     /// @brief Copy assignment operator.
-    /// @param other Ringbuffer to be copied.
-    /// @return Returns reference to the left hand side RungBuffer after swap.
-    /// @post *this == other.
-    /// @details Constant complexity.
+    /// @param other Ringbuffer to be copy assigned.
+    /// @return Returns reference to the assignment target container.
+    /// @post *this == other. All iterators, pointers and references of the target container should be considered invalid. Does not guarantee that target containers capacity equals the original.
     /// @throw Can throw std::bad_alloc or something from value_types constructor.
-    /// @exception If any exception is thrown, this function has no effect (Strong Exception Guarantee).
-    /// @details Linear complexity in relation to buffer size.
+    /// @exception If any exception is thrown, invariants are retained and no memory is leaked (Basic Exception Guarantee).
+    /// @details Linear complexity in relation to buffer size. 
     ring_buffer& operator=(const ring_buffer& other)
     {
 
-        if (std::allocator_traits<allocator_type>::propagate_on_container_copy_assignment::value && m_allocator != other.m_allocator)
+        if (this == &other) return *this;
+
+        if (std::allocator_traits<allocator_type>::propagate_on_container_copy_assignment::value && (m_allocator != other.m_allocator) || (m_capacity < other.size()))
         {
+            auto temp = ring_buffer(other);
+
             clear();
-            std::allocator_traits<allocator_type>::deallocate(m_allocator,m_data, m_capacity);
-
-            m_allocator = other.m_allocator;
-            m_data = std::allocator_traits<allocator_type>::allocate(m_allocator, other.m_capacity);
-            m_capacity = other.m_capacity;
-            m_headIndex = other.m_headIndex;
-            m_tailIndex = other.m_tailIndex;
-
-            for (size_type i = 0; i < other.size(), i++)
-            {
-                std::iterator_traits<allocator_type>::construct(m_allocator, &this->operator[](i), other[i])
-            }
-        } 
+            ring_buffer_base::swap(*this, temp);
+            std::swap(m_tailIndex, temp.m_tailIndex);
+            std::swap(m_headIndex, temp.m_headIndex);
+        }
         else
         {
-            if (size() >= other.size())
+            auto targetSize = size();
+            auto sourceSize = other.size();
+
+            if (targetSize <= sourceSize)
             {
-                std::copy(other.begin(), other.end(), begin());
-                for (size_type i = other.size(); i < size(); i++)
+                std::copy(other.begin(), other.begin() + targetSize, begin());
+                for (size_type i = size(); i < sourceSize; i++)
                 {
-                    std::allocator_traits<allocator_type>::destroy(m_allocator, &this->operator[](i))
+                    push_back(other[i]);
                 }
-                resize(other.size());
             }
             else
             {
-                std::copy(other.begin(), other.begin() + size(), begin());
-                for (size_type i = size(); i < other.size(); i++)
+                std::copy(other.begin(), other.end(), begin());
+                for (size_type i = sourceSize; i < targetSize; i++)
                 {
-                    push_back(other[i]);
+                    pop_back();
                 }
             }
         }
@@ -1137,15 +1135,9 @@ private:
     void swap(ring_buffer& other) noexcept
     {
         using std::swap;
-        if (std::allocator_traits<allocator_type>::propagate_on_container_swap::value)
-        {
-            swap(m_allocator, other.m_allocator);
-        }
-
-        swap(m_data, other.m_data);
+        ring_buffer_base::swap(*this, other);
         swap(m_headIndex, other.m_headIndex);
         swap(m_tailIndex, other.m_tailIndex);
-        swap(m_capacity, other.m_capacity);
     }
 
     /// @brief Friend swap.
@@ -1520,14 +1512,29 @@ private:
 
 
 private:
-    
-    template<typename T>
-    void swap(ring_buffer_base<T>& left, ring_buffer_base<T>& right) noexcept
-    {
-        std::swap(left.m_data,right.m_data);
-        std::swap(left.m_capacity, right.m_capacity);
-    }
      
+    void uninitialized_copy(ring_buffer& target, const ring_buffer& source)
+    {
+        size_t current = 0;
+        try
+        {
+            for (; current < source.size(); current++)
+            {
+                std::allocator_traits<allocator_type>::construct(target.m_allocator, &target[current], source[current]);
+                target.m_headIndex += 1;
+            }
+        }
+        catch (...)
+        {
+            for (size_t i = 0; i < current; i++)
+            {
+                std::allocator_traits<allocator_type>::destroy(m_allocator, &target[i]);
+                target.m_headIndex -= 1;
+            }
+            throw;
+        }
+    }
+
     /// @brief Returns a ForwardIterator to the beginning of the allocated memory area, that is not invalid while size == 0. 
     /// @note Used to initialize elements with std::uninitialized_fill and other respective algorithms.
     init_iterator init_begin()

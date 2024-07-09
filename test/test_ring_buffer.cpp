@@ -86,6 +86,12 @@ private:
     size_t* data_;
 };
 
+template<typename T, typename U>
+bool operator==(const CustomAllocator<T>&, const CustomAllocator<U>&) { return true; }
+
+template<typename T, typename U>
+bool operator!=(const CustomAllocator<T>&, const CustomAllocator<U>&) { return false; }
+
 // Define some factory functions.
 
 //==========================
@@ -290,8 +296,29 @@ TYPED_TEST(RingBufferTest, moveConstruction)
 // Tests requirement: Container expression a = b
 TYPED_TEST(RingBufferTest, copyAssignment)
 {
-    ring_buffer<TypeParam> control = this->t_buffer;
-    ASSERT_EQ(control, this->t_buffer);
+    ring_buffer<TypeParam> lowCapacityBuffer;
+    lowCapacityBuffer = this->t_buffer;
+    ASSERT_EQ(lowCapacityBuffer, this->t_buffer);
+
+    ring_buffer<TypeParam> control2;
+    control2 = this->t_buffer;
+    std::allocator<float> myAlloc{};
+    ring_buffer<TypeParam> allocControl(myAlloc);
+    allocControl = this->t_buffer;
+    ASSERT_EQ(control2, allocControl);
+
+
+    ring_buffer<TypeParam> control3(this->t_buffer);
+    auto highElementBuffer(CreateBuffer<TypeParam>(TEST_BUFFER_SIZE));
+    highElementBuffer = this->t_buffer;
+    ASSERT_EQ(control3, highElementBuffer);
+
+    ring_buffer<TypeParam> control4(this->t_buffer);
+    control4.push_back(getValue<TypeParam>());
+    auto highCapacityBuffer(CreateBuffer<TypeParam>(TEST_BUFFER_SIZE));
+    control4 = highCapacityBuffer;
+    ASSERT_EQ(control4, highCapacityBuffer);
+
     ASSERT_TRUE(std::is_copy_assignable<ring_buffer<TypeParam>>::value);
 }
 
