@@ -85,13 +85,6 @@ public:
 private:
     size_t* data_;
 };
-
-template<typename T, typename U>
-bool operator==(const CustomAllocator<T>&, const CustomAllocator<U>&) { return true; }
-
-template<typename T, typename U>
-bool operator!=(const CustomAllocator<T>&, const CustomAllocator<U>&) { return false; }
-
 // Define some factory functions.
 
 //==========================
@@ -755,9 +748,27 @@ TEST(NonTypedTest, emplace_back)
 // Tests requirement: SequenceContainer a.push_front(t).
 TYPED_TEST(RingBufferTest, push_front)
 {
-    const auto someVal = getValue<TypeParam>();
-    this->t_buffer.push_front(someVal);
-    ASSERT_EQ(this->t_buffer.front(), someVal);
+    ring_buffer<TypeParam> push_buffer = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+    auto ref = this->t_buffer;
+
+    for (size_t i = 0; i < push_buffer.size(); ++i)
+    {
+        this->t_buffer.push_front(push_buffer[i]);
+    }
+
+    size_t refIndex = 0;
+
+    for (; refIndex < push_buffer.size(); ++refIndex)
+    {
+        ASSERT_EQ(this->t_buffer[refIndex], push_buffer[TEST_BUFFER_SIZE - refIndex - 1]);
+    }
+
+    for (size_t i = 0; refIndex < this->t_buffer.size(); ++refIndex)
+    {
+        ASSERT_EQ(this->t_buffer[refIndex], ref[i]);
+        ++i;
+    }
+
 }
 
 // Tests requirement: SequenceContainer a.push_front(rv), where rv is a rvalue ref.
@@ -788,9 +799,27 @@ TYPED_TEST(RingBufferTest, pushFrontRV)
 // Tests requirement: SequenceContainer a.push_back(t)
 TYPED_TEST(RingBufferTest, pushBack)
 {
-    const auto someVal = getValue<TypeParam>();
-    this->t_buffer.push_back(someVal);
-    ASSERT_EQ(this->t_buffer.back(), someVal);
+    ring_buffer<TypeParam> push_buffer = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+    auto ref = this->t_buffer;
+
+    for (size_t i = 0; i < push_buffer.size(); ++i)
+    {
+        this->t_buffer.push_back(push_buffer[i]);
+    }
+    
+    size_t refIndex = 0;
+
+    for (; refIndex < ref.size(); ++refIndex)
+    {
+        ASSERT_EQ(this->t_buffer[refIndex], ref[refIndex]);
+    }
+
+    for ( size_t i = 0; refIndex < this->t_buffer.size(); ++refIndex)
+    {
+        ASSERT_EQ(this->t_buffer[refIndex], push_buffer[i]);
+        ++i;
+    }
+
 }
 
 // Tests requirement: SequenceContainer a.push_back(rv)
@@ -801,6 +830,27 @@ TYPED_TEST(RingBufferTest, pushBackRV)
     this->t_buffer.push_back(std::move(someVal));
 
     ASSERT_EQ(this->t_buffer.back(), refVal);
+
+    ring_buffer<TypeParam> push_buffer = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+    auto ref = this->t_buffer;
+
+    for (size_t i = 0; i < push_buffer.size(); ++i)
+    {
+        this->t_buffer.push_back(push_buffer[i]);
+    }
+
+    size_t refIndex = 0;
+
+    for (; refIndex < ref.size(); ++refIndex)
+    {
+        ASSERT_EQ(this->t_buffer[refIndex], ref[refIndex]);
+    }
+
+    for (size_t i = 0; refIndex < this->t_buffer.size(); ++refIndex)
+    {
+        ASSERT_EQ(this->t_buffer[refIndex], push_buffer[i]);
+        ++i;
+    }
 }
 
 // Tests requirement: SequenceContainer, a.pop_front()

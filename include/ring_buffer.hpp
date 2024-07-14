@@ -21,7 +21,6 @@ class _rBuf_const_iterator;
 template<typename T, typename Allocator = std::allocator<T>>
 struct ring_buffer_base {
 
-protected:
     using size_type = std::size_t;
     using allocator_type = Allocator;
 
@@ -30,7 +29,6 @@ protected:
     T* m_data;  /*!< Pointer to allocated memory.*/
     Allocator m_allocator;  /*!< Allocator used to allocate/deallocate and construct/destruct elements. Default is std::allocator<T>*/
 
-public:
     ring_buffer_base(const Allocator& alloc, size_type capacity)
         : m_allocator(alloc), m_data(std::allocator_traits<allocator_type>::allocate(m_allocator, capacity)), m_capacity(capacity)
     {
@@ -57,7 +55,7 @@ public:
     ring_buffer_base() { std::allocator_traits<allocator_type>::deallocate(m_data, m_capacity); }
 };
 
-/// @brief Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. 
+/// @brief Dynamic Ringbuffer is a dynamically growing circular AllocatorAware std::container with support for queue, stack and priority queue adaptor functionality.
 /// @tparam T Type of the elements.
 /// @tparam Allocator Allocator used for (de)allocation and (de)construction. Defaults to std::allocator<T>
 template<typename T, typename Allocator = std::allocator<T>> 
@@ -932,10 +930,7 @@ private:
     /// @details Linear complexity in relation to size of the buffer.
     void clear() noexcept
     {
-        for(size_t i = 0; i < size() ; ++i)
-        {
-            std::allocator_traits<allocator_type>::destroy(m_allocator, &this->operator[](i));
-        }
+        erase(begin(), end());
 
         m_headIndex = 0;
         m_tailIndex = 0;
@@ -1265,15 +1260,30 @@ private:
         this->swap(temp);
     }
 
-    /// @brief Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.
-    /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
-    /// @param val Element to insert.  Needs to be CopyConstructible.
-    /// @note All iterators are invalidated. If allocation happens, all pointers and references are invalidated.
-    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function retains invariants (Basic Exception Guarantee).
-    /// @details Constant complexity.
+    /// @brief Inserts an element in the back of the buffer. 
+    /// @note If buffer would get full after the operation, function allocates more memory.
+    /// @throw Can throw std::bad_alloc.
+    /// @param val Element to insert.
+    /// @pre T must satisfy CopyInsertable.
+    /// @post All iterators are invalidated. If more memory is allocated, all pointers and references are invalidated.
+    /// @exception If the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function has no effect (Strong Exception Guarantee).
+    /// @details Amortized constant complexity.
     void push_front(const value_type& val)
     {
-        validateCapacity(1);
+        if (m_capacity < size() + allocBuffer)
+        {
+            auto sz = size();
+            ring_buffer_base<T, Allocator> temp(m_allocator, m_capacity * 3 / 2);
+            std::uninitialized_copy(begin(), end(), temp.m_data);
+            std::allocator_traits<allocator_type>::construct(m_allocator, temp.m_data + temp.m_capacity - 1, val);
+            
+            destroy_elements();
+
+            ring_buffer_base::swap(*this, temp);
+            m_headIndex = sz;
+            m_tailIndex = m_capacity -1;
+            return;
+        }
 
         // Decrement temporary index in case constructor throws to retain invariants (elements of the buffer are always initialized).
         auto newIndex = m_tailIndex;
@@ -1282,55 +1292,101 @@ private:
         m_tailIndex = newIndex;
     }
 
-    /// @brief Inserts an element in the back of the buffer by move if move constructor is provided by value_type. If buffer would get full after the operation, allocates more memory.
-    /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
+    /// @brief Inserts an element in the back of the buffer by move if move constructor is provided by value_type.
+    /// @note If buffer would get full after the operation, allocates more memory.
+    /// @throw Can throw std::bad_alloc.
     /// @param val Rvalue reference to the element to insert.
-    /// @pre value_type needs to satisfy MoveInsertable or CopyInsertable.
-    /// @note All iterators are invalidated. If allocation happens, all pointers and references are invalidated.
-    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function retains invariants (Basic Exception Guarantee).
-    /// @details Constant complexity.
+    /// @pre value_type needs to satisfy MoveInsertable.
+    /// @post All iterators are invalidated. If more memory is allocated, all pointers and references are invalidated.
+    /// @exception If the move constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function has no effect (Strong Exception Guarantee).
+    /// @details Amortized constant complexity.
     void push_front(value_type&& val)
     {
-        validateCapacity(1);
+        if (m_capacity < size() + allocBuffer)
+        {
+            auto sz = size();
+            ring_buffer_base<T, Allocator> temp(m_allocator, m_capacity * 3 / 2);
+            std::uninitialized_copy(begin(), end(), temp.m_data);
+            std::allocator_traits<allocator_type>::construct(m_allocator, temp.m_data + temp.m_capacity - 1, std::forward<value_type>(val));
+            
+            destroy_elements();
 
-        // Decrement temporary index incase constructor throws to retain invariants (elements of the buffer are always initialized).
+            ring_buffer_base::swap(*this, temp);
+            m_headIndex = sz;
+            m_tailIndex = m_capacity -1;
+            return;
+        }
+
         auto newIndex = m_tailIndex;
         decrement(newIndex);
         std::allocator_traits<allocator_type>::construct(m_allocator, m_data + newIndex, std::forward<value_type>(val));
         m_tailIndex = newIndex;
     }
 
-    /// @brief Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.
-    /// @throw Might throw std::bad_alloc if there is not enough memory for allocation.
-    /// @param val Value of type T to be appended.
-    /// @note Allocates memory before the insertion if the buffer would be full after the operation.
+    /// @brief Inserts an element in the back of the buffer.
+    /// @param val Value of T to be appended.
+    /// @note If buffer would get full after the operation, allocates more memory.
     /// @throw Can throw std::bad_alloc.
-    /// @exception If the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function retains invariants (Basic Exception Guarantee).
-    /// @pre value_type needs to satisfy CopyInsertable.
+    /// @exception If the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee).
+    /// @pre value_type must satisfy CopyInsertable.
     /// @post If more memory is allocated all pointers, iterators and references are invalidated.
-    /// @details Constant complexity.
+    /// @details Amoprtized constant complexity.
     void push_back(const value_type& val)
     {
-        validateCapacity(1);
+        if (m_capacity < size() + allocBuffer)
+        {
+            auto sz = size();
+            ring_buffer_base<T, Allocator> temp(m_allocator, m_capacity * 3 / 2);
+            std::uninitialized_copy(begin(), end(), temp.m_data);
+            std::allocator_traits<allocator_type>::construct(m_allocator, temp.m_data + sz, val);
+            
+            destroy_elements();
+
+            ring_buffer_base::swap(*this, temp);
+            m_tailIndex = 0;
+            m_headIndex = sz;
+            increment(m_headIndex);
+            
+            return;
+        }
 
         std::allocator_traits<allocator_type>::construct(m_allocator, m_data + m_headIndex, val);
         increment(m_headIndex);
+
+        return;
     }
 
-    /// @brief Inserts an element in the back of the buffer by move if move constructor is provided for value_type. If buffer would get full after the operation, allocates more memory.
+    /// @brief Inserts an element in the back of the buffer by move if move constructor is provided for value_type.
+    /// @note  If buffer would get full after the operation more memory is allocated.
     /// @param val Rvalue reference to the value to be appended.
-    /// @note Allocates memory before the insertion if the buffer would be full after the operation.
-    /// @throw Can throw std::bad_alloc if more memory is allocated.
-    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function retains invariants (Basic Exception Guarantee).
-    /// @pre value_type needs to satisfy MoveInsertable or CopyInsertable.
+    /// @throw Can throw std::bad_alloc.
+    /// @exception If the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function has no effect (Strong Exception Guarantee).
+    /// @pre value_type needs to satisfy MoveInsertable.
     /// @post If more memory is allocated all pointers, iterators and references are invalidated.
-    /// @details Constant complexity.
+    /// @details Amortized constant complexity.
     void push_back(value_type&& val)
     {
-        validateCapacity(1);
-    
-        std::allocator_traits<allocator_type>::construct(m_allocator, m_data + m_headIndex, std::forward<value_type>(val));
+        if (m_capacity < size() + allocBuffer)
+        {
+            auto sz = size();
+            ring_buffer_base<T,Allocator> temp(m_allocator, m_capacity * 3/2);
+            std::uninitialized_copy(begin(), end(), temp.m_data);
+            std::allocator_traits<allocator_type>::construct(m_allocator, temp.m_data + sz, std::forward<value_type>(val));
+            
+            destroy_elements();
+
+            ring_buffer_base::swap(*this, temp);
+            m_headIndex = sz;
+            m_tailIndex = 0;
+            increment(m_headIndex);
+
+            return;
+        }
+
+        std::allocator_traits<allocator_type>::construct(m_allocator,m_data + m_headIndex, std::forward<value_type>(val));
         increment(m_headIndex);
+
+        return;
     }
 
     /// @brief Remove the first element in the buffer.
@@ -1513,6 +1569,12 @@ private:
 
 private:
      
+    void destroy_elements() noexcept
+    {
+        for_each(begin(), end(), [this](T& elem) { std::allocator_traits<allocator_type>::destroy(m_allocator, &elem); });
+    }
+
+
     void uninitialized_copy(ring_buffer& target, const ring_buffer& source)
     {
         size_t current = 0;
@@ -1701,8 +1763,7 @@ private:
     /// @param last Iterator pointing to past the last element to erase.
     /// @return Returns an iterator pointing to the element immediately after the erased elements.
     /// @pre First and last must be valid iterators to *this.
-    /// @throw If value_type is not nothrow move assignable/constructible, might throw something from swap. 
-    /// @exception If swap does not throw, function is noexcept. Otherwise provides no exception guarantee at all.
+    /// @exception If value_types swap is NoThrow, function is noexcept. If swap throws, behavior is undefined.
     iterator eraseBase(const_iterator first, const_iterator last)
     {
         iterator returnIt(this, first.getIndex());
@@ -1712,11 +1773,14 @@ private:
         if (diff > 0)
         {
             auto tempIt(returnIt);
+
+            // Swap to be erased elements to the end...
             for (; tempIt + diff < end(); tempIt++)
             {
                 std::swap(*(tempIt + diff), *tempIt);
             }
 
+            // ... and destroy them.
             for (; tempIt < end(); tempIt++)
             {
                 std::allocator_traits<allocator_type>::destroy(m_allocator, &*(tempIt));
