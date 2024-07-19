@@ -405,57 +405,110 @@ TYPED_TEST(RingBufferTest, assignInitListOperator)
 }
 
 // Tests requirement: SequenceContainer, emplace() expression a.emplace(p, args) where p is position iterator.
-TEST(NonTypedTest, emplace)
+TYPED_TEST(RingBufferTest, emplace)
 {
-    ring_buffer<std::pair<int, std::string>> testBuffer;
+    const auto emplaceValue = getValue<TypeParam>();
+    auto referenceBuffer = this->t_buffer;
+    const auto refIndex = 3;
 
-    std::pair<int, std::string> fillerOne { 51, "hello" };
-    std::pair<int, std::string> fillerTwo{ 53, "world" };
+    this->t_buffer.emplace(this->t_buffer.begin() + refIndex, emplaceValue);
 
-    testBuffer.push_back(fillerOne);
-    testBuffer.push_back(fillerTwo);
+    for (size_t i = 0; i < referenceBuffer.size(); ++i)
+    {
+        if (i < refIndex)
+        {
+            ASSERT_EQ(referenceBuffer[i], this->t_buffer[i]);
+        }
+        else
+        {
+            ASSERT_EQ(referenceBuffer[i], this->t_buffer[i + 1]);;
+        }
+    }
+    ASSERT_EQ(this->t_buffer[refIndex], emplaceValue);
 
-
-    std::pair<int, std::string> emplaced{ 1, "I love Mackerel" };
-
-    auto posIt = testBuffer.begin() + 1;
-    testBuffer.emplace(posIt, emplaced.first, emplaced.second);
-
-    ASSERT_EQ(*posIt, emplaced);
 }
-
 
 // Tests requirement: SequenceContainer, insert() expression a.insert(a,b) where a is a postion iterator and b is the value.
 TYPED_TEST(RingBufferTest, insert)
 {
-    const auto beginIt = this->t_buffer.begin();
-    const auto size = this->t_buffer.size();
-
     // Test the returned iterator and inserted value.
     const auto value = getValue<TypeParam>();
-    auto pointIt = this->t_buffer.insert(beginIt + 1, value);
+    auto pointIt = this->t_buffer.insert(this->t_buffer.begin() + 1, value);
 
     ASSERT_EQ(*pointIt, value);
     ASSERT_EQ(this->t_buffer[1], value);
 
     // Tests the same things for the last element.
-    const auto pointIt2 = this->t_buffer.insert(beginIt + (size), value);
+    const auto pointIt2 = this->t_buffer.insert(this->t_buffer.end(), value);
     ASSERT_EQ(*pointIt2, value);
-    ASSERT_EQ(this->t_buffer[size], value);
+    ASSERT_EQ(this->t_buffer[this->t_buffer.size() -1], value);
+
+    // Buffer integrity
+    ring_buffer<TypeParam> test = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+    auto ref (test);
+    auto refValue = getValue<TypeParam>();
+
+    test.insert(test.begin() + 2, refValue);
+
+    for (size_t i = 0; i < test.size(); ++i)
+    {
+        if (i < 2)
+        {
+            ASSERT_EQ(test[i], ref[i]);
+        }
+        else if(i == 2)
+        {
+            ASSERT_EQ(test[i], refValue);
+        }
+        else
+        {
+            ASSERT_EQ(test[i], ref[i - 1]);
+        }
+    }
 }
 
 // Tests requiremet: SequenceContainer, insert() expression a.insert(a, rv) where a is a postion iterator and rv is an rvalue.
 TYPED_TEST(RingBufferTest, insertRV)
 {
-    const auto it = this->t_buffer.begin();
-    const auto size = this->t_buffer.size();
 
-    // Test that returned iterator points to correct element and that the value is correct
-    const auto value = getValue<TypeParam>();
-    auto pointIt = this->t_buffer.insert(it + 1, std::move(value));
+    // Test the returned iterator and inserted value.
+    auto value = getValue<TypeParam>();
+    auto ref = value;
+    auto insertVal2 = value;
+    auto pointIt = this->t_buffer.insert(this->t_buffer.begin() + 1, std::move(value));
 
-    ASSERT_EQ(*pointIt, value);
-    ASSERT_EQ(this->t_buffer[1], value);
+    ASSERT_EQ(*pointIt, ref);
+    ASSERT_EQ(this->t_buffer[1], ref);
+
+    // Tests the same things for the last element.
+    const auto pointIt2 = this->t_buffer.insert(this->t_buffer.end(), std::move(insertVal2));
+    ASSERT_EQ(*pointIt2, ref);
+    ASSERT_EQ(this->t_buffer[this->t_buffer.size() - 1], ref);
+
+
+    // Buffer integrity
+    ring_buffer<TypeParam> test = CreateBuffer<TypeParam>(TEST_BUFFER_SIZE);
+    auto refBuffer(test);
+    auto insertVal3 = getValue<TypeParam>();
+    auto refValue = insertVal3;
+
+    test.insert(test.begin() + 2, std::move(insertVal3));
+
+    for (size_t i = 0; i < test.size(); ++i)
+    {
+        if (i < 2)
+        {
+            ASSERT_EQ(test[i], refBuffer[i]);
+        }
+        else if (i == 2)
+        {
+            ASSERT_EQ(test[i], refValue);
+        }
+        else
+        {
+            ASSERT_EQ(test[i], refBuffer[i - 1]);
+        }
+    }
 }
 
 // Tests requirement: SequenceContainer, insert() exprssion a.insert(p, n, t) where p is position iterator, n is a size_type and t is a value of value type a::value_type.
@@ -1007,51 +1060,52 @@ TYPED_TEST(RingBufferTest, find)
     auto ret = std::find(this->t_buffer.begin(), this->t_buffer.end(), val);
 }
 
-TEST(RingBufferTest, insertShuffleMonkey)
+TYPED_TEST(RingBufferTest, MonkeyTesting)
 {
-    ring_buffer<size_t> testBuffer(5);
+    ring_buffer<TypeParam> testBuffer(TEST_BUFFER_SIZE);
+
     for (size_t i = 0; i < 1; i++)
     {
         testBuffer.pop_front();
-        testBuffer.push_back(i);
+        testBuffer.push_back(getValue<TypeParam>());
     }
 
-    testBuffer.insert(testBuffer.begin(), testBuffer.begin(), testBuffer.end()-2);
+    testBuffer.insert(testBuffer.begin(), this->t_buffer.begin(), this->t_buffer.end() - 2);
 
 
     testBuffer.pop_front();
-    testBuffer.push_back(1);
+    testBuffer.push_back(getValue<TypeParam>());
     testBuffer.pop_front();
-    testBuffer.push_back(1);
+    testBuffer.push_back(getValue<TypeParam>());
     testBuffer.pop_front();
-    testBuffer.push_back(1);
+    testBuffer.push_back(getValue<TypeParam>());
     testBuffer.pop_front();
-    testBuffer.push_back(1);
+    testBuffer.push_back(getValue<TypeParam>());
 
     testBuffer.shrink_to_fit();
 
-    testBuffer.insert(testBuffer.begin() + 3, testBuffer.begin(), testBuffer.end() - 2);
+    testBuffer.insert(testBuffer.end(), ++this->t_buffer.begin(), --this->t_buffer.end());
+
+    auto fooValue = getValue<TypeParam>();
+    testBuffer.insert(testBuffer.begin() + 3, 4, std::move(fooValue));
+
+
+    testBuffer.pop_front();
+    testBuffer.push_back(getValue<TypeParam>());
+    testBuffer.pop_front();
+    testBuffer.push_back(getValue<TypeParam>());
+    testBuffer.pop_front();
+    testBuffer.push_back(getValue<TypeParam>());
+    testBuffer.pop_front();
+    testBuffer.push_back(getValue<TypeParam>());
+
+    auto fooValue2 = getValue<TypeParam>();
+    testBuffer.insert(testBuffer.begin() + 3, 4, fooValue);
 
     for (auto i = 0; i < testBuffer.size(); i++)
     {
         // Just to check that the elements are all valid.
-        testBuffer[i];
-    }
-
-    testBuffer.pop_front();
-    testBuffer.push_back(2);
-    testBuffer.pop_front();
-    testBuffer.push_back(2);
-    testBuffer.pop_front();
-    testBuffer.push_back(2);
-    testBuffer.pop_front();
-    testBuffer.push_back(2);
-
-    testBuffer.insert(testBuffer.begin() + 3, testBuffer.begin(), testBuffer.end() - 2);
-
-    for (auto i = 0; i < testBuffer.size(); i++)
-    {
-        testBuffer[i];
+        auto validElement = testBuffer[i];
     }
 }
 }
