@@ -18,11 +18,13 @@ const static size_t TEST_INT_VALUE = 9;
 
 class NonTrivialTestType {
 public:
-    NonTrivialTestType(size_t data = 0) : data_(new size_t(data)) {
+    NonTrivialTestType(size_t data = 0) : data_(new size_t(data)) 
+    {
     }
 
     // Non-trivial copy constructor
-    NonTrivialTestType(const NonTrivialTestType& other) : data_(new size_t(*other.data_)) {
+    NonTrivialTestType(const NonTrivialTestType& other) : data_(new size_t(*other.data_)) 
+    {
     }
 
     // Copy assignment operator
@@ -35,50 +37,58 @@ public:
     }
 
     // Move constructor
-    NonTrivialTestType(NonTrivialTestType&& other) noexcept : data_(other.data_) {
-        other.data_ = nullptr;
+    NonTrivialTestType(NonTrivialTestType&& other) noexcept : data_(std::exchange(other.data_, nullptr)) 
+    {
     }
 
     // Move assignment operator
-    NonTrivialTestType& operator=(NonTrivialTestType&& other) noexcept {
+    NonTrivialTestType& operator=(NonTrivialTestType&& other) noexcept 
+    {
         if (this != &other) {
             delete data_;
-            data_ = other.data_;
-            other.data_ = nullptr;
+            data_ = std::exchange(other.data_, nullptr);
         }
         return *this;
     }
 
-    bool operator!=(const NonTrivialTestType& other) const {
+    bool operator!=(const NonTrivialTestType& other) const 
+    {
         return *data_ != *other.data_;
     }
 
-    bool operator<=(const NonTrivialTestType& other) const {
+    bool operator<=(const NonTrivialTestType& other) const 
+    {
         return *data_ <= *other.data_;
     }
 
-    bool operator<(const NonTrivialTestType& other) const {
+    bool operator<(const NonTrivialTestType& other) const 
+    {
         return *data_ < *other.data_;
     }
 
-    bool operator>=(const NonTrivialTestType& other) const {
+    bool operator>=(const NonTrivialTestType& other) const 
+    {
         return *data_ >= *other.data_;
     }
 
-    bool operator>(const NonTrivialTestType& other) const {
+    bool operator>(const NonTrivialTestType& other) const 
+    {
         return *data_ > *other.data_;
     }
 
-    bool operator==(const NonTrivialTestType& other) const {
+    bool operator==(const NonTrivialTestType& other) const 
+    {
         return *data_ == *other.data_;
     }
 
 
-    ~NonTrivialTestType() {
+    ~NonTrivialTestType() 
+    {
         delete data_;
     }
 
-    size_t getData() const {
+    size_t getData() const 
+    {
         return *data_;
     }
 
