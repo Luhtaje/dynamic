@@ -74,24 +74,20 @@ namespace
         ring_buffer_base(const ring_buffer_base&) = delete;
         ring_buffer_base& operator=(const ring_buffer_base&) = delete;
 
-        ring_buffer_base& operator=(ring_buffer_base&& other) noexcept
-        {
-            swap(*this, other);
-            return *this;
-        }
-
         ring_buffer_base(ring_buffer_base&& other) noexcept : m_allocator(std::move(other.m_allocator)), m_data(std::exchange(other.m_data, nullptr)), m_capacity(std::exchange(other.m_capacity, 0))
         {
+        }
+
+        ring_buffer_base& operator=(ring_buffer_base&& other) noexcept
+        {
+            swap(*this,other);
+            return *this;
         }
 
         template<typename T>
         void swap(ring_buffer_base<T>& left, ring_buffer_base<T>& right) noexcept
         {
-            if (alloc_traits::propagate_on_container_swap::value)
-            {
-                std::swap(left.m_allocator, right.m_allocator);
-            }
-        
+            std::swap(left.m_allocator, right.m_allocator);    
             std::swap(left.m_data, right.m_data);
             std::swap(left.m_capacity, right.m_capacity);
         }
@@ -893,9 +889,21 @@ public:
         if (m_capacity < size() + allocBuffer)
         {
             auto sz = size();
-            ring_buffer_base<T, Allocator> temp(m_allocator, m_capacity * 3 / 2);
+            base temp(m_allocator, m_capacity * 3 / 2);
             std::uninitialized_copy(begin(), end(), temp.m_data);
-            alloc_traits::construct(m_allocator, temp.m_data + sz, std::forward<Args>(args)...);
+
+            try
+            {
+                alloc_traits::construct(m_allocator, temp.m_data + sz, std::forward<Args>(args)...);
+            }
+            catch (...)
+            {
+                for (size_t i = 0; i < sz; ++i)
+                {
+                    alloc_traits::destroy(m_allocator, temp.m_data + i);
+                }
+                throw;
+            }
 
             destroy_elements();
 
@@ -1024,17 +1032,18 @@ public:
 
         if (this == &other) return *this;
 
-        if (alloc_traits::propagate_on_container_copy_assignment::value && (m_allocator != other.m_allocator) || (m_capacity < other.size()))
+        if (alloc_traits::propagate_on_container_copy_assignment::value && (m_allocator != other.m_allocator))
         {
             auto temp = ring_buffer(other);
 
-            clear();
-            ring_buffer_base::swap(*this, temp);
+            base::swap(*this, temp);
             std::swap(m_tailIndex, temp.m_tailIndex);
             std::swap(m_headIndex, temp.m_headIndex);
         }
         else
         {
+            validateCapacity(other.size() - m_capacity);
+
             auto targetSize = size();
             auto sourceSize = other.size();
 
@@ -1064,12 +1073,22 @@ public:
     /// @pre value_type is MoveConstructible.
     /// @post *this has values other had before the assignment.
     /// @return Reference to the buffer to move from.
-    /// @exception If value_type is not MoveConstructible, and value_type provides a throwing CopyConstructor is used this function has undefined behaviour.
+    /// @exception If value_type is not MoveConstructible, and if value_type provides a throwing CopyConstructor this function has undefined behaviour.
     /// @details Constant complexity.
     ring_buffer& operator=(ring_buffer&& other) noexcept
     {
-        ring_buffer temp(std::move(other));
-        temp.swap(*this);
+        if (!alloc_traits::propagate_on_container_move_assignment::value && m_allocator != other.m_allocator)
+        {
+            clear();
+
+            alloc_traits::uninitialized_move(other.begin(), other.end(), m_data);
+        }
+        else
+        {
+            ring_buffer temp(std::move(other));
+            temp.swap(*this);
+        }
+
         return *this;
     }
 
@@ -1156,7 +1175,13 @@ public:
     void swap(ring_buffer& other) noexcept
     {
         using std::swap;
-        ring_buffer_base::swap(*this, other);
+        if (alloc_traits::propagate_on_container_swap::value)
+        {
+            swap(m_allocator, other.m_allocator);
+        }
+
+        swap(m_data, other.m_data);
+        swap(m_capacity, other.m_capacity);
         swap(m_headIndex, other.m_headIndex);
         swap(m_tailIndex, other.m_tailIndex);
     }
@@ -1577,24 +1602,7 @@ private:
     {
         if (m_capacity > size() + increase + allocBuffer) return;
 
-        auto enlargedCap = m_capacity / 2 + m_capacity;
-
-        if (enlargedCap > size() + increase)
-        {
-            reserve(enlargedCap + allocBuffer);
-            return;
-        }
-        
-        // Special case where 1.5*m_capacity is not enough, allocate <increase> + the normal capacity increase.
-        if(enlargedCap > 2)
-        {
-            reserve(enlargedCap + increase + allocBuffer);
-        }
-        // Special case where capacity is 0 / 1 and multiplying does not produce a change.
-        else
-        {
-            reserve(2);
-        }
+        reserve(m_capacity / 2 + m_capacity + allocBuffer);
     }
 
     /// @brief Base function for inserting elements by value and amount.
@@ -1610,7 +1618,7 @@ private:
     template<typename U>
     iterator insertBase(const_iterator pos, const size_type count, U&& value)
     {
-        ring_buffer_base tempCore(m_allocator, m_capacity < size() + count + allocBuffer ? m_capacity * 3 / 2 : m_capacity);
+        base tempCore(m_allocator, m_capacity < size() + count + allocBuffer ? m_capacity * 3 / 2 : m_capacity);
         ring_buffer temp(std::move(tempCore));
 
         // Copy elements up to pos
