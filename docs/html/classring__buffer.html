@@ -72,10 +72,12 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality.  
+<p>Dynamic Ringbuffer is a dynamically growing circular AllocatorAware std::container with support for queue, stack and priority queue adaptor functionality.  
  <a href="classring__buffer.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ring__buffer_8hpp_source.html">ring_buffer.hpp</a>&gt;</code></p>
+
+<p>Inherits ring_buffer_base&lt; T, Allocator &gt;.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
@@ -88,12 +90,12 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
 Public Types</h2></td></tr>
+<tr class="memitem:a3941064be54c41ce0c6de961f256a923"><td class="memItemLeft" align="right" valign="top"><a id="a3941064be54c41ce0c6de961f256a923"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>base</b> = typename <a class="el" href="classring__buffer.html">ring_buffer</a>&lt; T, Allocator &gt;::ring_buffer_base</td></tr>
+<tr class="separator:a3941064be54c41ce0c6de961f256a923"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a86bb7fcf18efac4fd9392b0d1e7936e2"><td class="memItemLeft" align="right" valign="top"><a id="a86bb7fcf18efac4fd9392b0d1e7936e2"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>value_type</b> = T</td></tr>
 <tr class="separator:a86bb7fcf18efac4fd9392b0d1e7936e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ba882483fe1804a86e9050edaf246f2"><td class="memItemLeft" align="right" valign="top"><a id="a0ba882483fe1804a86e9050edaf246f2"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>allocator_type</b> = Allocator</td></tr>
-<tr class="separator:a0ba882483fe1804a86e9050edaf246f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad513971955235a51282d9c51f6734fe7"><td class="memItemLeft" align="right" valign="top"><a id="ad513971955235a51282d9c51f6734fe7"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>reference</b> = T &amp;</td></tr>
 <tr class="separator:ad513971955235a51282d9c51f6734fe7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -109,9 +111,6 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>const_pointer</b> = 
 <tr class="memitem:abea16f16223deef2aa829de2831dbdc9"><td class="memItemLeft" align="right" valign="top"><a id="abea16f16223deef2aa829de2831dbdc9"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>difference_type</b> = std::ptrdiff_t</td></tr>
 <tr class="separator:abea16f16223deef2aa829de2831dbdc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abdc06ed4cdcd7970b6df48248af49ced"><td class="memItemLeft" align="right" valign="top"><a id="abdc06ed4cdcd7970b6df48248af49ced"></a>
-using&#160;</td><td class="memItemRight" valign="bottom"><b>size_type</b> = std::size_t</td></tr>
-<tr class="separator:abdc06ed4cdcd7970b6df48248af49ced"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa5201496780447d1b83c9648e07752af"><td class="memItemLeft" align="right" valign="top"><a id="aa5201496780447d1b83c9648e07752af"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>iterator</b> = <a class="el" href="classring__buffer_1_1__rBuf__iterator.html">_rBuf_iterator</a>&lt; <a class="el" href="classring__buffer.html">ring_buffer</a>&lt; T &gt; &gt;</td></tr>
 <tr class="separator:aa5201496780447d1b83c9648e07752af"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,7 +136,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a2449de34e9c4a70e81c5c76a1a75e71f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the buffer to a given size with given values and optionally a custom allocator.  <a href="classring__buffer.html#a2449de34e9c4a70e81c5c76a1a75e71f">More...</a><br /></td></tr>
 <tr class="separator:a2449de34e9c4a70e81c5c76a1a75e71f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2648ee9dbe34781862260df46ac0d1e5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a2648ee9dbe34781862260df46ac0d1e5">ring_buffer</a> (size_type count, const allocator_type &amp;alloc=allocator_type())</td></tr>
-<tr class="memdesc:a2648ee9dbe34781862260df46ac0d1e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom constructor. Initializes a buffer to a capacity without constructing any elemen.  <a href="classring__buffer.html#a2648ee9dbe34781862260df46ac0d1e5">More...</a><br /></td></tr>
+<tr class="memdesc:a2648ee9dbe34781862260df46ac0d1e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Custom constructor. Initializes a buffer with count amount of default constructed value_type elements.  <a href="classring__buffer.html#a2648ee9dbe34781862260df46ac0d1e5">More...</a><br /></td></tr>
 <tr class="separator:a2648ee9dbe34781862260df46ac0d1e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a34d43ed1b6357105e41d7811d5da6638"><td class="memTemplParams" colspan="2">template&lt;typename InputIt , typename  = std::enable_if_t&lt;std::is_convertible&lt;typename std::iterator_traits&lt;InputIt&gt;::value_type,value_type&gt;::value&gt;&gt; </td></tr>
 <tr class="memitem:a34d43ed1b6357105e41d7811d5da6638"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a34d43ed1b6357105e41d7811d5da6638">ring_buffer</a> (InputIt beginIt, InputIt endIt, const allocator_type &amp;alloc=allocator_type())</td></tr>
@@ -155,9 +154,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a232425cc3a36aeb1a844956fd93623f0"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a232425cc3a36aeb1a844956fd93623f0">ring_buffer</a> (<a class="el" href="classring__buffer.html">ring_buffer</a> &amp;&amp;other) noexcept</td></tr>
 <tr class="memdesc:a232425cc3a36aeb1a844956fd93623f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor.  <a href="classring__buffer.html#a232425cc3a36aeb1a844956fd93623f0">More...</a><br /></td></tr>
 <tr class="separator:a232425cc3a36aeb1a844956fd93623f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1e08915585f59f203e3d4ff5ce3cc723"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a1e08915585f59f203e3d4ff5ce3cc723">ring_buffer</a> (<a class="el" href="classring__buffer.html">ring_buffer</a> &amp;&amp;other, const allocator_type &amp;alloc) noexcept</td></tr>
-<tr class="memdesc:a1e08915585f59f203e3d4ff5ce3cc723"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor with different allocator.  <a href="classring__buffer.html#a1e08915585f59f203e3d4ff5ce3cc723">More...</a><br /></td></tr>
-<tr class="separator:a1e08915585f59f203e3d4ff5ce3cc723"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2bcb469aba7cabbc293495eea355e6d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#ac2bcb469aba7cabbc293495eea355e6d">ring_buffer</a> (<a class="el" href="classring__buffer.html">ring_buffer</a> &amp;&amp;other, const allocator_type &amp;alloc)</td></tr>
+<tr class="memdesc:ac2bcb469aba7cabbc293495eea355e6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move constructor with different allocator.  <a href="classring__buffer.html#ac2bcb469aba7cabbc293495eea355e6d">More...</a><br /></td></tr>
+<tr class="separator:ac2bcb469aba7cabbc293495eea355e6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adba67a9f961ab436428b0710cd1af773"><td class="memItemLeft" align="right" valign="top"><a id="adba67a9f961ab436428b0710cd1af773"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#adba67a9f961ab436428b0710cd1af773">~ring_buffer</a> ()</td></tr>
 <tr class="memdesc:adba67a9f961ab436428b0710cd1af773"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destructor. <br /></td></tr>
@@ -168,9 +167,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af647fe55fa023f8b9b6e948350c09ffe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classring__buffer_1_1__rBuf__iterator.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#af647fe55fa023f8b9b6e948350c09ffe">insert</a> (<a class="el" href="classring__buffer_1_1__rBuf__const__iterator.html">const_iterator</a> pos, value_type &amp;&amp;value)</td></tr>
 <tr class="memdesc:af647fe55fa023f8b9b6e948350c09ffe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element to the buffer.  <a href="classring__buffer.html#af647fe55fa023f8b9b6e948350c09ffe">More...</a><br /></td></tr>
 <tr class="separator:af647fe55fa023f8b9b6e948350c09ffe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a36dccabe03199fe8f651cdeb92ec36aa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classring__buffer_1_1__rBuf__iterator.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a36dccabe03199fe8f651cdeb92ec36aa">insert</a> (<a class="el" href="classring__buffer_1_1__rBuf__const__iterator.html">const_iterator</a> pos, const size_type amount, const value_type &amp;value)</td></tr>
-<tr class="memdesc:a36dccabe03199fe8f651cdeb92ec36aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element to the buffer.  <a href="classring__buffer.html#a36dccabe03199fe8f651cdeb92ec36aa">More...</a><br /></td></tr>
-<tr class="separator:a36dccabe03199fe8f651cdeb92ec36aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae2d9f8150e7762f6661154d0e37dc6ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classring__buffer_1_1__rBuf__iterator.html">iterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#ae2d9f8150e7762f6661154d0e37dc6ca">insert</a> (<a class="el" href="classring__buffer_1_1__rBuf__const__iterator.html">const_iterator</a> pos, const size_type count, const value_type &amp;value)</td></tr>
+<tr class="memdesc:ae2d9f8150e7762f6661154d0e37dc6ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element to the buffer.  <a href="classring__buffer.html#ae2d9f8150e7762f6661154d0e37dc6ca">More...</a><br /></td></tr>
+<tr class="separator:ae2d9f8150e7762f6661154d0e37dc6ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab68cc324f43afbaef53a5f6dec8e8f79"><td class="memTemplParams" colspan="2">template&lt;typename InputIt &gt; </td></tr>
 <tr class="memitem:ab68cc324f43afbaef53a5f6dec8e8f79"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classring__buffer_1_1__rBuf__iterator.html">iterator</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classring__buffer.html#ab68cc324f43afbaef53a5f6dec8e8f79">insert</a> (<a class="el" href="classring__buffer_1_1__rBuf__const__iterator.html">const_iterator</a> pos, InputIt sourceBegin, InputIt sourceEnd)</td></tr>
 <tr class="memdesc:ab68cc324f43afbaef53a5f6dec8e8f79"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts a range of elements into the buffer to a specific position.  <a href="classring__buffer.html#ab68cc324f43afbaef53a5f6dec8e8f79">More...</a><br /></td></tr>
@@ -204,11 +203,11 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a2ff5b379f041a4f7ff1cfc8a2a8f69c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the elements in the buffer with copy of [sourceBegin, sourceEnd)  <a href="classring__buffer.html#a2ff5b379f041a4f7ff1cfc8a2a8f69c5">More...</a><br /></td></tr>
 <tr class="separator:a2ff5b379f041a4f7ff1cfc8a2a8f69c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acf5e7138c98dc161fad55891ec10a35b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#acf5e7138c98dc161fad55891ec10a35b">assign</a> (std::initializer_list&lt; T &gt; list)</td></tr>
-<tr class="memdesc:acf5e7138c98dc161fad55891ec10a35b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the elements in the buffer.  <a href="classring__buffer.html#acf5e7138c98dc161fad55891ec10a35b">More...</a><br /></td></tr>
+<tr class="memdesc:acf5e7138c98dc161fad55891ec10a35b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the elements in the buffer with copy of the initializer list.  <a href="classring__buffer.html#acf5e7138c98dc161fad55891ec10a35b">More...</a><br /></td></tr>
 <tr class="separator:acf5e7138c98dc161fad55891ec10a35b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aacccdd4522868dc3549ac9c7c0bed128"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#aacccdd4522868dc3549ac9c7c0bed128">assign</a> (const size_type amount, value_type value)</td></tr>
-<tr class="memdesc:aacccdd4522868dc3549ac9c7c0bed128"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the elements in the buffer with given value.  <a href="classring__buffer.html#aacccdd4522868dc3549ac9c7c0bed128">More...</a><br /></td></tr>
-<tr class="separator:aacccdd4522868dc3549ac9c7c0bed128"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae747ef0e5bac6c9ee2eb4c3e7b728588"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#ae747ef0e5bac6c9ee2eb4c3e7b728588">assign</a> (const size_type amount, const value_type &amp;value)</td></tr>
+<tr class="memdesc:ae747ef0e5bac6c9ee2eb4c3e7b728588"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replaces the elements in the buffer with given value.  <a href="classring__buffer.html#ae747ef0e5bac6c9ee2eb4c3e7b728588">More...</a><br /></td></tr>
+<tr class="separator:ae747ef0e5bac6c9ee2eb4c3e7b728588"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a75342dd634240adde461810a0cee4504"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classring__buffer.html">ring_buffer</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a75342dd634240adde461810a0cee4504">operator=</a> (const <a class="el" href="classring__buffer.html">ring_buffer</a> &amp;other)</td></tr>
 <tr class="memdesc:a75342dd634240adde461810a0cee4504"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assignment operator.  <a href="classring__buffer.html#a75342dd634240adde461810a0cee4504">More...</a><br /></td></tr>
 <tr class="separator:a75342dd634240adde461810a0cee4504"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -255,16 +254,16 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a8f6fd7a2d343de27c99761c6029f6d28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocates memory and copies the existing buffer to the new memory location. Can be used to increase or decrease capacity.  <a href="classring__buffer.html#a8f6fd7a2d343de27c99761c6029f6d28">More...</a><br /></td></tr>
 <tr class="separator:a8f6fd7a2d343de27c99761c6029f6d28"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4bed0fe915650f882f772d022f89bc0b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a4bed0fe915650f882f772d022f89bc0b">push_front</a> (const value_type &amp;val)</td></tr>
-<tr class="memdesc:a4bed0fe915650f882f772d022f89bc0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.  <a href="classring__buffer.html#a4bed0fe915650f882f772d022f89bc0b">More...</a><br /></td></tr>
+<tr class="memdesc:a4bed0fe915650f882f772d022f89bc0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer.  <a href="classring__buffer.html#a4bed0fe915650f882f772d022f89bc0b">More...</a><br /></td></tr>
 <tr class="separator:a4bed0fe915650f882f772d022f89bc0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2d27891d77e19442f1d8acaa26b11ee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#ab2d27891d77e19442f1d8acaa26b11ee">push_front</a> (value_type &amp;&amp;val)</td></tr>
-<tr class="memdesc:ab2d27891d77e19442f1d8acaa26b11ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer by move if move constructor is provided by value_type. If buffer would get full after the operation, allocates more memory.  <a href="classring__buffer.html#ab2d27891d77e19442f1d8acaa26b11ee">More...</a><br /></td></tr>
+<tr class="memdesc:ab2d27891d77e19442f1d8acaa26b11ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer by move if move constructor is provided by value_type.  <a href="classring__buffer.html#ab2d27891d77e19442f1d8acaa26b11ee">More...</a><br /></td></tr>
 <tr class="separator:ab2d27891d77e19442f1d8acaa26b11ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3de0c8df71d288b2948d618bdd930250"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a3de0c8df71d288b2948d618bdd930250">push_back</a> (const value_type &amp;val)</td></tr>
-<tr class="memdesc:a3de0c8df71d288b2948d618bdd930250"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory.  <a href="classring__buffer.html#a3de0c8df71d288b2948d618bdd930250">More...</a><br /></td></tr>
+<tr class="memdesc:a3de0c8df71d288b2948d618bdd930250"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer.  <a href="classring__buffer.html#a3de0c8df71d288b2948d618bdd930250">More...</a><br /></td></tr>
 <tr class="separator:a3de0c8df71d288b2948d618bdd930250"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7d8ed70b4ef81563f9e8d349f256d84c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#a7d8ed70b4ef81563f9e8d349f256d84c">push_back</a> (value_type &amp;&amp;val)</td></tr>
-<tr class="memdesc:a7d8ed70b4ef81563f9e8d349f256d84c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer by move if move constructor is provided for value_type. If buffer would get full after the operation, allocates more memory.  <a href="classring__buffer.html#a7d8ed70b4ef81563f9e8d349f256d84c">More...</a><br /></td></tr>
+<tr class="memdesc:a7d8ed70b4ef81563f9e8d349f256d84c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inserts an element in the back of the buffer by move if move constructor is provided for value_type.  <a href="classring__buffer.html#a7d8ed70b4ef81563f9e8d349f256d84c">More...</a><br /></td></tr>
 <tr class="separator:a7d8ed70b4ef81563f9e8d349f256d84c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef28bc848394b3bc6a1dea129dbb412f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classring__buffer.html#aef28bc848394b3bc6a1dea129dbb412f">pop_front</a> () noexcept</td></tr>
 <tr class="memdesc:aef28bc848394b3bc6a1dea129dbb412f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the first element in the buffer.  <a href="classring__buffer.html#aef28bc848394b3bc6a1dea129dbb412f">More...</a><br /></td></tr>
@@ -334,7 +333,7 @@ Friends</h2></td></tr>
 <div class="textblock"><h3>template&lt;typename T, typename Allocator = std::allocator&lt;T&gt;&gt;<br />
 class ring_buffer&lt; T, Allocator &gt;</h3>
 
-<p>Dynamic Ringbuffer is a dynamically growing std::container with support for queue, stack and priority queue adaptor functionality. </p>
+<p>Dynamic Ringbuffer is a dynamically growing circular AllocatorAware std::container with support for queue, stack and priority queue adaptor functionality. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">T</td><td>Type of the elements. </td></tr>
@@ -372,6 +371,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="section post"><dt>Postcondition</dt><dd>this-&gt;<a class="el" href="classring__buffer.html#aa8e1113807a6554022cee5af36d3e1f0" title="Check if buffer is empty.">empty()</a> == true. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc if there is not enough memory available for allocation. </td></tr>
     <tr><td class="paramname">If</td><td>any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).</td></tr>
   </table>
   </dd>
@@ -416,7 +416,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="section post"><dt>Postcondition</dt><dd>this-&gt;<a class="el" href="classring__buffer.html#aa8e1113807a6554022cee5af36d3e1f0" title="Check if buffer is empty.">empty()</a> == true. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory available for allocation. </td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor. </td></tr>
     <tr><td class="paramname">If</td><td>any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).</td></tr>
   </table>
   </dd>
@@ -477,11 +477,11 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
   </dd>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>T needs to satisfy CopyInsertable. </dd></dl>
-<dl class="section post"><dt>Postcondition</dt><dd>std::distance(<a class="el" href="classring__buffer.html#a4a2abcc16c769e390ed5fc16b320cce7" title="Construct iterator at begin.">begin()</a>, <a class="el" href="classring__buffer.html#ab057216d2bd4ad43454758fb3eeed319" title="Construct iterator at end.">end()</a>) == count. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>std::distance(<a class="el" href="classring__buffer.html#a4a2abcc16c769e390ed5fc16b320cce7" title="Construct iterator at begin.">begin()</a>, <a class="el" href="classring__buffer.html#ab057216d2bd4ad43454758fb3eeed319" title="Construct iterator at end.">end()</a>) == <a class="el" href="classring__buffer.html#aca0782fc0b1264ff01c5ffbe199423a5" title="Gets the size of the container.">size()</a>. </dd></dl>
 <dl class="section note"><dt>Note</dt><dd>Allocates memory for count + allocBuffer elements. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory available for allocation. </td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor. </td></tr>
     <tr><td class="paramname">If</td><td>any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).</td></tr>
   </table>
   </dd>
@@ -526,17 +526,17 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Custom constructor. Initializes a buffer to a capacity without constructing any elemen. </p>
+<p>Custom constructor. Initializes a buffer with count amount of default constructed value_type elements. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">capacity</td><td>Capacity of the buffer. </td></tr>
+    <tr><td class="paramname">count</td><td>amount of default constructed value_type elements. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>T must satisfy DefaultInsertable. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor. </td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc if there is not enough memory available for allocation, or some exception from T's constructor. </td></tr>
     <tr><td class="paramname">If</td><td>any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).</td></tr>
   </table>
   </dd>
@@ -600,8 +600,8 @@ template&lt;typename InputIt , typename  = std::enable_if_t&lt;std::is_convertib
 <dl class="section pre"><dt>Precondition</dt><dd>valye_type must satisfy CopyInsertable. InputIt must be deferencable to value_type, and incrementing rangeBegin (repeatedly) must reach rangeEnd. Otherwise behaviour is undefined. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory available for allocation, or something from T's constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is thrown the buffer will be in a valid but unexpected state. (Basic exception guarantee).</td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc, or something from T's CopyConstructor if not NoThrowCopyConstructible. </td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown no memory is leaked and program remains in a valid state. (Basic exception guarantee).</td></tr>
   </table>
   </dd>
 </dl>
@@ -645,11 +645,11 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="section pre"><dt>Precondition</dt><dd>T must satisfy CopyInsertable. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory for allocation. </td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc, or something from T's CopyConstructor if not NoThrowCopyConstructible. </td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown no memory is leaked and program remains in a valid state. (Basic exception guarantee).</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Allocates memory for 2 extra elements.</dd></dl>
 <p>Linear complexity in relation to initializer list size (O(n)). </p>
 
 </div>
@@ -688,10 +688,10 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
   </dd>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>T must meet CopyInsertable. </dd></dl>
-<dl class="section post"><dt>Postcondition</dt><dd>this == <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing std::container with support for queue,...">ring_buffer(rhs)</a>. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>this == <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing circular AllocatorAware std::container with support for q...">ring_buffer(rhs)</a>. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory for memory allocation, or something from value_types constructor. @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).</td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc, or something from T's CopyConstructor if not NoThrowCopyConstructible. @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).</td></tr>
   </table>
   </dd>
 </dl>
@@ -744,10 +744,10 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
   </dd>
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>T must meet CopyInsertable. </dd></dl>
-<dl class="section post"><dt>Postcondition</dt><dd>this == <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing std::container with support for queue,...">ring_buffer(rhs)</a> but with a different allocator. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>this == <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing circular AllocatorAware std::container with support for q...">ring_buffer(rhs)</a> but with a different allocator. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory for memory allocation, or something from value_types constructor. @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).</td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc, or something from T's CopyConstructor if not NoThrowCopyConstructible. @except If any exception is thrown, invariants are preserved.(Basic Exception Guarantee).</td></tr>
   </table>
   </dd>
 </dl>
@@ -784,17 +784,16 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <p>Move constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>Rvalue reference to other buffer. </td></tr>
+    <tr><td class="paramname">other</td><td>Rvalue reference to other buffer.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>value_type must resolve std::is_nothrow_move_constructible&lt;value_type&gt;::value to true. Otherwise function does nothing.</dd></dl>
-<p>Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant. </p>
+<p>Constant complexity. </p>
 
 </div>
 </div>
-<a id="a1e08915585f59f203e3d4ff5ce3cc723"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1e08915585f59f203e3d4ff5ce3cc723">&#9670;&nbsp;</a></span>ring_buffer() <span class="overload">[10/10]</span></h2>
+<a id="ac2bcb469aba7cabbc293495eea355e6d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2bcb469aba7cabbc293495eea355e6d">&#9670;&nbsp;</a></span>ring_buffer() <span class="overload">[10/10]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -824,7 +823,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">noexcept</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
@@ -833,18 +832,17 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">other</td><td>Rvalue reference to other buffer. </td></tr>
-    <tr><td class="paramname">alloc</td><td>Allocator for the new ring buffer. </td></tr>
+    <tr><td class="paramname">alloc</td><td>Allocator for the new ring buffer.</td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>value_type must resolve std::is_nothrow_move_constructible&lt;value_type&gt;::value to true. Otherwise function does nothing.</dd></dl>
-<p>Linear complexity in relation to buffer size, unless other's allocator compares equal or is propagated on move assignment, then complexity is Constant. </p>
+<p>Linear complexity in relation to buffer size. </p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="aacccdd4522868dc3549ac9c7c0bed128"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aacccdd4522868dc3549ac9c7c0bed128">&#9670;&nbsp;</a></span>assign() <span class="overload">[1/3]</span></h2>
+<a id="ae747ef0e5bac6c9ee2eb4c3e7b728588"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae747ef0e5bac6c9ee2eb4c3e7b728588">&#9670;&nbsp;</a></span>assign() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -863,7 +861,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">value_type&#160;</td>
+          <td class="paramtype">const value_type &amp;&#160;</td>
           <td class="paramname"><em>value</em>&#160;</td>
         </tr>
         <tr>
@@ -892,11 +890,11 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc or from value_types constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is throw, invariants are preserved (Basic Exception Guarantee).</td></tr>
+    <tr><td class="paramname">If</td><td>any exception is throw, no memory is leaked but buffer will be in valid but unexpected state (Basic Exception Guarantee). If more memory is allocated and exception is thrown, function has no effect (Strong exception guarantee)</td></tr>
   </table>
   </dd>
 </dl>
-<p>Linear Complexity in relation to ranges size (O(n * 2) from linear clear and linear construction). </p><dl class="section note"><dt>Note</dt><dd>Destroys all elements in the buffer before constructing the assigned elements. </dd></dl>
+<p>Linear Complexity. Calls destructor for each element in buffer and amount times values constructor. </p>
 
 </div>
 </div>
@@ -950,12 +948,12 @@ template&lt;typename InputIt &gt; </div>
 <dl class="section post"><dt>Postcondition</dt><dd>All existing references, pointers and iterators are to be considered invalid. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Can</td><td>throw std::bad_alloc or from value_types constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is throw, invariants are preserved (Basic Exception Guarantee).</td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc or something from value_types constructor if not nothrow. </td></tr>
+    <tr><td class="paramname">If</td><td>any exception is throw, no memory is leaked but buffer will be in valid but unexpected state (Basic Exception Guarantee). If more memory is allocated, in case of any exception the function does nothing (Strong Exception Guarantee)</td></tr>
   </table>
   </dd>
 </dl>
-<p>Linear Complexity in relation to ranges size (O(n * 2) from linear clear and linear construction). </p><dl class="section note"><dt>Note</dt><dd>Destroys all elements in the buffer before constructing the assigned elements. </dd></dl>
+<p>Linear Complexity. Calls destructor for each element in buffer and CopyConstructor for the assigned range. </p>
 
 </div>
 </div>
@@ -985,23 +983,23 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Replaces the elements in the buffer. </p>
+<p>Replaces the elements in the buffer with copy of the initializer list. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">list</td><td>Initializer list containing the elements to replace the existing ones. </td></tr>
+    <tr><td class="paramname">list</td><td>Source of elements to assign. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>value_type is CopyInsertable. List does not contain elements of *this. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>value_type is CopyInsertable. </dd></dl>
 <dl class="section post"><dt>Postcondition</dt><dd>All existing references, pointers and iterators are to be considered invalid. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Can</td><td>throw std::bad_alloc or from value_types constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is throw, invariants are preserved (Basic Exception Guarantee).</td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc or something from value_types constructor if not nothrow. </td></tr>
+    <tr><td class="paramname">If</td><td>any exception is throw, no memory is leaked but buffer will be in valid but unexpected state (Basic Exception Guarantee). If more memory is allocated, in case of any exception the function does nothing (Strong Exception Guarantee)</td></tr>
   </table>
   </dd>
 </dl>
-<p>Linear Complexity in relation to ranges size (O(n * 2) from linear clear and linear construction). </p><dl class="section note"><dt>Note</dt><dd>Destroys all elements in the buffer before constructing the assigned elements. </dd></dl>
+<p>Linear Complexity. Calls destructor for each element in buffer and CopyConstructor for each element in the list. </p>
 
 </div>
 </div>
@@ -1435,7 +1433,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc. </td></tr>
-    <tr><td class="paramname">If</td><td>T's Move (or copy) constructor is not noexcept and throws, behaviour is undefined. Otherwise if exceptions are thrown (std::bad_alloc) this function has no effect (Strong exception guarantee). </td></tr>
+    <tr><td class="paramname">If</td><td>T's Move (or copy in case T does not provide Move Semantics) constructor throws, behaviour is undefined. Otherwise if exceptions are thrown (std::bad_alloc) this function has no effect (Strong exception guarantee). </td></tr>
   </table>
   </dd>
 </dl>
@@ -1485,22 +1483,22 @@ template&lt;class... Args&gt; </div>
 <p>Construct an element in place from arguments. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pos</td><td>Iterator pointing to the element where the new element will be constructed. </td></tr>
+    <tr><td class="paramname">pos</td><td>Iterator before which the new element will be constructed. </td></tr>
     <tr><td class="paramname">args</td><td>Argument pack containing arguments to construct value_type element. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns an iterator pointing to the element constructed from args. </dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>T must meet EmplaceConstructible. </dd></dl>
-<dl class="section post"><dt>Postcondition</dt><dd>returned iterator points at the element constructed from args. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>T must meet EmplaceConstructible, MoveAssignalbe and MoveInsertable. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>Iterators, pointers and references are invalidated after the emplace point. If more memory is allocated, pointers and references to all elements are invalidated. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element. Additionally, rotate can throw bad_alloc and if T does not provide a noexcept move semantics. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is thrown, invariants are preserved. (Basic exception guarantee).</td></tr>
+    <tr><td class="paramname">If</td><td>T's CopyConstructor is NoThrow then in case of any exception invariants are preserved. (Basic exception guarantee). If T's construction throws the behavior is undefined.</td></tr>
   </table>
   </dd>
 </dl>
-<p>Amortized constant complexity. </p>
+<p>Amortized linear complexity in relation to distance from pos to <a class="el" href="classring__buffer.html#ab057216d2bd4ad43454758fb3eeed319" title="Construct iterator at end.">end()</a>. </p>
 
 </div>
 </div>
@@ -1543,7 +1541,7 @@ template&lt;class... Args&gt; </div>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is thrown, invariants are preserved. (Basic exception guarantee).</td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown, function has no effect. (Strong exception guarantee).</td></tr>
   </table>
   </dd>
 </dl>
@@ -1590,7 +1588,7 @@ template&lt;class... Args&gt; </div>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc if memory is allocated. Can also throw from T's constructor when constructing the element. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is thrown, invariants are preserved. (Basic exception guarantee).</td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown, function has no effect. (Strong exception guarantee).</td></tr>
   </table>
   </dd>
 </dl>
@@ -1740,7 +1738,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Possibly</td><td>throws from value_types move/copy assignment operator if last != <a class="el" href="classring__buffer.html#ab057216d2bd4ad43454758fb3eeed319" title="Construct iterator at end.">end()</a>. </td></tr>
-    <tr><td class="paramname">If</td><td>value_type is nothrow_move_constructible and nothrow_move_assignable function is noexcept. Otherwise provides no exception guarantee at all.</td></tr>
+    <tr><td class="paramname">If</td><td>value_type is nothrow_move_constructible and nothrow_move_assignable function is noexcept. Otherwisde provides no exception guarantee at all.</td></tr>
   </table>
   </dd>
 </dl>
@@ -1886,8 +1884,8 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 
 </div>
 </div>
-<a id="a36dccabe03199fe8f651cdeb92ec36aa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a36dccabe03199fe8f651cdeb92ec36aa">&#9670;&nbsp;</a></span>insert() <span class="overload">[1/5]</span></h2>
+<a id="ae2d9f8150e7762f6661154d0e37dc6ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae2d9f8150e7762f6661154d0e37dc6ca">&#9670;&nbsp;</a></span>insert() <span class="overload">[1/5]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1907,7 +1905,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const size_type&#160;</td>
-          <td class="paramname"><em>amount</em>, </td>
+          <td class="paramname"><em>count</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1932,20 +1930,21 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pos</td><td>Iterator where the the element should be inserted </td></tr>
-    <tr><td class="paramname">value</td><td>Value to insert. T must meet the requirements of CopyInsertable. </td></tr>
+    <tr><td class="paramname">count</td><td>Amount of T elements to be inserted. </td></tr>
+    <tr><td class="paramname">value</td><td>Value to insert. </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section pre"><dt>Precondition</dt><dd>T must meet the requirements of CopyInsertable. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Iterator that pos to the inserted element. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Internally calls insertBase. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc, or something from T's move/copy constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is thrown, invariants are retained. (Basic Exception guarantee).</td></tr>
+    <tr><td class="paramname">Might</td><td>throw std::bad_alloc, or something from T's copy constructor if not NoThrow. </td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown, the function does nothing (Strong exception guarantee).</td></tr>
   </table>
   </dd>
 </dl>
-<p>Linear Complexity in relation to amount of inserted elements. </p>
+<p>Linear complexity in relation to buffer size and inserted elements. O(n). </p>
 
 </div>
 </div>
@@ -1993,16 +1992,16 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Iterator that points to the inserted element. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Internally calls insertBase. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>iterator pointing to the inserted value. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>T must meet CopyInsertable. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc, or something from T's move/copy constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is thrown, invariants are retained. (Basic Exception guarantee).</td></tr>
+    <tr><td class="paramname">Might</td><td>throw std::bad_alloc, or something from T's copy constructor if not NoThrow. </td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown, the function does nothing (Strong exception guarantee).</td></tr>
   </table>
   </dd>
 </dl>
-<p>Linear Complexity in relation to amount of inserted elements. </p>
+<p>Linear complexity in relation to buffer size and inserted elements. O(n). </p>
 
 </div>
 </div>
@@ -2059,23 +2058,22 @@ template&lt;typename InputIt &gt; </div>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">pos</td><td>Iterator to the position where range will be inserted to. </td></tr>
+    <tr><td class="paramname">pos</td><td>A valid dereferenceable iterator to the position where range will be inserted to. </td></tr>
     <tr><td class="paramname">sourceBegin</td><td>Iterator to first element of the range. </td></tr>
     <tr><td class="paramname">sourceEnd</td><td>Iterator past the last element of the range. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns an iterator to an element in the buffer which is copy of the first element in the range. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Internally calls insertRangeBase. </dd></dl>
-<dl class="section pre"><dt>Precondition</dt><dd>pos must be a valid dereferenceable iterator within the container. Iterators must point to elements that are implicitly convertible to value_type. Otherwise behavior is undefined. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>T must meet requirements of CopyInsertable. Iterators must point to elements that are implicitly convertible to value_type and sourceEnd must be reachable from sourceBegin. Otherwise behavior is undefined. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Can</td><td>throw std::bad_alloc and something from value_types constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee)</td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc or something from value_types constructor and iterator operations. </td></tr>
+    <tr><td class="paramname">If</td><td>any exceptiong is thrown, the function does nothing (Strong exception guarantee).</td></tr>
   </table>
   </dd>
 </dl>
-<p>Amortized linear complexity in relation to range size. </p>
+<p>Linear complexity in relation to buffer size and inserted elements. O(n). </p>
 
 </div>
 </div>
@@ -2125,15 +2123,14 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </dl>
 <dl class="section pre"><dt>Precondition</dt><dd>pos must be a valid dereferenceable iterator within the container. Otherwise behavior is undefined. </dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>Returns Iterator to the first element inserted, or the element pointed by pos if the initializer list was empty. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Internally calls insertRangeBase. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc and something from value_types constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exceptiong is thrown, invariants are retained (Basic Excpetion guarantee)</td></tr>
+    <tr><td class="paramname">If</td><td>any exceptiong is thrown, the function does nothing (Strong exception guarantee).</td></tr>
   </table>
   </dd>
 </dl>
-<p>Amortized linear complexity in relation to range size. </p>
+<p>Linear complexity in relation to buffer size and inserted elements. O(n). </p>
 
 </div>
 </div>
@@ -2182,15 +2179,15 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Iterator that pos to the inserted element. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>Internally calls insertBase. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>T must meet MoveInsertable. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Might</td><td>throw std::bad_alloc, or something from T's move/copy constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is thrown, invariants are retained. (Basic Exception guarantee).</td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown, the function does nothing (Strong exception guarantee).</td></tr>
   </table>
   </dd>
 </dl>
-<p>Linear Complexity in relation to amount of inserted elements. </p>
+<p>Linear complexity in relation to buffer size and inserted elements. O(n). </p>
 
 </div>
 </div>
@@ -2254,20 +2251,21 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <p>Copy assignment operator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>Ringbuffer to be copied. </td></tr>
+    <tr><td class="paramname">other</td><td>Ringbuffer to be copy assigned. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Returns reference to the left hand side RungBuffer after swap. </dd></dl>
-<dl class="section post"><dt>Postcondition</dt><dd>*this == other.</dd></dl>
-<p>Constant complexity. </p><dl class="exception"><dt>Exceptions</dt><dd>
+<dl class="section return"><dt>Returns</dt><dd>Returns reference to the assignment target container. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>*this == other. All iterators, pointers and references of the target container should be considered invalid. Does not guarantee that target containers capacity equals the original. </dd></dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc or something from value_types constructor. </td></tr>
-    <tr><td class="paramname">If</td><td>any exception is thrown, this function has no effect (Strong Exception Guarantee).</td></tr>
+    <tr><td class="paramname">If</td><td>any exception is thrown, invariants are retained and no memory is leaked (Basic Exception Guarantee).</td></tr>
   </table>
   </dd>
 </dl>
-<p>Linear complexity in relation to buffer size. </p>
+<p>Linear complexity in relation to buffer size. <br  />
+ </p>
 
 </div>
 </div>
@@ -2309,7 +2307,7 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <dl class="section return"><dt>Returns</dt><dd>Reference to the buffer to move from. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">If</td><td>value_type is not MoveConstructible, and value_type provides a throwing CopyConstructor is used this function has undefined behaviour.</td></tr>
+    <tr><td class="paramname">If</td><td>value_type is not MoveConstructible, and if value_type provides a throwing CopyConstructor this function has undefined behaviour.</td></tr>
   </table>
   </dd>
 </dl>
@@ -2524,30 +2522,24 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory. </p>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory for allocation. </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>Inserts an element in the back of the buffer. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">val</td><td>Value of type T to be appended. </td></tr>
+    <tr><td class="paramname">val</td><td>Value of T to be appended. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Allocates memory before the insertion if the buffer would be full after the operation. </dd></dl>
+<dl class="section note"><dt>Note</dt><dd>If buffer would get full after the operation, allocates more memory. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">Can</td><td>throw std::bad_alloc. </td></tr>
-    <tr><td class="paramname">If</td><td>the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function retains invariants (Basic Exception Guarantee). </td></tr>
+    <tr><td class="paramname">If</td><td>the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function has no effect (Strong Exception Guarantee). </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>value_type needs to satisfy CopyInsertable. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>value_type must satisfy CopyInsertable. </dd></dl>
 <dl class="section post"><dt>Postcondition</dt><dd>If more memory is allocated all pointers, iterators and references are invalidated.</dd></dl>
-<p>Constant complexity. </p>
+<p>Amoprtized constant complexity. </p>
 
 </div>
 </div>
@@ -2577,24 +2569,24 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Inserts an element in the back of the buffer by move if move constructor is provided for value_type. If buffer would get full after the operation, allocates more memory. </p>
+<p>Inserts an element in the back of the buffer by move if move constructor is provided for value_type. </p>
+<dl class="section note"><dt>Note</dt><dd>If buffer would get full after the operation more memory is allocated. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">val</td><td>Rvalue reference to the value to be appended. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Allocates memory before the insertion if the buffer would be full after the operation. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Can</td><td>throw std::bad_alloc if more memory is allocated. </td></tr>
-    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function retains invariants (Basic Exception Guarantee). </td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc. </td></tr>
+    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function has no effect (Strong Exception Guarantee). </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>value_type needs to satisfy MoveInsertable or CopyInsertable. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>value_type needs to satisfy MoveInsertable. </dd></dl>
 <dl class="section post"><dt>Postcondition</dt><dd>If more memory is allocated all pointers, iterators and references are invalidated.</dd></dl>
-<p>Constant complexity. </p>
+<p>Amortized constant complexity. </p>
 
 </div>
 </div>
@@ -2624,27 +2616,29 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Inserts an element in the back of the buffer. If buffer would get full after the operation, allocates more memory. </p>
+<p>Inserts an element in the back of the buffer. </p>
+<dl class="section note"><dt>Note</dt><dd>If buffer would get full after the operation, function allocates more memory. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory for allocation. </td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">val</td><td>Element to insert. Needs to be CopyConstructible. </td></tr>
+    <tr><td class="paramname">val</td><td>Element to insert. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>All iterators are invalidated. If allocation happens, all pointers and references are invalidated. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>T must satisfy CopyInsertable. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>All iterators are invalidated. If more memory is allocated, all pointers and references are invalidated. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of exception this function retains invariants (Basic Exception Guarantee).</td></tr>
+    <tr><td class="paramname">If</td><td>the copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function has no effect (Strong Exception Guarantee).</td></tr>
   </table>
   </dd>
 </dl>
-<p>Constant complexity. </p>
+<p>Amortized constant complexity. </p>
 
 </div>
 </div>
@@ -2674,10 +2668,11 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p>Inserts an element in the back of the buffer by move if move constructor is provided by value_type. If buffer would get full after the operation, allocates more memory. </p>
+<p>Inserts an element in the back of the buffer by move if move constructor is provided by value_type. </p>
+<dl class="section note"><dt>Note</dt><dd>If buffer would get full after the operation, allocates more memory. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">Might</td><td>throw std::bad_alloc if there is not enough memory for allocation. </td></tr>
+    <tr><td class="paramname">Can</td><td>throw std::bad_alloc. </td></tr>
   </table>
   </dd>
 </dl>
@@ -2687,15 +2682,15 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
   </table>
   </dd>
 </dl>
-<dl class="section pre"><dt>Precondition</dt><dd>value_type needs to satisfy MoveInsertable or CopyInsertable. </dd></dl>
-<dl class="section note"><dt>Note</dt><dd>All iterators are invalidated. If allocation happens, all pointers and references are invalidated. </dd></dl>
+<dl class="section pre"><dt>Precondition</dt><dd>value_type needs to satisfy MoveInsertable. </dd></dl>
+<dl class="section post"><dt>Postcondition</dt><dd>All iterators are invalidated. If more memory is allocated, all pointers and references are invalidated. </dd></dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
-    <tr><td class="paramname">If</td><td>the move/copy constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function retains invariants (Basic Exception Guarantee).</td></tr>
+    <tr><td class="paramname">If</td><td>the move constructor of value_type throws, behaviour is undefined. Otherwise in case of any exception this function has no effect (Strong Exception Guarantee).</td></tr>
   </table>
   </dd>
 </dl>
-<p>Constant complexity. </p>
+<p>Amortized constant complexity. </p>
 
 </div>
 </div>
@@ -2984,11 +2979,12 @@ template&lt;typename T , typename Allocator  = std::allocator&lt;T&gt;&gt; </div
 <p>Member swap implementation. Swaps RingBuffers member to member. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">other</td><td>Reference to a <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing std::container with support for queue,...">ring_buffer</a> to swap with.</td></tr>
+    <tr><td class="paramname">other</td><td>Reference to a <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing circular AllocatorAware std::container with support for q...">ring_buffer</a> to swap with.</td></tr>
   </table>
   </dd>
 </dl>
-<p>Constant complexity. </p>
+<p>Constant complexity. </p><dl class="section note"><dt>Note</dt><dd>Requires allocator_type to return true_type from propagate_on_container_swap, otherwise memory operations <br  />
+ </dd></dl>
 
 </div>
 </div>

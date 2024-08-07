@@ -21,6 +21,9 @@ Inheritance diagram for ring\+\_\+buffer$<$ T, Allocator $>$\+::\+\_\+r\+Buf\+\_
 \mbox{\Hypertarget{classring__buffer_1_1__rBuf__iterator_a8e062b91a350605830107a21cdd7e6c0}\label{classring__buffer_1_1__rBuf__iterator_a8e062b91a350605830107a21cdd7e6c0}} 
 using {\bfseries iterator\+\_\+category} = std\+::random\+\_\+access\+\_\+iterator\+\_\+tag
 \item 
+\mbox{\Hypertarget{classring__buffer_1_1__rBuf__iterator_acf0d99e5b2f171f873049d9237466a57}\label{classring__buffer_1_1__rBuf__iterator_acf0d99e5b2f171f873049d9237466a57}} 
+using {\bfseries c\+\_\+iterator} = \mbox{\hyperlink{classring__buffer_1_1__rBuf__const__iterator}{\+\_\+r\+Buf\+\_\+const\+\_\+iterator}}$<$ \+\_\+r\+Buf $>$
+\item 
 \mbox{\Hypertarget{classring__buffer_1_1__rBuf__iterator_a31fd8fefaf968cfa8fd1131593ff7306}\label{classring__buffer_1_1__rBuf__iterator_a31fd8fefaf968cfa8fd1131593ff7306}} 
 using {\bfseries value\+\_\+type} = typename \+\_\+r\+Buf\+::value\+\_\+type
 \item 
@@ -222,7 +225,7 @@ Moves iterator forward.
 \hline
 \end{DoxyParams}
 \begin{DoxyNote}{Note}
-Moving the iterator beyond \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}} or \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} makes the iterator point to an invalid element.
+Moving the iterator beyond \mbox{\hyperlink{classring__buffer_a4a2abcc16c769e390ed5fc16b320cce7}{begin()}} or \mbox{\hyperlink{classring__buffer_ab057216d2bd4ad43454758fb3eeed319}{end()}} makes the iterator point to an invalid element (dereferencing is undefined behaviour).
 \end{DoxyNote}
 Constant complexity. \mbox{\Hypertarget{classring__buffer_1_1__rBuf__iterator_ab179b9c045939a05a8cf34ebee2f63fc}\label{classring__buffer_1_1__rBuf__iterator_ab179b9c045939a05a8cf34ebee2f63fc}} 
 \index{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_iterator$<$ \_rBuf $>$@{ring\_buffer$<$ T, Allocator $>$::\_rBuf\_iterator$<$ \_rBuf $>$}!operator-\/@{operator-\/}}

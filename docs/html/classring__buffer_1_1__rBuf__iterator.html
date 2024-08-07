@@ -94,6 +94,9 @@ Public Types</h2></td></tr>
 <tr class="memitem:a8e062b91a350605830107a21cdd7e6c0"><td class="memItemLeft" align="right" valign="top"><a id="a8e062b91a350605830107a21cdd7e6c0"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>iterator_category</b> = std::random_access_iterator_tag</td></tr>
 <tr class="separator:a8e062b91a350605830107a21cdd7e6c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf0d99e5b2f171f873049d9237466a57"><td class="memItemLeft" align="right" valign="top"><a id="acf0d99e5b2f171f873049d9237466a57"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>c_iterator</b> = <a class="el" href="classring__buffer_1_1__rBuf__const__iterator.html">_rBuf_const_iterator</a>&lt; _rBuf &gt;</td></tr>
+<tr class="separator:acf0d99e5b2f171f873049d9237466a57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31fd8fefaf968cfa8fd1131593ff7306"><td class="memItemLeft" align="right" valign="top"><a id="a31fd8fefaf968cfa8fd1131593ff7306"></a>
 using&#160;</td><td class="memItemRight" valign="bottom"><b>value_type</b> = typename _rBuf::value_type</td></tr>
 <tr class="separator:a31fd8fefaf968cfa8fd1131593ff7306"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -321,8 +324,8 @@ template&lt;class _rBuf &gt; </div>
 <p>Constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">container</td><td>Pointer to the <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing std::container with support for queue,...">ring_buffer</a> element which owns this iterator. </td></tr>
-    <tr><td class="paramname">index</td><td>Index pointing to the logical element of the <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing std::container with support for queue,...">ring_buffer</a>.</td></tr>
+    <tr><td class="paramname">container</td><td>Pointer to the <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing circular AllocatorAware std::container with support for q...">ring_buffer</a> element which owns this iterator. </td></tr>
+    <tr><td class="paramname">index</td><td>Index pointing to the logical element of the <a class="el" href="classring__buffer.html" title="Dynamic Ringbuffer is a dynamically growing circular AllocatorAware std::container with support for q...">ring_buffer</a>.</td></tr>
   </table>
   </dd>
 </dl>
@@ -544,7 +547,7 @@ template&lt;class _rBuf &gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="section note"><dt>Note</dt><dd>Moving the iterator beyond <a class="el" href="classring__buffer.html#a4a2abcc16c769e390ed5fc16b320cce7" title="Construct iterator at begin.">begin()</a> or <a class="el" href="classring__buffer.html#ab057216d2bd4ad43454758fb3eeed319" title="Construct iterator at end.">end()</a> makes the iterator point to an invalid element.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Moving the iterator beyond <a class="el" href="classring__buffer.html#a4a2abcc16c769e390ed5fc16b320cce7" title="Construct iterator at begin.">begin()</a> or <a class="el" href="classring__buffer.html#ab057216d2bd4ad43454758fb3eeed319" title="Construct iterator at end.">end()</a> makes the iterator point to an invalid element (dereferencing is undefined behaviour).</dd></dl>
 <p>Constant complexity. </p>
 
 </div>
