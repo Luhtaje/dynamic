@@ -834,10 +834,15 @@ public:
 
         iterator it(this, pos.getIndex());
 
+<<<<<<< HEAD
         //Construct temporary
         _alloc_temp<Allocator> tempObj (base::m_allocator, std::forward<Args>(args)...);
+=======
+        //Construct temporary. Constructed before container is changed in case it throws.
+        _alloc_temp<Allocator> tempObj (m_allocator, std::forward<Args>(args)...);
+>>>>>>> c4e2901 (small comments doc changes)
 
-        //Provide basic guarantee
+        //Provide basic guarantee. TODO provide strong guarantee to head and tail and optimize to move toward closer end.
         auto last = end();
         alloc_traits::construct(base::m_allocator, &*last, std::move(*(last - 1)));
         increment(m_headIndex);
@@ -1110,7 +1115,7 @@ public:
     }
 
     /// @brief Index operator.
-    /// @param logicalIndex Index of the element. If LogicalIndex >= size(), this function has undefined behavriour.
+    /// @param logicalIndex Index of the element. If LogicalIndex >= size(), this function has undefined behaviour.
     /// @details Constant complexity.
     /// @note The operator acts as interface that hides the physical memory layout from the user. Logical index neeeds to be added to internal tail index to get actual element address. 
     /// @return Returns a reference to the element.
@@ -1686,7 +1691,7 @@ private:
         return iterator(this, pos.getIndex());
     }
 
-    /// @brief Base function for erasing elements from the buffer. Erases always as a range.
+    /// @brief Base function for erasing elements from the buffer.
     /// @param first Iterator pointing to the first element of the range to erase.
     /// @param last Iterator pointing to past the last element to erase.
     /// @return Returns an iterator pointing to the element immediately after the erased elements.
