@@ -53,7 +53,10 @@ namespace
 
     };
 
-    //Base class that wraps memory allocation into an initialization (RAII).
+    
+}
+
+//Base class that wraps memory allocation into an initialization (RAII).
     template<typename T, typename Allocator = std::allocator<T>>
     struct ring_buffer_base {
 
@@ -94,7 +97,6 @@ namespace
 
         ring_buffer_base() { alloc_traits::deallocate(m_data, m_capacity); }
     };
-}
 
 // Forward declaration of _rBuf_const_iterator.
 template<class _rBuf>
@@ -1622,6 +1624,17 @@ private:
     template<typename U>
     iterator insertBase(const_iterator pos, const size_type count, U&& value)
     {
+        if (pos == end())
+        {
+            emplace_back(std::forward<U>(value));
+            return iterator(this, pos.getIndex());
+        }
+        else if (pos == begin())
+        {
+            emplace_front(std::forward<U>(value));
+            return iterator(this, pos.getIndex());
+        }
+
         base tempCore(base::m_allocator, base::m_capacity < size() + count + allocBuffer ? base::m_capacity * 3 / 2 : base::m_capacity);
         ring_buffer temp(std::move(tempCore));
 
