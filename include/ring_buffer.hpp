@@ -834,13 +834,8 @@ public:
 
         iterator it(this, pos.getIndex());
 
-<<<<<<< HEAD
         //Construct temporary
         _alloc_temp<Allocator> tempObj (base::m_allocator, std::forward<Args>(args)...);
-=======
-        //Construct temporary. Constructed before container is changed in case it throws.
-        _alloc_temp<Allocator> tempObj (m_allocator, std::forward<Args>(args)...);
->>>>>>> c4e2901 (small comments doc changes)
 
         //Provide basic guarantee. TODO provide strong guarantee to head and tail and optimize to move toward closer end.
         auto last = end();
