@@ -95,7 +95,7 @@ namespace
             std::swap(left.m_capacity, right.m_capacity);
         }
 
-        ring_buffer_base() { alloc_traits::deallocate(m_data, m_capacity); }
+        ~ring_buffer_base() { alloc_traits::deallocate(m_allocator, m_data, m_capacity); }
     };
 
 // Forward declaration of _rBuf_const_iterator.
@@ -1087,7 +1087,7 @@ public:
         {
             clear();
 
-            alloc_traits::uninitialized_move(other.begin(), other.end(), base::m_data);
+            _uninitialized_move(other.begin(), other.end(), base::m_data);
         }
         else
         {
