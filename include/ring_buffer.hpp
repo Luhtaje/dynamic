@@ -1635,29 +1635,49 @@ private:
             return iterator(this, pos.getIndex());
         }
 
-        base tempCore(base::m_allocator, base::m_capacity < size() + count + allocBuffer ? base::m_capacity * 3 / 2 : base::m_capacity);
-        ring_buffer temp(std::move(tempCore));
+        if (base::m_capacity < size() + count + allocBuffer)
+        {   
+            //Reallocate and move whole buffer. Strong guarantee
+            base tempCore(base::m_allocator, base::m_capacity * 3 / 2 );
+            ring_buffer temp(std::move(tempCore));
 
-        // Copy elements up to pos
-        std::uninitialized_copy(cbegin(), pos, temp.m_data);
-        temp.m_headIndex = std::distance(cbegin(), pos);
-        
-        // Insert the element(s)
-        for (size_type i = 0; i < count; i++)
-        {
-            alloc_traits::construct(temp.m_allocator, temp.m_data + temp.m_headIndex, std::forward<U>(value));
-            ++temp.m_headIndex;
+            // Copy elements up to pos
+            std::uninitialized_copy(cbegin(), pos, temp.m_data);
+            temp.m_headIndex = std::distance(cbegin(), pos);
+
+            // Insert the element(s)
+            for (size_type i = 0; i < count; i++)
+            {
+                alloc_traits::construct(temp.m_allocator, temp.m_data + temp.m_headIndex, std::forward<U>(value));
+                ++temp.m_headIndex;
+            }
+
+            // Copy elements after pos
+            std::uninitialized_copy(pos, cend(), temp.m_data + temp.m_headIndex);
+            temp.m_headIndex += std::distance(pos, cend());
+
+            // Swap whole buffer.
+            swap(temp);
+            return iterator(this, pos.getIndex());
         }
+        else
+        {
+        // Not at end, provide basic guarantee.
+            iterator it(this, pos.getIndex());
 
-        // Copy elements after pos
-        std::uninitialized_copy(pos, cend(), temp.m_data + temp.m_headIndex);
-        temp.m_headIndex += std::distance(pos, cend());
+            //Construct temporary
+            _alloc_temp<Allocator> tempObj(base::m_allocator, std::forward<U>(value));
 
-        // Swap whole buffer.
-        swap(temp);
+            //Provide basic guarantee. TODO optimize to move toward closer end.
+            auto last = end();
+            alloc_traits::construct(base::m_allocator, &*last, std::move(*(last - 1)));
+            increment(m_headIndex);
+            std::move_backward(it, last - 1, last);
 
-        return iterator(this, pos.getIndex());
+            *it = std::move(tempObj._getValue());
 
+            return it;
+        }
     }
 
     /// @brief Base function for inserting elements from a range of [rangeBegin, rangeEnd).
